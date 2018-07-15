@@ -1,10 +1,10 @@
 # Site settings
 title: Max Blog
-SEOTitle: 王维的博客 | Max Blog
+SEOTitle: Max Blog
 header-img: img/post-header-work-man.png
 email: viywang@gmail.com
 description: "Keep self busy."
-keyword: "Max Blog, 王维"
+keyword: "Max Blog"
 url: "http://VVViy.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/VVViy/VVViy.github.io.git" # you code repository
@@ -94,16 +94,8 @@ service-worker: true
 # Friends
 #friends: [
 #    {
-#        title: "WY",
-#        href: "http://zhengwuyang.com"
-#    },{
-#        title: "简书·BY",
-#        href: "http://www.jianshu.com/u/e71990ada2fd"
-#    },{
 #        title: "Apple",
 #        href: "https://apple.com"
 #    },{
-#        title: "Apple Developer",
-#        href: "https://developer.apple.com/"
 #    }
 #]
