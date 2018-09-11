@@ -11,7 +11,7 @@ github_repo: "https://github.com/VVViy/VVViy.github.io.git" # you code repositor
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "To be a soldier with weapons."
+sidebar-about-description: "It's not the gods' thing, it's people."
 sidebar-avatar: /img/avatar-max.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
