@@ -48,24 +48,19 @@ highlighter: rouge
 kramdown:
   input: GFM                            # use Github Flavored Markdown !important
 
-
-
-# 评论系统
 # Disqus（https://disqus.com/）
 # disqus_username: qiubaiying
 
 # Gitalk
 gitalk:
-  enable: true    #是否开启Gitalk评论
-  clientID: 683b5d989f59724115c3                           #生成的clientID
-  clientSecret: 48f283e00ce9135b8c6540597a23fa87d1c51c04   #生成的clientSecret
-  repo: VVViy.github.io    #仓库名称
-  owner: VVViy    #github用户名
+  enable: true    
+  clientID: 683b5d989f59724115c3                           
+  clientSecret: 48f283e00ce9135b8c6540597a23fa87d1c51c04   
+  repo: VVViy.github.io   
+  owner: VVViy    
   admin: VVViy
-  distractionFreeMode: true #是否启用类似FB的阴影遮罩
+  distractionFreeMode: true 
 
-
-# 统计
 
 # Analytics settings
 # Baidu Analytics
@@ -73,15 +68,15 @@ ba_track_id: dc6952b6bed2215a315af325680caedf
 
 # Google Analytics
 ga_track_id: 'UA-122325447-1'            # Format: UA-xxxxxx-xx
-ga_domain: auto              # 默认的是 auto, 这里我是自定义了的域名，你如果没有自己的域名，需要改成auto
+ga_domain: auto             
 
 
 
 
 
 # Featured Tags
-featured-tags: true                     # 是否使用首页标签
-featured-condition-size: 1              # 相同标签数量大于这个数，才会出现在首页
+featured-tags: true                    
+featured-condition-size: 1
 
 
 
