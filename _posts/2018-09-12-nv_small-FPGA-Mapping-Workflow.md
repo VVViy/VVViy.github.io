@@ -4,7 +4,7 @@ title:      nv_small FPGA Mapping Workflow
 subtitle:   part I: Vivado project
 date:       2018-09-12
 author:     Max
-header-img: 
+header-img: img/post-bg-ios9-web.jpg
 catalog: true
 tags:
     - NVDLA
@@ -105,77 +105,4 @@ tags:
 	```	
 		//add these code to NV_nvdla module
 		assign m_axi_awsize  = 3;
-		assign m_axi_awburst = 2'b01;
-		assign m_axi_awlock  = 1'b0;
-		assign m_axi_awcache = 4'b0010;
-		assign m_axi_awprot  = 3'h0;
-		assign m_axi_awqos   = 4'h0;
-		assign m_axi_awuser  = 'b1;
-		assign m_axi_wuser   = 'b0;
-		assign m_axi_arsize  = 3;
-		assign m_axi_arburst = 2'b01;
-		assign m_axi_arlock  = 1'b0;
-		assign m_axi_arcache = 4'b0010;
-		assign m_axi_arprot  = 3'h0;
-		assign m_axi_arqos   = 4'h0;
-		assign m_axi_aruser  = 'b1;
-
-		//add below code to NV_NVDLA_apb2csb module
-		assign pslverr = 1'b0;
-	```
-
-	**Tips** : 正常来说，添加如上信号便可以在BD工程中建立连接了，但是在仅作如上修改的情况下，在BD工程中必须要使用AXI smartconnect做PL和PS的接口互连，如果想使用AXI interconnect或干脆直接将NVDLA master与PS slave互连，还要进一步修改如下信号位宽,否则，BD工程在`validate`的时候会报错
-
-	```
-		//modify following signal bit width in NV_nvdla module
-		
-		//input [7:0] 	  nvdla_core2dbb_b_bid;
-		input [5:0] 	  nvdla_core2dbb_b_bid;
-		//input [7:0] 	  nvdla_core2dbb_r_rid;
-		input [5:0] 	  nvdla_core2dbb_r_rid;
-		//output [7:0] 	  nvdla_core2dbb_aw_awid;
-		output [5:0] 	  nvdla_core2dbb_aw_awid;
-		//output [3:0] 	  nvdla_core2dbb_aw_awlen;
-		output [7:0] 	  nvdla_core2dbb_aw_awlen;
-		//output [7:0] 	  nvdla_core2dbb_ar_arid;
-		output [5:0] 	  nvdla_core2dbb_ar_arid;
-		//output [3:0] 	  nvdla_core2dbb_ar_arlen;
-		output [7:0] 	  nvdla_core2dbb_ar_arlen;
-	```
-
-	实际上，所有的*_id signal只有后4位work. 另外，不要忘了在NV_nvdla module的NV_NVDLA_partition_o u_partition_o{...}实例中修改相应信号位宽，这里就不写了.
-	3. <required> 添加xdc，新建两个xdc文件，一个为IP在OOC综合时使用，另一个则是在global syth时使用，OOC xdc可以直接约束两个primary clk，如
-
-	```
-		create_clock -period 10.001 -name u_dla_core_clk [get_ports u_dla_core_clk];
-		create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
-	```
-
-	另一个xdc保持空白就行，这里涉及到了一个xdc的scope问题，感兴趣的可以参考Xilinx的UG903.除此之外，在`source`窗口选中OOC版本的xdc，在属性窗口的`USED_IN`属性里添加`out-of-context`选项，选中另一版本xdc，在属性窗口中为`PROCESSING_ORDER`属性选择`LATE`.
-
-	4. <required> 封装nvdla IP，Tools-->Create and Package New IP-->Package your current project, next and finish;
-	5. <required> AXI master interface推断，点击`Ports and Interfaces`，查看是否有自动推断出的master接口，若没有，选择全部master接口信号，右键选择`Auto Infer Interface`，Fig-1, 推断出master接口信号后，需要检查位宽是否与源文件中一致(之前出现过标量矢量化的情况)，即`Size Left`，`Size Right`，另外，检查`Driver Value`，Fig-2, 若官方源码中的信号驱动强度为0，则选中该信号，在属性窗口删除0值；对后添加的master信号，将驱动强度设置为0；
-	
-	![Interface part](img/blog#1-#1.JPG)
-	Fig-1
-
-	![Width and Driver](img/blog#1-#2.JPG)
-	Fig-2
-
-	6. <required> APB slave interface推断,这个接口不会自动推断，需要选中全部APB信号，右键自动推断，在弹出窗口中依次选择`Advanced`-->`apb_rtl`, 推断出AXI和APB信号后，右键两个接口信号，选择`Associate Clocks`，分别关联两个clk即可，若core和csb跑异步时钟，那么AXI关联core clk，APB关联csb clk；
-	7. <required> APB memory map, 因为AXI/APB master-slave接口是memory-map机制做数据映射的，我画了一个简图Fig-3，而不同于AXI memory block的自动生成，APB memory block需要额外添加，选择`Addressing and Memory`-->`Memory Maps(for slaves)`，右键`IP Addressing and Memory Wizard`选择APB接口信号，继续右键`Add Address Block`(一块连续地址，一个block便可)，如Fig-4；
-
-	![Memory map](img/blog#1-#3.JPG)
-	Fig-3
-
-	![Address block](img/blog#1-#4.JPG)
-	Fig-4
-
-	8. <required> `Review and Package` -->`Package IP`.
-# step 4: 新建BD工程 (Win10)
-	1. <required> 新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的IP(nvdla_ip_prj_name.srcs)添加到IP列表，新建BD工程`Flow Navigator`-->`Create Block Design`；
-	2. <required> 添加ps，nvdla ip，axi apb bridge，axi interconnect等ip，ps要配置master，slave以及PL-PS中断接口，之后连接接口即可；
-	3. <required> 添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
-
-# step 5: [optional] 测试, Vivado+SDK/VIP.
-
+		assign m_axi_awburst = 2
