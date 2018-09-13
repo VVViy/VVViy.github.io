@@ -27,8 +27,8 @@ tags:
   (不同版本petalinux的linux kernel版本不同，从而DMA API不同，导致对nvdla/sw/kmd驱动源码的修改方式有些区别).
 * Board: Xilinx zcu102 rev1.0
 
-### Step 1: build tree and vmod (Linux)
-官方HW工程是通过在branch/spec/defs/下定义不同的spec来对相同源码构建不同的行为模型架构，所以，源码内部有很多的C++和perl相关的条件编译。因此，在搭建vivado工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将nv_small/vmod/nvdla编译为纯RTL code.
+### Step 1: Build tree and vmod (Linux)
+官方HW工程是通过在branch/spec/defs/下定义不同的spec来对相同源码构建不同的行为模型架构，所以，源码内部有很多的c++和perl相关的条件编译。因此，在搭建vivado工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将nv_small/vmod/nvdla编译为纯RTL source code.
 
 **====Tips====** 
 
@@ -49,28 +49,28 @@ CPAN > install YAML
 CPAN > exit
 ```
 
-成功`[TMAKE]:DONE`后，在目录下会生成一个`outdir`目录，目录下便是搭建vivado所需的全部code.
+成功`[TMAKE]:DONE`后，在目录下会生成一个`outdir`目录，目录下便是搭建vivado所需的全部RTL code.
 
 
 ### step 2: 新建RTL工程 (Win10)
-1. <requied> 添加源文件，可按照nv_small/spec/defs/nv_small.spc指定vmod/nvdla/下待添加的内核源文件————small版本不包含bdma，retiming和rubik内核(文件夹)以及其他文件夹中的部分.v————实际，可先添加top文件下的modules，之后，vivado显示的hierarchy中缺少什么文件，加之即可;
+1. <requied> 添加源文件，可按照nv_small/spec/defs/nv_small.spec描述来指定vmod/nvdla/下待添加的内核源文件————small版本不包含bdma，retiming和rubik内核(文件夹)以及其他文件夹中的部分.v————实际中，可先添加top文件下的modules，之后，vivado显示的hierarchy中缺少什么文件，加之即可;
 
-2. <requied> 添加RAM文件时，要选择*outdir/nv_small/vmod/rams/fpga/small_rams/*文件夹下的RAM源文件;
+2. <requied> 添加RAM文件时，要选择`outdir/nv_small/vmod/rams/fpga/small_rams/`文件夹下的RAM源文件;
 
 **====Tips====** 
 
-    1). Xilinx RAM资源的使用有4种方式---flexibility依次递减---i)源码推断, ii)XPMs, iii)直接例化RAM primitive, 
+    1). Xilinx RAM资源的使用有4种基本方式————flexibility依次递减————i)源码推断, ii)XPMs, iii)直接例化8k/16k RAM primitives, 
         iv)例化RAM IP.
 	
     2). 待全部缺失文件补全后，可能会发现在`NV_nvdla` hierarchy以外，还存在一些modules，这个是因为一个文件中定义了多个
         modules，可以将未用到的modules comment掉.
 	
-3. <requied> 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，且buffer资源有限，若不关闭gating，有很大skew(之前因为部分gating未关闭，测试一直不过)；使用到开关宏包括以下4个，我是定义了一个.vh文件，定义了这些宏，然后将头文件include到指定.v文件；之前使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，用notepad++处理，倒是还可以，大家自行处理;
+3. <requied> 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，且buffer资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
 
-	- VLIB_BYPASS_POWER_CG
-	- NV_FPGA_FIFOGEN
-	- FIFOGEN_MASTER_CLK_GATING_DISABLED
-	- FPGA
+	* VLIB_BYPASS_POWER_CG
+	* NV_FPGA_FIFOGEN
+	* FIFOGEN_MASTER_CLK_GATING_DISABLED
+	* FPGA
 
 **====Tips====** 
 
