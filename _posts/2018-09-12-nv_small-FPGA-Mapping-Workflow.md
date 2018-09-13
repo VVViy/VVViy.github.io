@@ -175,7 +175,7 @@ create_clock -period 10.001 -name u_dla_core_clk [get_ports u_dla_core_clk];
 create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 ```
 
-另一个xdc保持空白就行，这里涉及到了一个xdc的scope问题，感兴趣的可以参考Xilinx的UG903.除此之外，在`source`窗口选中OOC版本的xdc，在属性窗口的`USED_IN`属性里添加`out-of-context`选项，选中另一版本xdc，在属性窗口中为`PROCESSING_ORDER`属性选择`LATE`.
+另一个xdc保持空白就行，这里涉及到了一个xdc的scope问题，感兴趣的可以参考Xilinx的UG903.除此之外，在`source`窗口选中OOC版本的xdc，在属性窗口的`USED_IN`属性里添加`out-of-context`选项，否则，BD综合时就出问题了，选中另一版本xdc，在属性窗口中为`PROCESSING_ORDER`属性选择`LATE`.
 
 4. <required> 封装nvdla IP，Tools-->Create and Package New IP-->Package your current project, next and finish;
 	
