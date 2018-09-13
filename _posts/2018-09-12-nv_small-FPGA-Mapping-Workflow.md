@@ -67,10 +67,10 @@ CPAN > exit
 	
 3. <requied> 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，且buffer资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
 
-	* VLIB_BYPASS_POWER_CG
-	* NV_FPGA_FIFOGEN
-	* FIFOGEN_MASTER_CLK_GATING_DISABLED
-	* FPGA
+- VLIB_BYPASS_POWER_CG
+- NV_FPGA_FIFOGEN
+- FIFOGEN_MASTER_CLK_GATING_DISABLED
+- FPGA
 
 **====Tips====** 
 
