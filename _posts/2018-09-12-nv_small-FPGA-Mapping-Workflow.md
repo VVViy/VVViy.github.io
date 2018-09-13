@@ -84,7 +84,7 @@ CPAN > exit
 
 
 ### step 3: 封装IP (Win10)
-1. 添加wrapper，如果在NV_nvdla里例化了generated clock，请删除，另外，为了在block design中能够与PS的AXI master和slave接口连接，需要在当前工程结构下，再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
+1.添加wrapper，如果在NV_nvdla里例化了generated clock，请删除，另外，为了在block design中能够与PS的AXI master和slave接口连接，需要在当前工程结构下，再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
 
 **====Tips====** 
 	
