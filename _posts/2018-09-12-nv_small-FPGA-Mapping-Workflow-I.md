@@ -4,7 +4,7 @@ title:      nv_small FPGA Mapping Workflow
 subtitle:   part I-Vivado project
 date:       2018-09-12
 author:     Max
-header-img: img/post-bg-ios9-web.jpg
+header-img: img/post-gray-background.jpg
 catalog: true
 tags:
     - NVDLA
