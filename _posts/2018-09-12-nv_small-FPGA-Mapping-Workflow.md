@@ -215,7 +215,7 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
 
 
-**====备注====**
+**====PS====**
 
 	1.Part II是petalinux内容，后续会抽时间写；
 	2.有问题可issue或mail我，但要说明的是，问题不要涉及源码逻辑，因为改结构是我的Phase-2 work，起步不久，
