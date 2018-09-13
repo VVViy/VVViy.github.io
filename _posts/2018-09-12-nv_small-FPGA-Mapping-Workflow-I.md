@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      nv_small FPGA Mapping Workflow
-subtitle:   part I-Vivado project
+subtitle:   Part I-Vivado project
 date:       2018-09-12
 author:     Max
 header-img: img/post-gray-background.jpg
