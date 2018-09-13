@@ -32,10 +32,11 @@ tags:
 
 **====Tips====** 
 
-    1). build tree所需的工具中，cpp，gcc，g++，perl，python采用linux系统默认，java需要额外安装，若只是build RTL，
-        其他tool可直接enter.
+    1). build tree所需的工具中，cpp，gcc，g++，perl，python采用linux系统默认，java需要额外安装，若只是
+        build RTL，其他tool可直接enter.
 	
-    2). 在build RTL过程还需要perl module的支持，可以直接使用类似pip的perl CPAN安装错误信息中指定的module，如
+    2). 在build RTL过程还需要perl module的支持，可以直接使用类似pip的perl CPAN安装错误信息中指定的module，
+        如
 
 ```perl
 $ perl -MCPAN -e shell
@@ -59,11 +60,11 @@ CPAN > exit
 
 **====Tips====** 
 
-    1). Xilinx RAM资源的使用有4种基本方式————flexibility依次递减————i)源码推断, ii)XPMs, iii)直接例化8k/16k RAM primitives, 
-        iv)例化RAM IP.
+    1). Xilinx RAM资源的使用有4种基本方式————flexibility依次递减————i)源码推断, ii)XPMs, iii)直接例化
+        8k/16k RAM primitives, iv)例化RAM IP.
 	
-    2). 待全部缺失文件补全后，可能会发现在`NV_nvdla` hierarchy以外，还存在一些modules，这个是因为一个文件中定义了多个
-        modules，可以将未用到的modules comment掉.
+    2). 待全部缺失文件补全后，可能会发现在`NV_nvdla` hierarchy以外，还存在一些modules，这个是因为一个文
+        件中定义了多个modules，可以将未用到的modules comment掉.
 	
 3. <requied> 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，clock buf资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
 
@@ -74,8 +75,8 @@ CPAN > exit
 
 **====Tips====** 
 
-    1). 其实，也可以不关闭gating信号逻辑，使用syth选项支持相关逻辑的clock gating，clk buf会增加, 测试了部分信号, 待测试全部
-        信号的资源消耗和逻辑稳定性.
+    1). 其实，也可以不关闭gating信号逻辑，使用syth选项支持相关逻辑的clock gating，clk buf会增加, 测试了
+        部分信号, 待测试全部信号的资源消耗和逻辑稳定性.
 	
     2). nvdla_pwrbus_ram_*_pd相关逻辑，可以转化使用BRAM的sleep达到相同效果，待测试.
 
@@ -87,8 +88,8 @@ CPAN > exit
 
 **====Tips====** 
 	
-	也可以将axi apb bridge ip同时封装在wrapper中，这样在BD工程中，PS->nvdla ip通信就变成了master->slave接口互连映射,而非
-	本文采用的master->axi apb bridge->slave互连模式. 
+	也可以将axi apb bridge ip同时封装在wrapper中，这样在BD工程中，PS->nvdla ip通信就变成了master->slave
+	接口互连映射,而非本文采用的master->axi apb bridge->slave互连模式. 
 	
 2. <required> 补全AXI与APB信号，NVDLA使用AXI和APB协议与MCU通信，但是源码中缺失了部分信号需要按照`AMBA AXI and ACE Protocol Spec`和`AMBA 3 APB Protocol spec`补全，缺失的AXI,APB信号包括，
 
