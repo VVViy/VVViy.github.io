@@ -145,9 +145,9 @@ assign pslverr = 1'b0;
 
 **====Tips====**
 	
-	正常来说，添加如上信号便可以在BD工程中建立连接了，但是在仅作如上修改的情况下，在BD工程中必须要使用AXI smartconnect做PL
-	和PS的接口互连，如果想使用AXI interconnect或干脆直接将NVDLA master与PS slave互连，还要进一步修改如下信号位宽,否则，
-	BD工程在`validate`的时候会报错.
+	添加如上信号后，其实已经能够在BD工程中完成interface连接任务了，但是仅作上述修改，BD工程中必须要使用AXI
+	smartconnect做PL和PS的接口互连，如果想使用AXI interconnect或干脆直接将NVDLA master与PS slave互连，
+	还要进一步修改如下信号位宽,否则，BD工程在`validate`的时候会报错.
 
 ```
 //modify following signal bit width in NV_nvdla module
