@@ -54,9 +54,9 @@ CPAN > exit
 
 
 ### step 2: 新建RTL工程 (Win10)
-1. <requied> 添加源文件，可按照nv_small/spec/defs/nv_small.spec描述来指定vmod/nvdla/下待添加的内核源文件————small版本不包含bdma，retiming和rubik内核(文件夹)以及其他文件夹中的部分.v————实际中，可先添加top文件下的modules，之后，vivado显示的hierarchy中缺少什么文件，加之即可;
+1. 添加源文件，可按照nv_small/spec/defs/nv_small.spec描述来指定vmod/nvdla/下待添加的内核源文件————small版本不包含bdma，retiming和rubik内核(文件夹)以及其他文件夹中的部分.v————实际中，可先添加top文件下的modules，之后，vivado显示的hierarchy中缺少什么文件，加之即可;
 
-2. <requied> 添加RAM文件时，要选择`outdir/nv_small/vmod/rams/fpga/small_rams/`文件夹下的RAM源文件;
+2. 添加RAM文件时，要选择`outdir/nv_small/vmod/rams/fpga/small_rams/`文件夹下的RAM源文件;
 
 **====Tips====** 
 
@@ -66,7 +66,7 @@ CPAN > exit
     2). 待全部缺失文件补全后，可能会发现在`NV_nvdla` hierarchy以外，还存在一些modules，这个是因为一个文
         件中定义了多个modules，可以将未用到的modules comment掉.
 	
-3. <requied> 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，clock buf资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
+3. 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，clock buf资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
 
 - VLIB_BYPASS_POWER_CG
 - NV_FPGA_FIFOGEN
@@ -84,14 +84,14 @@ CPAN > exit
 
 
 ### step 3: 封装IP (Win10)
-1. <required> 添加wrapper，如果在NV_nvdla里例化了generated clock，请删除，另外，为了在block design中能够与PS的AXI master和slave接口连接，需要在当前工程结构下，再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
+1. 添加wrapper，如果在NV_nvdla里例化了generated clock，请删除，另外，为了在block design中能够与PS的AXI master和slave接口连接，需要在当前工程结构下，再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
 
 **====Tips====** 
 	
 	也可以将axi apb bridge ip同时封装在wrapper中，这样在BD工程中，PS->nvdla ip通信就变成了master->slave
 	接口互连映射,而非本文采用的master->axi apb bridge->slave互连模式. 
 	
-2. <required> 补全AXI与APB信号，NVDLA使用AXI和APB协议与MCU通信，但是源码中缺失了部分信号需要按照`AMBA AXI and ACE Protocol Spec`和`AMBA 3 APB Protocol spec`补全缺失的AXI,APB信号，即
+2. 补全AXI与APB信号，NVDLA使用AXI和APB协议与MCU通信，但是源码中缺失了部分信号需要按照`AMBA AXI and ACE Protocol Spec`和`AMBA 3 APB Protocol spec`补全缺失的AXI,APB信号，即
 
 ```
 //append axi signal to NV_nvdla_wrapper signal list
@@ -168,7 +168,7 @@ output [7:0] 	  nvdla_core2dbb_ar_arlen;
 
 实际上，所有的*_id signal只有后4位work. 另外，不要忘了在NV_nvdla module的NV_NVDLA_partition_o u_partition_o{...}实例中修改相应信号位宽，这里就不写了.
 
-3. <required> 添加xdc，新建两个xdc文件，一个为IP在OOC综合时使用，另一个则是在global syth时使用，OOC xdc可以直接约束两个primary clk，如
+3. 添加xdc，新建两个xdc文件，一个为IP在OOC综合时使用，另一个则是在global syth时使用，OOC xdc可以直接约束两个primary clk，如
 
 ```
 create_clock -period 10.001 -name u_dla_core_clk [get_ports u_dla_core_clk];
@@ -177,9 +177,9 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 
 另一个xdc保持空白就行，这里涉及到了一个xdc的scope问题，感兴趣的可以参考Xilinx的UG903.除此之外，在`source`窗口选中OOC版本的xdc，在属性窗口的`USED_IN`属性里添加`out-of-context`选项，否则，BD综合时就出问题了，选中另一版本xdc，在属性窗口中为`PROCESSING_ORDER`属性选择`LATE`.
 
-4. <required> 封装nvdla IP，Tools-->Create and Package New IP-->Package your current project, next and finish;
+4. 封装nvdla IP，Tools-->Create and Package New IP-->Package your current project, next and finish;
 	
-5. <required> AXI master interface推断，点击`Ports and Interfaces`，查看是否有自动推断出的master接口，若没有，选择全部master接口信号，右键选择`Auto Infer Interface`，Fig-1, 推断出master接口信号后，需要检查位宽是否与源文件中一致(之前出现过标量矢量化的情况)，即`Size Left`，`Size Right`，另外，检查`Driver Value`，Fig-2, 若官方源码中的信号驱动强度为0，则选中该信号，在属性窗口删除0值；对后添加的master信号，将驱动强度设置为0；
+5. AXI master interface推断，点击`Ports and Interfaces`，如Fig-1, 查看是否有自动推断出的master接口，若没有，选中全部master接口信号，右键选择`Auto Infer Interface`，推断出master接口信号后，需要检查位宽是否与源文件中声明的相一致(之前出现过标量矢量化的情况，工具坑)，即`Size Left`，`Size Right`，另外，检查`Driver Value`，如Fig-2, 若官方源码中声明的信号在此列表中显示驱动强度为0，则选中该信号，在属性窗口删除0值，另外，需要对上面我们后添加的master信号，将驱动强度设置为0；
 	
 ![Interface part](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%231.JPG?raw=true)
 
@@ -189,9 +189,9 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 
                                               Fig-2
 
-6. <required> APB slave interface推断,这个接口不会自动推断，需要选中全部APB信号，右键自动推断，在弹出窗口中依次选择`Advanced`-->`apb_rtl`, 推断出AXI和APB信号后，右键两个接口信号，选择`Associate Clocks`，分别关联两个clk即可，若core和csb跑异步时钟，那么AXI关联core clk，APB关联csb clk；
+6. APB slave interface推断,这个接口不会自动推断，需要选中全部APB信号，右键自动推断，在弹出窗口中依次选择`Advanced`-->`apb_rtl`, 推断出AXI和APB信号后，右键两个接口信号，选择`Associate Clocks`，分别关联两个clk即可，若core和csb跑异步时钟，那么AXI关联core clk，APB关联csb clk；
 	
-7. <required> APB memory map, 因为AXI/APB master-slave接口是memory-map机制做数据映射的，我画了一个简图Fig-3，而不同于AXI memory block的自动生成，APB memory block需要额外添加，选择`Addressing and Memory`-->`Memory Maps(for slaves)`，右键`IP Addressing and Memory Wizard`选择APB接口信号，继续右键`Add Address Block`(一块连续地址，一个block便可)，如Fig-4；
+7. APB memory map, 因为AXI/APB master-slave接口是memory-map机制做数据映射的，我画了一个简图Fig-3，而不同于AXI memory block的自动生成，APB memory block需要额外添加，选择`Addressing and Memory`-->`Memory Maps(for slaves)`，右键`IP Addressing and Memory Wizard`选择APB接口信号，继续右键`Add Address Block`(一块连续地址，一个block便可)，如Fig-4；
 
 ![Memory map](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%233.JPG?raw=true)
 
@@ -201,15 +201,15 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 
                                               Fig-4
 
-8. <required> `Review and Package` -->`Package IP`.
+8. `Review and Package` -->`Package IP`.
 
 
 ### step 4: 新建BD工程 (Win10)
-1. <required> 新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的IP(nvdla_ip_prj_name.srcs)添加到IP列表，新建BD工程`Flow Navigator`-->`Create Block Design`；
+1. 新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的IP(nvdla_ip_prj_name.srcs)添加到IP列表，新建BD工程`Flow Navigator`-->`Create Block Design`；
 	
-2. <required> 添加ps，nvdla ip，axi apb bridge，axi interconnect等ip，ps要配置master，slave以及PL-PS中断接口，之后连接接口即可；
+2. 添加ps，nvdla ip，axi apb bridge，axi interconnect等ip，ps要配置master，slave以及PL-PS中断接口，之后连接接口即可；
 
-3. <required> 添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
+3. 添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
 
 ### step 5: [optional] 测试
 Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
