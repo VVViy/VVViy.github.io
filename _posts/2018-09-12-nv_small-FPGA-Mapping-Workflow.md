@@ -209,4 +209,5 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 
 3. <required> 添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
 
-### step 5: [optional] 测试, Vivado+SDK/VIP/HW manager, 请自行选择，我没做:sweat_smile:.
+### step 5: [optional] 测试
+Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
