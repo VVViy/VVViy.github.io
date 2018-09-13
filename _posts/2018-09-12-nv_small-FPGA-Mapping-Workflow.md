@@ -65,7 +65,7 @@ CPAN > exit
     2). 待全部缺失文件补全后，可能会发现在`NV_nvdla` hierarchy以外，还存在一些modules，这个是因为一个文件中定义了多个
         modules，可以将未用到的modules comment掉.
 	
-3. <requied> 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，且buffer资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
+3. <requied> 关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，clock buf资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
 
 - VLIB_BYPASS_POWER_CG
 - NV_FPGA_FIFOGEN
@@ -83,11 +83,12 @@ CPAN > exit
 
 
 ### step 3: 封装IP (Win10)
-1. <required> 添加wrapper，如果在NV_nvdla里例化了generated clock，请删除；另外，为了在block design中能够与PS的AXI master和slave接口连接，需要再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
+1. <required> 添加wrapper，如果在NV_nvdla里例化了generated clock，请删除，另外，为了在block design中能够与PS的AXI master和slave接口连接，需要在当前工程结构下，再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
 
 **====Tips====** 
 	
-	也可以将axi apb bridge ip直接例化在wrapper中，但本文未在此使用该ip，而是推迟到BD工程中. 
+	也可以将axi apb bridge ip同时封装在wrapper中，这样在BD工程中，PS->nvdla ip通信就变成了master->slave接口互连映射,而非
+	本文采用的master->axi apb bridge->slave互连模式. 
 	
 2. <required> 补全AXI与APB信号，NVDLA使用AXI和APB协议与MCU通信，但是源码中缺失了部分信号需要按照`AMBA AXI and ACE Protocol Spec`和`AMBA 3 APB Protocol spec`补全，缺失的AXI,APB信号包括，
 
