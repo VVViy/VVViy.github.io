@@ -13,9 +13,9 @@ tags:
 ---
 
 ### Preface
-  大家好，本文将简要介绍映射nvdla nv_small版本到FPGA过程中可能遇到的‘坑’，旨在给做相同工作的小伙伴一个参考，不作指导性建议. 
+  本文将简要介绍映射nvdla nv_small版本到FPGA过程中可能遇到的‘坑’，旨在给做相同工作的小伙伴一个参考，不作指导性建议. 
   
-  本文会详细描述从使用官方源码构建vivado IP工程到最终BD工程网表生成的全部步骤以及每个步骤中容易出错的地方。但需要**说明**的是，该映射工作是本人公司项目的一部分，所以，受规则所限，文中不会直接展示官方开源内容以外的设计内容，望谅解.
+  本文会尽可能完整地描述从官方源码构建vivado IP工程到最终BD工程网表生成的全部步骤以及每个步骤中容易出错的地方。但需要**<font size=8>说明</font>**的是，该映射工作是本人公司项目的一部分，所以，受规则所限，文中不会直接展示官方开源内容以外的设计内容，望谅解.
   
  
 ### Development environment setup
@@ -30,10 +30,10 @@ tags:
 
 **====Tips====** 
 
-    1). <requied> build tree所需的工具中，cpp，gcc，g++，perl，python采用linux系统默认，java需要额外安装，若只是build RTL，
+    1). build tree所需的工具中，cpp，gcc，g++，perl，python采用linux系统默认，java需要额外安装，若只是build RTL，
         其他tool可直接enter.
 	
-    2). <requied> 在build RTL过程还需要perl module的支持，可以直接使用类似pip的perl CPAN安装错误信息中指定的module，如
+    2). 在build RTL过程还需要perl module的支持，可以直接使用类似pip的perl CPAN安装错误信息中指定的module，如
 
 ```perl
 $ perl -MCPAN -e shell
@@ -57,7 +57,7 @@ CPAN > exit
 
 **====Tips====** 
 
-    1). Xilinx RAM资源的使用有4中方式---flexibility依次递减---i)源码推断, ii)XPMs, iii)直接例化RAM primitive, 
+    1). Xilinx RAM资源的使用有4种方式---flexibility依次递减---i)源码推断, ii)XPMs, iii)直接例化RAM primitive, 
         iv)例化RAM IP.
 	
     2). 待全部缺失文件补全后，可能会发现在`NV_nvdla` hierarchy以外，还存在一些modules，这个是因为一个文件中定义了多个
