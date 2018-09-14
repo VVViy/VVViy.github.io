@@ -43,7 +43,7 @@ $ mkdir tftproot
 $ /etc/init.d/openbsd-inetd restart
 ```
 
-**注意**，千万别把重定向追加`>>`,写成重定向覆盖`>`.
+**注意**，千万不要把重定向追加`>>`,写成重定向覆盖`>`.
 
 运行下述命令验证，
 
@@ -64,14 +64,23 @@ $ source <path-to-installed-Petalinux>/settings.sh
 $ petalinux-creat -t project -template [zynq/zynqMP/microblaze] -n [project_name]
 ```
 
-这里的`template`，如果使用zynq-7000系列，则选择`zynq`，`zynq +UltraScale MPSoC`，选择`zynqMP`.
+这里的`template`，如果使用`zynq-7000`系列，则选择`zynq`，`zynq +UltraScale MPSoC`，选择`zynqMP`.
 
 **====Tips====**
 
     创建Petalinux工程有两种方式：i)使用下载的.bsp文件创建，ii)建个空工程.对于nvdla工程，后续都要使用PL.hdf重新build，
     没有区别；但如果不使用PL逻辑，可以直接使用第一种的prebuilt bootloader文件下板，而不用重新build.
     
-2.配置petalinux工程，
+2.配置petalinux工程，首先将Vivado `export hardware`输出的`*.hdf`文件拷贝到新建的petalinux工程文件下，之后运行如下命令，
+
+```
+$ cd <path-to-petalinux-prj>
+$ petalinux-config --get-hw-description=./
+```
+
+* 在配置界面中，方向键选中`DTG settings`-->`template...`, enter进入修改为开发板版本，如`zcu102-rev1.0`；
+* 进入`Image Packaging Configuration`-->`Root filesystem Type`，enter进入选中`SD card`. 修改此处后，linux根目录系统`rootfs`将配置到SD中，而非默认的`raminitfs`，后者是将根目录系统镜像在boot阶段加载到内存中，所以，一旦裁剪的kernel增大（大概超过120M），那么系统boot不动.
+
 
 ### Step 3: Customize the linux kernel for build UMD
 
