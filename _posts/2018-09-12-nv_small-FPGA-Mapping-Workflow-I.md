@@ -88,8 +88,8 @@ CPAN > exit
 
 **====Tips====** 
 	
-	也可以将axi apb bridge ip同时封装在wrapper中，这样在BD工程中，PS->nvdla ip通信就变成了master->slave
-	接口互连映射,而非本文采用的master->axi apb bridge->slave互连模式. 
+	也可以将axi apb bridge ip同时封装在wrapper中，这样在BD工程中，PS->nvdla ip方向通信就变成了
+	axi master->axi slave接口互连映射,而非本文采用的axi master->axi apb bridge->apb slave互连模式. 
 	
 2.补全AXI与APB信号，NVDLA使用AXI和APB协议与MCU通信，但是源码中缺失了部分信号需要按照`AMBA AXI and ACE Protocol Spec`和`AMBA 3 APB Protocol spec`补全缺失的AXI,APB信号，即
 
