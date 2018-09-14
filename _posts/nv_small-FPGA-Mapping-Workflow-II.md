@@ -34,7 +34,7 @@ $ ./petalinux-v2018.1-final-installer.run <path-to-target-install-dir>
 
 和S家EDA工具安装.run一样，不要以sudo权限安装，`permission denial`就`chmod`改下权限. 安装目录自选即可，之前有个agilent工程师说必须安装在`/opt/pkg/`下，否则可能会crash，也许是`centos`系统原因，`ubuntu`不存在的.另外，安装进程到license时，一旦出现`...[y/N]?`，别急着回车，这里默认是`N`，需要手动`y`.
 
-4.验证安装正确性，安装完成后，应该会出现`warning:No tftp server found...`, 这个如果不是`NFS`做远程boot的话，是不用在意的，强迫症请参考下述命令.
+4.验证安装正确性，安装完成后，应该会出现`Warning:No tftp server found...`, 这个如果不是`NFS`做远程boot的话，是不用在意的，强迫症请参考下述命令.
 
 ```
 $ apt-get install tftpd tftp openbsd-inetd
