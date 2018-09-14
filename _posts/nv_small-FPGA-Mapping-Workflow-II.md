@@ -19,10 +19,10 @@ tags:
 
 此外，无论是Part I还是本文，文章内容描述方式都以‘How to do’为第一目标，背后的技术点并未阐述，因为不想干扰操作过程。实际上，作者在三个月的摸索过程中，遇到很多值得留意的技术点，特别是在搭多时钟域工程的时候，后期会与同道讨论并逐步添加到文章中。
 
-### Step 1: Install petalinux in linux
+### Step 1: Install petalinux in host
 Xilinx petalinux相当于是一个定制版的Yocto工具，Xilinx已经把BSP准备的妥妥的了，我们要做的是定制自己的linux kernel. 安装过程在Xilinx `UG1144`写的比较清楚，这里做个概述.
 
-1.linux环境下安装依赖库，按照`UG144 Table 2-1`补全依赖工具包和库，串口调试工具我用的是`putty`和`gtkterm`.
+1.linux环境下安装依赖库，按照`UG1144 Table 2-1`补全依赖工具包和库，串口调试工具我用的是`putty`和`gtkterm`.
 
 2.修改shell，`UG1144`提示要修改`shell`为`bash`，可以`echo $SHELL`查看一下当前`/bin/sh`是不是`bash`，如果不是，`sudo dpkg-reconfigure`,在弹出界面中点`否`或重建`ln`.
 
