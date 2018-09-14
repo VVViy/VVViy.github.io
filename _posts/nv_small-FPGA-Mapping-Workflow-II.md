@@ -54,7 +54,7 @@ $ echo $PETALINUX
 #if output path is <path-to-installed-PetaLinux>, then success.
 ```
 
-### Step 2: Create petalinux project and configure for SD card boot
+### Step 2: Create petalinux project and configure SD card boot
 1.创建petalinux工程，工具安装成功后，运行如下命令建立工程;
 
 ```
@@ -82,7 +82,7 @@ $ petalinux-config --get-hw-description=./
 * 进入`Image Packaging Configuration`-->`Root filesystem Type`，enter进入选中`SD card`. 修改此处后，linux根目录系统`rootfs`将配置到SD中，而非默认的`raminitfs`，后者是将根目录系统镜像在boot阶段加载到内存中，所以，一旦裁剪的kernel增大（大概超过120M），那么系统boot不动.
 
 
-### Step 3: Customize the linux kernel for build UMD
+### Step 3: Customize the linux kernel for building UMD
 
 
 ### Step 4: Create and add KMD module by petalinux tool
