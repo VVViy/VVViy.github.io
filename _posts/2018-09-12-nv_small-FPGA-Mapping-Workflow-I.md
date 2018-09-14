@@ -53,7 +53,7 @@ CPAN > exit
 成功`[TMAKE]:DONE`后，在目录下会生成一个`outdir`目录，目录下便是搭建vivado所需的全部RTL code.
 
 
-### step 2: 新建RTL工程 (Win10)
+### Step 2: 新建RTL工程 (Win10)
 1.添加源文件，可按照nv_small/spec/defs/nv_small.spec描述来指定vmod/nvdla/下待添加的内核源文件————small版本不包含bdma，retiming和rubik内核(文件夹)以及其他文件夹中的部分.v————实际中，可先添加top文件下的modules，之后，vivado显示的hierarchy中缺少什么文件，加之即可;
 
 2.添加RAM文件时，要选择`outdir/nv_small/vmod/rams/fpga/small_rams/`文件夹下的RAM源文件;
@@ -83,7 +83,7 @@ CPAN > exit
 4.[optional] 之后可在top module里添加generated时钟，进行综合、布局布线，查看资源开销、功耗和时钟频率等信息.
 
 
-### step 3: 封装IP (Win10)
+### Step 3: 封装IP (Win10)
 1.添加wrapper，如果在NV_nvdla里例化了generated clock，请删除，另外，为了在block design中能够与PS的AXI master和slave接口连接，需要在当前工程结构下，再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
 
 **====Tips====** 
@@ -204,14 +204,14 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 8.`Review and Package` -->`Package IP`.
 
 
-### step 4: 新建BD工程 (Win10)
+### Step 4: 新建BD工程 (Win10)
 1.新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的IP(nvdla_ip_prj_name.srcs)添加到IP列表，新建BD工程`Flow Navigator`-->`Create Block Design`；
 	
 2.添加ps，nvdla ip，axi apb bridge，axi interconnect等ip，ps要配置master，slave以及PL-PS中断接口，之后连接接口即可；
 
 3.添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
 
-### step 5: [optional] 测试
+### Step 5: [optional] 测试
 Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
 
 ---
