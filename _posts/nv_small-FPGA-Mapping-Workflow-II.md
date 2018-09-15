@@ -15,7 +15,7 @@ tags:
 
 
 ### Preface
-参考Part I，基本可以跑起FPGA工程，而对于使用Xilinx heterogeneous architecture FPGA chip的小伙伴，完成PL.hdf设计后，肯定要进一步配置ARM linux，下板跑跑`github.com/nvdla/sw`Sanity测试集，所以，本文将结合作者实践，尽可能完整的描述Xilinx petalinux工程构建流程及对官方SW工程源码的定制化修改.
+参考Part I，基本可以跑起FPGA工程，而对于使用Xilinx heterogeneous architecture FPGA chip的小伙伴，完成PL.hdf设计后，肯定要进一步配置ARM linux，下板跑跑`github.com/nvdla/sw`Sanity测试集，所以，本文将结合作者实践及官网`issue`中的信息，尽可能完整的描述Xilinx petalinux工程构建流程及对官方SW工程源码的定制化修改.
 
 此外，无论是Part I还是本文，文章内容描述方式都以‘How to do’为第一目标，背后的技术点并未阐述，因为不想干扰操作过程。实际上，作者在三个月的摸索过程中，遇到很多值得留意的技术点，特别是在搭多时钟域工程的时候，后期希望与同道讨论后逐步添加到文章中.
 a
@@ -68,8 +68,10 @@ $ petalinux-creat -t project --template [zynq/zynqMP/microblaze] -n [project_nam
 
 **====Tips====**
 
-    创建Petalinux工程有两种方式：i)使用下载的.bsp文件创建，ii)建个空工程.对于nvdla工程，后续都要使用PL.hdf
-    重新build，没有区别；但如果不使用PL逻辑，可以直接使用第一种的prebuilt bootloader文件下板，而不用重新build.
+    1). 创建Petalinux工程有两种方式：i)使用下载的.bsp文件创建，ii)建个空工程.对于nvdla工程，后续都要使用PL.hdf
+        重新build，没有区别；但如果不使用PL逻辑，可以直接使用第一种的prebuilt bootloader文件下板，而不用重新build;
+        
+    2). petalinux的相关命令，可参考UG1157.
     
 2.配置petalinux工程，首先将Vivado `export hardware`输出的`*.hdf`文件拷贝到新建的petalinux工程目录下，之后运行如下命令，
 
@@ -125,7 +127,7 @@ $ petalinux-build
 $ petalinux-create -t modules -n opendla --enable
 ```
 
-modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/....`目录下.
+modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/files/`目录下.
 
 2.修改驱动源文件,之前提到不同版本的kernel，对应的API有所不同，需要根据自己的内核版本修改驱动源码中的调用函数. 作者使用4.9内核，需做如下修改
 
@@ -142,20 +144,66 @@ modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<p
 
 ```
 ...
-439: //dma_declare_coherent_memory(drm->dev, 0xC0000000, 0xC0000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);
-440: dma_declare_coherent_memory(drm->dev, 0x40000000, 0x40000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);
+439: //dma=dma_declare_coherent_memory(drm->dev, 0xC0000000, 0xC0000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);
+440: dma=dma_declare_coherent_memory(drm->dev, 0x40000000, 0x40000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);
+...
 ```
+
+**====Tips====**
+
+    对于使用2018版Xilinx工具的小伙伴，除了上述修改，还要删除DMA_MEMORY_MAP flag，官方开发者在issue中提到该flag已经
+    在kernel v4.13后续版本中删除了该flag.
 
 * 对于`nv_small`版本，还要修改`nvdla/sw/kmd/firmware/include/opendla.h`，添加`DLA_SMALL_CONFIG`宏，这样`KMD`驱动才能根据`opendla_small.h`寄存器声明来完成对`nvdla core`内部子内核的裁剪,使其符合`nv_small/spec/defs/nv_small.spec`定义.
 
-### Step 5: Modify the default devide tree for NVDLA identification
+### Step 5: Modify the default device tree for NVDLA identification
+`Device tree`是`ARM`处理器`Bootloader`必备之品，`FSBL`在系统boot阶段将`device tree`加载到内存，之后的kernel才会根据其内部`Node`配置内核，确定有哪些硬件设备可用.这个"确定"过程首先便是通过特定`diver`的`probe`函数搜索`DTB`中是否存在匹配的`Compatible`属性. 那么对于nvdla工程，需要查看`KMD`驱动`nvdla probe`函数的`Compatible`属性值是否与petalinux工程中`device tree`中`PL node`中的`Compatible`相一致，查看`nvdla/sw/kmd/port/linux/nvdla_core_callbacks.c, line 338`显示`kmd probe`函数指定的`compatible`属性值为`.compatible = "nvidia,nvdla_2"`(`nvdla/sw/kmd/Documentation/devicetree/bindings/nvdla/nvdla.txt`中的`compatible`属性值`compatible = "nvidia,nvdla-1"`是针对`nvdla_full`版本的)，而`<path-to-petalinux-prj>/component/plnx_workspace/device-tree/pl.dtsi`中的节点信息描述了我们在Vivado中创建的`nvdla`工程，其中的`compatible`属性值显然与驱动函数中的不同，需要修改一致. 即在`<path-to-petalinux-prj>/project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi`覆盖掉`compatible`属性值，并添加之前提到的`reserved memory`(`reserved memory`的节点定义可参考[Linux Reserved Memory](http://www.wiki.xilinx.com/Linux+Reserved+Memory))
 
+```
+/include/ "system-conf.dtsi"
+/ {
+    reserved-memory {
+            #address-cells = <2>;
+            #size-cells = <2>;
+            ranges;
+
+            nvdla_reserved: buffer@0 {
+                      no-map;
+                      reg = <0x0 0x70000000 0x0 0x40000000>;
+            };
+    };
+};
+
+&[your lable-name appeared in pl.dtsi]{
+    compatible = "nvidia,nvdla_2";
+    memory-region = <&nvdla_reserved>;
+}
+```
+
+**====Tips====**
+
+    1). 根据`UG1144 APPX.B Table B-1`所言,<path-to-petalinux-prj>/component/plnx_workspace/device-tree/
+        目录下后缀为`.dtsi`和`.dts`的`device tree`定义文件是petalinux工具自动生成的，每次`petalinux-build`都会
+        自动覆盖更新，所以对其修改无用.而`system-user.dtsi`不会被工具修改.
+    
+    2). Device tree格式目前尚无统一标准，Linaro要牵头出标准，已经发布了DeviceTree Specification Release v0.2 
+        (www.devicetree.org)但内容尚不完整，作者之前参考了Linaro, Linux， Raspberry Pi， ARM， NXP， Toradex等
+        多家的Device Tree文档，后期会在Blog里挂出survey and summary文档.
 
 ### Step 6: Build petalinux project and package bootloader files
+1.重新编译petalinux,在之前的`petalinux-build`之后，不仅创建了`modules`子工程，而且修改了`device tree`，所以需要重新编译整个工程，如果仅仅是添加了`apps/modules`，那么只要按照`UG1144 Chapter 7`做增量编译即可.
 
+2.制作`bootloader`， `petalinux bootloader`使用`u-boot`, 可按照下述命令打包`bootloader`相关文件，下板需要使用到`BOOT.BIN`, `image.ub`和`rootfs.ext4`, `BOOT.BIN`包含`fsbl, bitstream, pmu, u-boot`, `image.ub`包含`kernel image, DTB, rootfs image`.
+
+```
+$ cd <path-to-petalinux-prj>/images/linux/
+$ petalinux-package --boot --fsbl [zynq_fsbl/zynqmp_fsbl] --fpga [your *.bit file] --pmufw pmufw --u-boot 
+```
 
 ### Step 7: Partition and configure SD card
+1.SD卡分区，根据`UG1144 Chapter 6 “Configuring SD Card ext filesystem Boot” section`对SD分区，作者将SD卡划分为`BOOT(fat32)`, `rootfs(etx4)`, `Workbench(etx4)`三个分区，分别放置boot文件，rootfs，UMD源文件和测试相关文件.
 
+2.
 
 ### Step 8: Download and run tests
 
