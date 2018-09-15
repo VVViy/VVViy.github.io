@@ -82,7 +82,7 @@ $ petalinux-config --get-hw-description=./
 * 进入`Image Packaging Configuration`-->`Root Filesystem Type`，enter进入选中`SD card`. 修改此处后，linux根目录系统`rootfs`将配置到SD中，而非默认的`raminitfs`，后者是将根目录系统镜像在boot阶段加载到内存中，一旦裁剪的kernel较大（大概超过120M），那么系统boot不起来；
 * 退出并保存配置.
 
-3.配置kernel，由于`rootfs`配置到SD boot，那么就要取消掉kernel的ram init，否则，在boot阶段，kernel在内存中找不到rootfs的符号镜像，便会出错，
+3.配置kernel，由于`rootfs`配置到SD boot，那么就要取消掉kernel的....ram init....，否则在boot阶段，kernel在内存中找不到rootfs的符号镜像，便会出错，
 
 ```
 $ petalinux-config -c kernel
@@ -94,9 +94,9 @@ $ petalinux-config -c kernel
     Fig-1
 
 ### Step 3: Customize the linux kernel for building UMD
-`nvdla/sw/prebuilt/linux/`中包含了官方在`kernel v13.3`下预编译的`nvdla_runtime`ELF文件和依赖库`libnvdla_runtime.o`文件，但patelinux 2017.4的kernel是`v4.9`，两个版本的DMA API不同，运行不了官方版本，需要重新为4.9版本编译`umd`. 
+`nvdla/sw/prebuilt/linux/`中包含了官方在`kernel v4.13.3`下预编译的`nvdla_runtime`ELF文件和依赖库`libnvdla_runtime.o`文件，但`patelinux 2017.4`的kernel是`v4.9`，两个版本的DMA API不同，导致依赖于`DRM`实现`DMA`数据搬移的`KMD`驱动无法工作，从而，`UMD`无法正常运行，因此，需要重新为4.9版本编译`UMD`. 
 
-本来最初打算写`recipe`通过petalinux的`bitbake`直接编译`/nvdla/umd/`下的源码，将动态库.o和elf添加到rootfs下，但研究发现这很难实现，petalinux工具只能添加`prebuilt`的.o文件，而不能新建以库文件为目标的子工程（只能创建`apps`，`modules`和`install`子工程），即使将.o的编译添加到`nvdla_runtime`的apps子工程编译中，如何配置对应`recipe`保存中间生成的.o文件到rootfs，也是个难题. 所以，最后选择配置kernel，添加`GNU toolchain`，直接下板编译`umd`的一切所需.
+本来最初打算写`recipe`通过petalinux的`bitbake`直接编译`/nvdla/umd/`下的源码，将动态库`.o`和`elf`添加到`rootfs`下，但研究发现这很难实现，petalinux工具只能添加`prebuilt`的.o文件，而不能新建以库文件为目标的子工程（只能创建`apps`，`modules`和`install`子工程），即使将`.o`的编译添加到`nvdla_runtime`的`apps`子工程`makefile`编译中，如何配置对应`recipe`保存中间生成的`.o`文件到`rootfs`，也是个难题. 所以，最后选择配置kernel，添加`GNU toolchain`，直接下板编译`UMD`的一切所需,`nvdla/sw/umd/`源码目录结构对应的`makefile`将编译依赖关系妥善处理，所以，直接下板`make`即可，比较方便.
 
 1.定制rootfs，实际上，petalinux不仅提供了很多不同平台版本的可配置kernel镜像，还提供了各种系统工具包和库文件，像OpenCV，Xen等等，配置根目录
 
@@ -104,10 +104,13 @@ $ petalinux-config -c kernel
 $ petalinux-config -c rootfs
 ```
 
-弹出界面中，选择..............,选择....，如Fig-2 ~ Fig-3，退出并保存.如果要实现更复杂的功能，可以选择.....，但该包过大(~10G)，也可以选择添加其他如`ldd`，`sudo`等工具包和库. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
+弹出界面中，选择..............,选择....，如Fig-2 ~ Fig-3，退出并保存.如果要实现更复杂的功能，可以选择.....，但该包过大(~10G);也可以选择添加其他如`ldd`，`sudo`等工具包和库. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
 
 
     Fig-2
+    
+    
+    Fig-3
 
 2.编译petalinux工程，配置到这里可以先编译一次工程，否则，后续修改`device tree`时无法查看`PL nvdla`的节点信息，编译petalinux project
 
@@ -116,13 +119,34 @@ $ petalinux-build
 ```
 
 ### Step 4: Create and add KMD module by petalinux tool
-驱动模块kmd的编译只能通过petalinux工具编译添加，且编译方式不同于`nvdla/sw/readme`中介绍的`generic kernel out-of-tree mmodule build`（可参考linux kernel官网[Building External Modules](https://www.kernel.org/doc/Documentation/kbuild/modules.txt)）,创建modules子工程
+1.创建`modules`子工程,驱动模块kmd的编译只能通过petalinux工具编译添加，且编译方式不同于`nvdla/sw/readme`中介绍的`generic kernel out-of-tree module build`（可参考linux kernel官网[Building External Modules](https://www.kernel.org/doc/Documentation/kbuild/modules.txt)）,创建modules子工程
 
 ```
 $ petalinux-create -t modules -n opendla --enable
 ```
 
-modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/....`目录下，
+modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/....`目录下.
+
+2.修改驱动源文件,之前提到不同版本的kernel，对应的API有所不同，需要根据自己的内核版本修改驱动源码中的调用函数. 作者使用4.9内核，需做如下修改
+
+* `nvdla/sw/kmd/port/linux/nvdla_gem.c,line 332`的`drm_gem_object_put_unlocked()`函数是在`v4.12`之后版本中才出现，其替代了之前版本中的`drm_gem_object_unreference_unlocked`，详情可参考[Linux kernel v4.12 DRM TODO List](https://www.kernel.org/doc/html/v4.12/gpu/todo.html#switch-from-reference-unreference-to-get-put)
+
+```
+...
+332: //drm_gem_object_put_unlocked(dobj);
+333: drm_gem_object_unreference_unlocked(dobj);
+...
+```
+
+* `line 439: dma_declare_coherent_memory(drm->dev, 0xC0000000, 0xC0000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);`该函数表示需要在`PS DDR`中保留一块不被kernel支配，大小为`0x40000000`的地址空间，以便`nvdla core`使用`DMA`方式对`CNN`输入图像和处理结果在Cache与DDR间进行数据搬移，不知为何官方源码采用了硬编码方式处理物理地址，总线地址和存储块尺寸参数. 按照源码中的注释`/* TODO Register separate driver for memory and use DT node to read memory range */`， 表明官方不希望我们修改函数中的参数信息，而是根据参数值去修改`device tree`中对应的`Node`属性值.但在Vivado BD工程中，`PS DDR`的有效地址为`0x00000000 ~ 0x7FFFFFFF`, 显然，参数列表中的物理地址和总线地址不在`PL`的有效访问范围内，必须对此进行修改，至于具体改为什么值，可自行选择，只要是`page size`整数倍便可，如`256 MiB`,那么便将两个`0xC0000000`修改为`0x70000000`(为何取高位地址，感兴趣的可参考[Memory Mapping and DMA](http://static.lwn.net/images/pdf/LDD3/ch15.pdf),老司机请略过), 同时，存储块尺寸不需要修改. 作者保留了1G空间,
+
+```
+...
+439: //dma_declare_coherent_memory(drm->dev, 0xC0000000, 0xC0000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);
+440: dma_declare_coherent_memory(drm->dev, 0x40000000, 0x40000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);
+```
+
+* 对于`nv_small`版本，还要修改`nvdla/sw/kmd/firmware/include/opendla.h`，添加`DLA_SMALL_CONFIG`宏，这样`KMD`驱动才能根据`opendla_small.h`寄存器声明来完成对`nvdla core`内部子内核的裁剪,使其符合`nv_small/spec/defs/nv_small.spec`定义.
 
 ### Step 5: Modify the default devide tree for NVDLA identification
 
