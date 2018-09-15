@@ -18,7 +18,7 @@ tags:
 参考Part I，基本可以跑起FPGA工程，而对于使用Xilinx heterogeneous architecture FPGA chip的小伙伴，完成PL.hdf设计后，肯定要进一步配置ARM linux，下板跑跑`github.com/nvdla/sw`Sanity测试集，所以，本文将结合作者实践，尽可能完整的描述Xilinx petalinux工程构建流程及对官方SW工程源码的定制化修改.
 
 此外，无论是Part I还是本文，文章内容描述方式都以‘How to do’为第一目标，背后的技术点并未阐述，因为不想干扰操作过程。实际上，作者在三个月的摸索过程中，遇到很多值得留意的技术点，特别是在搭多时钟域工程的时候，后期希望与同道讨论后逐步添加到文章中.
-
+a
 ### Step 1: Install petalinux in host
 Xilinx petalinux是一个定制版的`Yocto`工具，Xilinx已经把BSP准备的妥妥的了，我们要做的是定制自己的kernel. 安装过程在Xilinx `UG1144`写的比较清楚，这里做个概述.
 
@@ -45,7 +45,7 @@ $ /etc/init.d/openbsd-inetd restart
 
 **注意**，千万不要把重定向追加`>>`,写成重定向覆盖`>`.
 
-运行下述命令验证正确性，
+运行下述命令验证安装正确性，
 
 ```
 $ source <path-to-installed-PetaLinux>/settings.sh
@@ -64,7 +64,7 @@ $ source <path-to-installed-Petalinux>/settings.sh
 $ petalinux-creat -t project --template [zynq/zynqMP/microblaze] -n [project_name]
 ```
 
-这里的`template`，如果使用`zynq-7000`系列芯片，选择`zynq`；`zynq +UltraScale MPSoC`，则选择`zynqMP`.
+对于`template`，如果使用`zynq-7000`系列芯片，选择`zynq`；`zynq +UltraScale MPSoC`，则选择`zynqMP`.
 
 **====Tips====**
 
@@ -78,9 +78,9 @@ $ cd <path-to-petalinux-prj>
 $ petalinux-config --get-hw-description=./
 ```
 
-* 在配置界面中，选中`DTG settings`-->`template...`, enter进入修改为开发板版本，如`zcu102-rev1.0`；
+* 在配置界面中，选中`DTG settings`-->`template...`, enter进入修改为开发板版本，如`zcu102-rev1.0`，详见`UG1144 Chapter 3，p22`；
 * 进入`Image Packaging Configuration`-->`Root Filesystem Type`，enter进入选中`SD card`. 修改此处后，linux根目录系统`rootfs`将配置到SD中，而非默认的`raminitfs`，后者是将根目录系统镜像在boot阶段加载到内存中，一旦裁剪的kernel较大（大概超过120M），那么系统boot不起来；
-* 退出保存配置.
+* 退出并保存配置.
 
 3.配置kernel，由于`rootfs`配置到SD boot，那么就要取消掉kernel的ram init，否则，在boot阶段，kernel在内存中找不到rootfs的符号镜像，便会出错，
 
@@ -88,10 +88,13 @@ $ petalinux-config --get-hw-description=./
 $ petalinux-config -c kernel
 ```
 
-弹出窗口中，选择..........................，取消掉，退出保存配置.
+弹出窗口中，选择..........................，取消掉.....................，如Fig-1，退出并保存配置.
+
+
+    Fig-1
 
 ### Step 3: Customize the linux kernel for building UMD
-`nvdla/sw/prebuilt/linux/`中包含了官方在`kernel v13.3`下预编译的`nvdla_runtime`ELF文件和依赖库`libnvdla_runtime.o`文件，但patelinux 2017.4的kernel是`v4.9`，两个版本的DMA API不同，运行不了. 
+`nvdla/sw/prebuilt/linux/`中包含了官方在`kernel v13.3`下预编译的`nvdla_runtime`ELF文件和依赖库`libnvdla_runtime.o`文件，但patelinux 2017.4的kernel是`v4.9`，两个版本的DMA API不同，运行不了官方版本，需要重新为4.9版本编译`umd`. 
 
 本来最初打算写`recipe`通过petalinux的`bitbake`直接编译`/nvdla/umd/`下的源码，将动态库.o和elf添加到rootfs下，但研究发现这很难实现，petalinux工具只能添加`prebuilt`的.o文件，而不能新建以库文件为目标的子工程（只能创建`apps`，`modules`和`install`子工程），即使将.o的编译添加到`nvdla_runtime`的apps子工程编译中，如何配置对应`recipe`保存中间生成的.o文件到rootfs，也是个难题. 所以，最后选择配置kernel，添加`GNU toolchain`，直接下板编译`umd`的一切所需.
 
@@ -101,16 +104,19 @@ $ petalinux-config -c kernel
 $ petalinux-config -c rootfs
 ```
 
-弹出界面中，选择..............,选择....，退出保存.如果要实现更复杂的功能，可以选择.....，但该包过大(~10G)，也可以选择添加其他如`ldd`，`sudo`等工具包和库. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
+弹出界面中，选择..............,选择....，如Fig-2 ~ Fig-3，退出并保存.如果要实现更复杂的功能，可以选择.....，但该包过大(~10G)，也可以选择添加其他如`ldd`，`sudo`等工具包和库. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
 
-2.编译petalinux工程，配置到这里可以编译一次工程，否则，后续修改`device tree`时无法查看`PL nvdla`的节点信息，编译project
+
+    Fig-2
+
+2.编译petalinux工程，配置到这里可以先编译一次工程，否则，后续修改`device tree`时无法查看`PL nvdla`的节点信息，编译petalinux project
 
 ```
 $ petalinux-build
 ```
 
 ### Step 4: Create and add KMD module by petalinux tool
-驱动模块kmd只能通过petalinux工具编译添加，且编译方式不同于`nvdla/sw/readme`中介绍的`generic kernel out-of-tree mmodule build`（可参考linux kernel官网[Building External Modules](https://www.kernel.org/doc/Documentation/kbuild/modules.txt)）,创建modules子工程
+驱动模块kmd的编译只能通过petalinux工具编译添加，且编译方式不同于`nvdla/sw/readme`中介绍的`generic kernel out-of-tree mmodule build`（可参考linux kernel官网[Building External Modules](https://www.kernel.org/doc/Documentation/kbuild/modules.txt)）,创建modules子工程
 
 ```
 $ petalinux-create -t modules -n opendla --enable
