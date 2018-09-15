@@ -187,8 +187,8 @@ modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<p
         自动覆盖更新，所以对其修改无用.而`system-user.dtsi`不会被工具修改.
     
     2). Device tree格式目前尚无统一标准，Linaro要牵头出标准，已经发布了DeviceTree Specification Release v0.2 
-        (www.devicetree.org)但内容尚不完整，作者之前参考了Linaro, Linux， Raspberry Pi， ARM， NXP， Toradex等
-        多家的Device Tree文档，后期会在Blog里挂出survey and summary文档.
+        (www.devicetree.org)但内容尚不完整，作者参考了Linaro, Linux， Raspberry Pi， ARM， NXP， Toradex等多家
+        的Device Tree文档，后期会在Blog里挂出survey and summary文档.
 
 ### Step 6: Build petalinux project and package bootloader files
 1.重新编译petalinux,在之前的`petalinux-build`之后，不仅创建了`modules`子工程，而且修改了`device tree`，所以需要重新编译整个工程，如果仅仅是添加了`apps/modules`，那么只要按照`UG1144 Chapter 7`做增量编译即可.
