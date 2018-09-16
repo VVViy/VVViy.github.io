@@ -218,7 +218,7 @@ SRC_URI = "file://makefile \
         家的Device Tree文档，后期会在Blog里挂出survey and summary文档.
 
 ### Step 6: Build petalinux project and package bootloader files
-1.重新编译petalinux，在之前`petalinux-build`后，我们不仅创建了`modules`子工程，而且修改了`device tree`，所以需要重新编译整个工程，如果仅仅是添加了`apps/modules`，那么只要按照`UG1144 Chapter 7`做增量编译即可.
+1.重新编译petalinux，在之前`petalinux-build`后，我们不仅创建了`modules`子工程，而且修改了`device tree`，所以需要重新编译整个工程，如果仅仅是添加了`apps or modules`，那么只要按照`UG1144 Chapter 7`做增量编译即可.
 
 2.制作`bootloader`， `petalinux bootloader`使用`u-boot`, 可按照下述命令打包`bootloader`相关文件，下板需要使用到`BOOT.BIN`, `image.ub`和`rootfs.ext4`, `BOOT.BIN`包含`fsbl, bitstream, pmu, u-boot`, `image.ub`包含`kernel image, DTB, rootfs image`.
 
