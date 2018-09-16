@@ -281,8 +281,10 @@ $ su root ./run_test.sh
 
 **====Tips====**
 
-    在run_test.sh脚本中，执行nvdla_runtime之前，要先为其声明依赖库路径，export LD_LIBRARY_PATH=<path-to-libnvdla_runtime.o>
+    1). 在run_test.sh脚本中，执行nvdla_runtime之前，要先为其声明依赖库路径，export LD_LIBRARY_PATH=<path-to-libnvdla_runtime.o>
 
+    2). 由于目前官方发布的compiler不支持nv_small nvdla core，所以作者只跑了Runtime test application. 如果有构建nv_full版本工程的同学，
+        需要注意，compiler是运行在host环境下的，而非ARM，可以到nvdla/sw/prebuilt/linux/文件下file *，一看便知.
 
 
 
