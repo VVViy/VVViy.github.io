@@ -106,7 +106,7 @@ $ petalinux-config -c kernel
 $ petalinux-config -c rootfs
 ```
 
-弹出界面中，选择..............,选择....，如Fig-2 ~ Fig-3，退出并保存. 如果要实现更复杂的功能，可以选择.....，但该包过大(~10G); 也可以选择添加其他如`ldd`，`sudo`等工具包和库. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
+弹出界面中，选择..............,选择....，如Fig-2 ~ Fig-3，退出并保存. 如果要实现更复杂的功能，可以选择.....，但该包过大(~10G); 也可以选择添加其他如`ldd`，`sudo`等工具. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
 
 
     Fig-2
