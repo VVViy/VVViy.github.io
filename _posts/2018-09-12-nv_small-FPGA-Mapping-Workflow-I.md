@@ -157,8 +157,6 @@ assign pslverr = 1'b0;
 input [5:0] 	  nvdla_core2dbb_b_bid;
 //input [7:0] 	  nvdla_core2dbb_r_rid;
 input [5:0] 	  nvdla_core2dbb_r_rid;
-
-
 //output [7:0] 	  nvdla_core2dbb_aw_awid;
 output [5:0] 	  nvdla_core2dbb_aw_awid;
 //output [3:0] 	  nvdla_core2dbb_aw_awlen;
