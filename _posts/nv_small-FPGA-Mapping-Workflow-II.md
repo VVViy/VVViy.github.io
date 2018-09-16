@@ -129,7 +129,7 @@ $ petalinux-create -t modules -n opendla --enable
 
 modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/files/`目录下，并将目录下的`opendla.c`文件删除.
 
-2.修改驱动源文件,之前提到不同版本的kernel，对应的API有所不同，需要根据自己的内核版本修改驱动源码中的调用函数. 作者使用4.9内核，需做如下修改
+2.修改驱动源文件，之前提到不同版本的kernel，对应的API有所不同，需要根据自己的内核版本修改驱动源码中的调用函数. 作者使用4.9内核，需做如下修改
 
 * `nvdla/sw/kmd/port/linux/nvdla_gem.c,line 332`的`drm_gem_object_put_unlocked()`函数是在`v4.12`之后版本中才出现，其替代了之前版本中的`drm_gem_object_unreference_unlocked`，详情可参考[Linux kernel v4.12 DRM TODO List](https://www.kernel.org/doc/html/v4.12/gpu/todo.html#switch-from-reference-unreference-to-get-put)
 
