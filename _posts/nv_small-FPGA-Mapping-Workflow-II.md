@@ -127,7 +127,7 @@ $ petalinux-build
 $ petalinux-create -t modules -n opendla --enable
 ```
 
-modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/files/`目录下，并将目录下的`opendla.c`文件删除.
+modules子工程创建后，将`nvdla/sw/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/files/`目录下，并将目录下的`opendla.c`文件删除.
 
 2.修改驱动源文件，之前提到不同版本的kernel，对应的API有所不同，需要根据自己的内核版本修改驱动源码中的调用函数. 作者使用4.9内核，需做如下修改
 
