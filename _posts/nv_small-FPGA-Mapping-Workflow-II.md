@@ -26,7 +26,7 @@ Xilinx petalinux是一个定制版的`Yocto`工具，Xilinx已经把BSP准备的
 
 2.修改shell，`UG1144`提示要修改`shell`为`bash`，可以`echo $SHELL`查看一下当前`/bin/sh`是否为`bash`，如果不是，`sudo dpkg-reconfigure`,在弹出界面中点`否`或重建`ln`.
 
-3.安装petalinux，到[Xilinx download center](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html)下载`petalinux [version number] installer`,`[version number]`要和Vivado版本一致，其他的`BSP, sstate`无需下载，`petalinux-build`工程时，会自动download. 运行下述命令安装，
+3.安装petalinux，到[Xilinx Download Center](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html)下载`petalinux [version number] installer`,`[version number]`要和Vivado版本一致，其他的`BSP, sstate`无需下载，`petalinux-build`工程时，会自动download. 运行下述命令安装，
 
 ```
 $ ./petalinux-v2018.1-final-installer.run <path-to-target-install-dir>
