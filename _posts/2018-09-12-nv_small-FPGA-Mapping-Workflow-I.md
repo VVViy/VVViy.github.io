@@ -155,6 +155,8 @@ assign pslverr = 1'b0;
 input [5:0] 	  nvdla_core2dbb_b_bid;
 //input [7:0] 	  nvdla_core2dbb_r_rid;
 input [5:0] 	  nvdla_core2dbb_r_rid;
+
+
 //output [7:0] 	  nvdla_core2dbb_aw_awid;
 output [5:0] 	  nvdla_core2dbb_aw_awid;
 //output [3:0] 	  nvdla_core2dbb_aw_awlen;
@@ -208,7 +210,9 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 	
 2.添加ps，nvdla ip，axi apb bridge，axi interconnect等ip，ps要配置master，slave以及PL-PS中断接口，之后连接接口即可；
 
-3.添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
+3.地址分配，待interface连接完成后，切换到`Address Editor`页面，右键选择`Auto Assign Address`对互连接口进行地址映射，`slave`接口保留64k即可. 之后切换回`Diagram`窗口，`validate`.
+
+4.添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
 
 ### Step 5: [optional] 测试
 Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
