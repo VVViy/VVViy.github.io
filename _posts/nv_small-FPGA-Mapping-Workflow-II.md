@@ -173,8 +173,11 @@ opendla-objs := .......................
 ...
 SRC_URI = "file://makefile \
 ```
+
    ~~file://opendla.c~~
-```           file://cdp.c \
+   
+```           
+           file://cdp.c \
            ...
            file://opendla.h \
            ...
@@ -196,7 +199,7 @@ SRC_URI = "file://makefile \
 
             nvdla_reserved: buffer@0 {
                       no-map;
-                      reg = <0x0 0x70000000 0x0 0x40000000>;
+                      reg = <0x0 0x40000000 0x0 0x40000000>;
             };
     };
 };
