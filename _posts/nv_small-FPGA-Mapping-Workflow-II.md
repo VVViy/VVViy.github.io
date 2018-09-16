@@ -237,6 +237,7 @@ $ cd <path-to-petalinux-prj>/images/linux/
 $ lsblk -a
 # make sure your SD partition 2 label---sdX2, X may be 'b' or 'c' 
 ...
+$ sudo umount /dev/sdX2
 $ sudo dd if=rootfs.etx4 of=/dev/sdX2
 ...
 $ sync
