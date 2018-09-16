@@ -121,7 +121,7 @@ $ petalinux-build
 ```
 
 ### Step 4: Create and add KMD module by petalinux tool
-1.创建`modules`子工程,驱动模块kmd的编译只能通过petalinux工具编译添加，且编译方式不同于`nvdla/sw/readme`中介绍的`generic kernel out-of-tree module build`（可参考linux kernel官网[Building External Modules](https://www.kernel.org/doc/Documentation/kbuild/modules.txt)）,创建modules子工程
+1.创建`modules`子工程，驱动模块kmd的编译只能通过petalinux工具编译添加，且编译方式不同于`nvdla/sw/readme`中介绍的`generic kernel out-of-tree module build`（可参考linux kernel官网[Building External Modules](https://www.kernel.org/doc/Documentation/kbuild/modules.txt)）,创建modules子工程
 
 ```
 $ petalinux-create -t modules -n opendla --enable
