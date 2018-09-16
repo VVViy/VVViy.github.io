@@ -24,7 +24,9 @@ tags:
 * Vivado: 2017.4
 * Petalinux: 2017.4, Linux kernel v4.9
 
-  (不同版本petalinux的linux kernel版本不同，从而DMA API不同，导致对nvdla/sw/kmd驱动源码的修改方式有些区别).* Board: Xilinx zcu102 rev1.0
+  (不同版本petalinux的linux kernel版本不同，从而DMA API不同，导致对nvdla/sw/kmd驱动源码的修改方式有些区别).
+  
+* Board: Xilinx zcu102 rev1.0
 
 ### Step 1: Build tree and vmod (Linux)
 官方HW工程是通过在branch/spec/defs/下定义不同的spec来对相同源码构建不同的行为模型架构，所以，源码内部有很多的c++和perl相关的条件编译。因此，在搭建vivado工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将nv_small/vmod/nvdla编译为纯RTL source code.
