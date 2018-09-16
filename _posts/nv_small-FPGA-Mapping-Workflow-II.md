@@ -98,7 +98,7 @@ $ petalinux-config -c kernel
 ### Step 3: Customize the linux kernel for building UMD
 `nvdla/sw/prebuilt/linux/`中包含了官方在`kernel v4.13.3`下预编译的`nvdla_runtime`ELF文件和依赖库`libnvdla_runtime.o`文件，但`patelinux 2017.4`的kernel是`v4.9`，两个版本的DMA API不同，导致依赖于`DRM`实现`DMA`数据搬移的`KMD`驱动无法工作，从而，`UMD`无法正常运行，因此，需要重新为4.9版本编译`UMD`. 
 
-本来最初打算写`recipe`通过petalinux的`bitbake`直接编译`/nvdla/umd/`下的源码，将动态库`.o`和`elf`添加到`rootfs`下，但研究发现这很难实现，petalinux工具只能添加`prebuilt`的.o文件，而不能新建以库文件为目标的子工程（只能创建`apps`，`modules`和`install`子工程），即使将`.o`的编译添加到`nvdla_runtime`的`apps`子工程`makefile`编译中，如何配置对应`recipe`保存中间生成的`.o`文件到`rootfs`，也是个难题. 所以，最后选择配置kernel，添加`GNU toolchain`，直接下板编译`UMD`的一切所需,`nvdla/sw/umd/`源码目录结构对应的`makefile`将编译依赖关系妥善处理，所以，直接下板`make`即可，比较方便.
+本来最初打算写`recipe`通过petalinux的`bitbake`直接编译`/nvdla/sw/umd/`下的源码，将动态库`.o`和`elf`添加到`rootfs`下，但研究发现这很难实现，petalinux工具只能添加`prebuilt`的.o文件，而不能新建以库文件为目标的子工程（只能创建`apps`，`modules`和`install`子工程），即使将`.o`的编译添加到`nvdla_runtime`的`apps`子工程`makefile`编译中，如何配置对应`recipe`保存中间生成的`.o`文件到`rootfs`，也是个难题. 所以，最后选择配置kernel，添加`GNU toolchain`，直接下板编译`UMD`的一切所需,`nvdla/sw/umd/`源码目录结构对应的`makefile`将编译依赖关系妥善处理，所以，直接下板`make`即可，比较方便.
 
 1.定制rootfs，实际上，petalinux不仅提供了很多不同平台版本的可配置kernel镜像，还提供了各种系统工具包和库文件，像OpenCV，Xen等等，配置根目录
 
