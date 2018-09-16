@@ -213,7 +213,7 @@ SRC_URI = "file://makefile \
         所以对其修改无用.而system-user.dtsi不会被工具修改；
     
     2). Device tree格式目前尚无统一标准，Linaro在牵头组织，已经发布了DeviceTree Specification Release v0.2 
-        (www.devicetree.org)但内容尚不完整，作者参考了Linaro, Linux， Raspberry Pi， ARM， NXP， Toradex等多
+        (www.devicetree.org)但内容尚不完整，作者参考了Linaro，Linux，Raspberry Pi，ARM，NXP，Toradex等多
         家的Device Tree文档，后期会在Blog里挂出survey and summary文档.
 
 ### Step 6: Build petalinux project and package bootloader files
