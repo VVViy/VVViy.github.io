@@ -39,7 +39,7 @@ $ ./petalinux-[version NO.]-final-installer.run <path-to-target-install-dir>
 ```
 $ apt-get install tftpd tftp openbsd-inetd
 $ echo tftp dgram udp wait nobody /usr/sbin/tcpd /usr/sbin/in.tftpd /tftproot >> /etc/inetd.conf
-$ mkdir -p <specified-dir>/tftproot
+$ mkdir /tftproot
 $ /etc/init.d/openbsd-inetd restart
 ```
 
