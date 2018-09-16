@@ -19,12 +19,12 @@ tags:
   
  
 ### Development environment setup
-* Win10: build vivado prj for HW;
-* Vmware Ubuntu 16.04: host for petalinux prj;
+* Win10: build vivado project for HW
+* Vmware Ubuntu 16.04: host for petalinux project
 * Vivado: 2017.4
-* Petalinux: 2017.4, Linux kernel v4.9
+* Petalinux: 2017.4, Linux kernel v4.9.
 
-  (不同版本petalinux的linux kernel版本不同，从而DMA API不同，导致对nvdla/sw/kmd驱动源码的修改方式有些区别).
+  (不同版本petalinux的linux kernel版本不同，从而DMA API不同，导致对nvdla/sw/kmd驱动源码的修改方式有些区别)
   
 * Board: Xilinx zcu102 rev1.0
 
