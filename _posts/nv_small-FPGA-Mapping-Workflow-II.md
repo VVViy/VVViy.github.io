@@ -73,7 +73,7 @@ $ petalinux-creat -t project --template [zynq/zynqMP/microblaze] -n [project_nam
         
     2). petalinux的相关命令，可参考UG1157.
     
-2.配置petalinux工程，首先将Vivado `export hardware`输出的`*.hdf`文件拷贝到新建的petalinux工程目录下，之后运行如下命令，
+2.配置petalinux工程，首先将Vivado `export hardware`输出的`?.hdf`文件拷贝到新建的petalinux工程目录下，之后运行如下命令，
 
 ```
 $ cd <path-to-petalinux-prj>
@@ -90,7 +90,7 @@ $ petalinux-config --get-hw-description=./
 $ petalinux-config -c kernel
 ```
 
-弹出窗口中，选择..........................，取消掉.....................，如Fig-1，退出并保存配置.
+弹出窗口中，选择..........................，取消掉.....................，如Fig-1，实际上，可以进一步配置`kernel`，为其"瘦身"，如在`Device Drivers`中取消掉不使用的外设驱动，最后，退出并保存配置.
 
 
     Fig-1
@@ -127,7 +127,7 @@ $ petalinux-build
 $ petalinux-create -t modules -n opendla --enable
 ```
 
-modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/files/`目录下.
+modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/files/`目录下，并将目录下的`opendla.c`文件删除.
 
 2.修改驱动源文件,之前提到不同版本的kernel，对应的API有所不同，需要根据自己的内核版本修改驱动源码中的调用函数. 作者使用4.9内核，需做如下修改
 
@@ -140,7 +140,7 @@ modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<p
 ...
 ```
 
-* `line 439: dma_declare_coherent_memory(drm->dev, 0xC0000000, 0xC0000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);`该函数表示需要在`PS DDR`中保留一块不被kernel支配，大小为`0x40000000`的地址空间，以便`nvdla core`使用`DMA`方式对`CNN`输入图像和处理结果在Cache与DDR间进行数据搬移，不知为何官方源码采用了硬编码方式处理物理地址，总线地址和存储块尺寸参数. 按照源码中的注释`/* TODO Register separate driver for memory and use DT node to read memory range */`， 表明官方不希望我们修改函数中的参数信息，而是根据参数值去修改`device tree`中对应的`Node`属性值.但在Vivado BD工程中，`PS DDR`的有效地址为`0x00000000 ~ 0x7FFFFFFF`, 显然，参数列表中的物理地址和总线地址不在`PL`的有效访问范围内，必须对此进行修改，至于具体改为什么值，可自行选择，只要是`page size`整数倍便可，如`256 MiB`,那么便将两个`0xC0000000`修改为`0x70000000`(为何取高位地址，感兴趣的可参考[Memory Mapping and DMA](http://static.lwn.net/images/pdf/LDD3/ch15.pdf),老司机请略过), 同时，存储块尺寸不需要修改. 作者保留了1G空间,
+* `line 439: dma_declare_coherent_memory(drm->dev, 0xC0000000, 0xC0000000,0x40000000, DMA_MEMORY_MAP | DMA_MEMORY_EXCLUSIVE);`该函数表示需要在`PS DDR`中保留一块不被kernel支配，大小为`0x40000000`的地址空间，以便`nvdla core`使用`DMA`方式对`CNN`输入图像和处理结果在Cache与DDR间进行数据搬移，不知为何官方源码采用了硬编码方式处理物理地址，总线地址和存储块尺寸参数. 按照源码中的注释`/* TODO Register separate driver for memory and use DT node to read memory range */`， 表明官方不希望我们修改函数中的参数信息，而是根据参数值去修改`device tree`中对应的`Node`属性值.但在Vivado BD工程中，`PS DDR`的有效地址为`0x00000000 ~ 0x7FFFFFFF`, 显然，参数列表中的物理地址和总线地址不在`PL`的有效访问范围内，必须对此进行修改，至于具体改为什么值，可自行选择，只要是`page size`整数倍便可，如`256 MiB`,那么便可将`0xC0000000`修改为`0x70000000`(为何取高位地址，感兴趣的可参考[Memory Mapping and DMA](http://static.lwn.net/images/pdf/LDD3/ch15.pdf),老司机请略过), 同时，存储块尺寸不需要修改. 作者保留了1G空间,
 
 ```
 ...
@@ -152,12 +152,39 @@ modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<p
 **====Tips====**
 
     对于使用2018版Xilinx工具的小伙伴，除了上述修改，还要删除DMA_MEMORY_MAP flag，官方开发者在issue中提到该flag已经
-    在kernel v4.13后续版本中删除了该flag.
+    在kernel v4.13后续版本中停用了.
 
 * 对于`nv_small`版本，还要修改`nvdla/sw/kmd/firmware/include/opendla.h`，添加`DLA_SMALL_CONFIG`宏，这样`KMD`驱动才能根据`opendla_small.h`寄存器声明来完成对`nvdla core`内部子内核的裁剪,使其符合`nv_small/spec/defs/nv_small.spec`定义.
 
+3.配置`makefile`和`recipe`，打开目录下的`makefile`文件将构成`opendla.ko`的`.o`对象添加其中，
+```
+opendla-m := opendla.o
+
+###append all of sources###
+opendla-objs := .......................
+###########################
+...
+```
+
+之后，打开`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/`下的`?.bb`，为之前新增加的源文件添加声明，
+
+```
+...
+SRC_URI = "file://makefile \
+```
+   ~~file://opendla.c~~
+```
+           file://cdp.c \
+           ...
+           file://opendla.h \
+           ...
+           file://COPYRIGHT \
+"
+...
+```
+
 ### Step 5: Modify the default device tree for NVDLA identification
-`Device tree`是`ARM`处理器`Bootloader`必备之品，`FSBL`在系统boot阶段将`device tree`加载到内存，之后的kernel才会根据其内部`Node`配置内核，确定有哪些硬件设备可用.这个"确定"过程首先便是通过特定`diver`的`probe`函数搜索`DTB`中是否存在匹配的`Compatible`属性. 那么对于nvdla工程，需要查看`KMD`驱动`nvdla probe`函数的`Compatible`属性值是否与petalinux工程中`device tree`中`PL node`中的`Compatible`相一致，查看`nvdla/sw/kmd/port/linux/nvdla_core_callbacks.c, line 338`显示`kmd probe`函数指定的`compatible`属性值为`.compatible = "nvidia,nvdla_2"`(`nvdla/sw/kmd/Documentation/devicetree/bindings/nvdla/nvdla.txt`中的`compatible`属性值`compatible = "nvidia,nvdla-1"`是针对`nvdla_full`版本的)，而`<path-to-petalinux-prj>/component/plnx_workspace/device-tree/pl.dtsi`中的节点信息描述了我们在Vivado中创建的`nvdla`工程，其中的`compatible`属性值显然与驱动函数中的不同，需要修改一致. 即在`<path-to-petalinux-prj>/project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi`覆盖掉`compatible`属性值，并添加之前提到的`reserved memory`(`reserved memory`的节点定义可参考[Linux Reserved Memory](http://www.wiki.xilinx.com/Linux+Reserved+Memory))
+`Device tree`是`ARM`处理器`Bootloader`必备之品，`FSBL`在系统boot阶段将`device tree`加载到内存，之后，kernel才能根据`nodes inside device tree`确定当前环境下有哪些外围设备可供kernel驱使，而这个"确定"过程主要是通过特定`diver`的`probe`函数搜索`DTB`中是否存在匹配的`compatible`属性来实现的. 所以，对于nvdla工程，需要查看`KMD`驱动中`nvdla probe`函数的`compatible`属性值是否与petalinux工程下`device tree`中`PL node`的`compatible`属性值一致. 查看`nvdla/sw/kmd/port/linux/nvdla_core_callbacks.c, line 338`，显示`nvdla probe`函数指定的`compatible`属性值为`.compatible = "nvidia,nvdla_2"` (`nvdla/sw/kmd/Documentation/devicetree/ bindings/nvdla/nvdla.txt`中的`compatible`属性值`compatible = "nvidia,nvdla-1"`是针对`nvdla_full`版本的)，而`<path-to-petalinux-prj>/component/plnx_workspace/device-tree/pl.dtsi`中的节点信息描述了我们在Vivado中创建的`nvdla`工程，其中的`compatible`属性值显然与驱动函数中的不同，需要修改一致. 即在`<path-to-petalinux-prj>/project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi`覆盖掉`compatible`属性值，并添加之前提到的`reserved memory`(`reserved memory`的节点定义可参考[Linux Reserved Memory](http://www.wiki.xilinx.com/Linux+Reserved+Memory))
 
 ```
 /include/ "system-conf.dtsi"
@@ -174,7 +201,7 @@ modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<p
     };
 };
 
-&[your lable-name appeared in pl.dtsi]{
+&[your label-name appeared in pl.dtsi]{
     compatible = "nvidia,nvdla_2";
     memory-region = <&nvdla_reserved>;
 }
@@ -182,13 +209,13 @@ modules子工程创建后，将`nvdla/kmd/`下的所有`.c,.h`文件拷贝到`<p
 
 **====Tips====**
 
-    1). 根据`UG1144 APPX.B Table B-1`所言,<path-to-petalinux-prj>/component/plnx_workspace/device-tree/
-        目录下后缀为`.dtsi`和`.dts`的`device tree`定义文件是petalinux工具自动生成的，每次`petalinux-build`都会
-        自动覆盖更新，所以对其修改无用.而`system-user.dtsi`不会被工具修改.
+    1). 根据UG1144 APPX.B Table B-1所言,<path-to-petalinux-prj>/component/plnx_workspace/device-tree/目录
+        下后缀为.dtsi和.dts的device tree定义文件是petalinux工具自动生成的，每次petalinux-build都会自动覆盖更新，
+        所以对其修改无用.而system-user.dtsi不会被工具修改；
     
-    2). Device tree格式目前尚无统一标准，Linaro要牵头出标准，已经发布了DeviceTree Specification Release v0.2 
-        (www.devicetree.org)但内容尚不完整，作者参考了Linaro, Linux， Raspberry Pi， ARM， NXP， Toradex等多家
-        的Device Tree文档，后期会在Blog里挂出survey and summary文档.
+    2). Device tree格式目前尚无统一标准，Linaro在牵头组织，已经发布了DeviceTree Specification Release v0.2 
+        (www.devicetree.org)但内容尚不完整，作者参考了Linaro, Linux， Raspberry Pi， ARM， NXP， Toradex等多
+        家的Device Tree文档，后期会在Blog里挂出survey and summary文档.
 
 ### Step 6: Build petalinux project and package bootloader files
 1.重新编译petalinux,在之前的`petalinux-build`之后，不仅创建了`modules`子工程，而且修改了`device tree`，所以需要重新编译整个工程，如果仅仅是添加了`apps/modules`，那么只要按照`UG1144 Chapter 7`做增量编译即可.
@@ -201,15 +228,56 @@ $ petalinux-package --boot --fsbl [zynq_fsbl/zynqmp_fsbl] --fpga [your *.bit fil
 ```
 
 ### Step 7: Partition and configure SD card
-1.SD卡分区，根据`UG1144 Chapter 6 “Configuring SD Card ext filesystem Boot” section`对SD分区，作者将SD卡划分为`BOOT(fat32)`, `rootfs(etx4)`, `Workbench(etx4)`三个分区，分别放置boot文件，rootfs，UMD源文件和测试相关文件.
+1.SD卡分区，根据`UG1144 Chapter 6 “Configuring SD Card ext filesystem Boot” section`对SD分区，作者将SD卡划分为`BOOT(fat32)`, `rootfs(etx4)`, `Workbench(etx4)`三个分区，分别放置boot文件，rootfs，UMD源文件和测试文件.
 
-2.
+2.拷贝分区文件，将`<path-to-petalinux-prj>/images/linux/`下`BOOT.BIN, image.ub`直接拷贝到SD卡的BOOT分区，并将`nvdla/sw/umd`和预编译测试集`nvdla/sw/regression/flatbus/kmd`拷贝到`Workbench`分区. 对于`rootfs`，作者通过`dd`进行的文件系统底层转换，
 
+```
+$ cd <path-to-petalinux-prj>/images/linux/
+$ lsblk -a
+# make sure your SD partition 2 label---sdX2, X may be 'b' or 'c' 
+...
+$ sudo dd if=rootfs.etx4 of=/dev/sdX2
+...
+$ sync
+```
+
+**====Tips====**
+
+    1). nvdla/sw/umd/include/ErrorMacros.h，line 60，根据rootfs目录结构更改此error log路径； 
+    
+    2). 查看nvdla/sw/umd/port/linux/nvdla.c，line 53，说明umd需要使用kmd申请的D128 render实现DMA，
+        所以，下板安装kmd驱动后，可以通过查看/dev/dri下是否存在renderD128, /proc/interrupts是否存在
+        nvdla相关的中断项，可确认kmd驱动是否正确安装.
+    
 ### Step 8: Download and run tests
+1.下板调试，SD卡插回开发板，调整开发板启动模式开关拨到SD启动，host打开串口调试工具配置`port`. 上电后输入用户名密码进入系统，安装驱动，查看`dri`和`interrupts`，
 
+```
+$ insmod /lib/modules/[kernel version number]_.../.../opendla.ko
+...
+$ ls /dev/dri/
+...
+$ cat /proc/interrupts
+...
+```
 
+2.跑测试集，首先将SD第三个分区挂载到目录系统，然后编译`umd`，跑测试脚本, 如Fig-4. 如果SD p3挂载在/media/card，则
 
+```
+$ cd /media/card/umd
+$ export TOP=$pwd
+$ make TOOLCHAIN_PREFIX=/usr/bin/
+...
+$ dmesg -n 1
+$ su root ./run_test.sh
+```
 
+    Fig-4
+
+**====Tips====**
+
+    在run_test.sh脚本中，执行nvdla_runtime之前，要先为其声明依赖库路径，export LD_LIBRARY_PATH=<path-to-libnvdla_runtime.o>
 
 
 
