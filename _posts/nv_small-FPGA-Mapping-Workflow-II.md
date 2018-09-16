@@ -29,7 +29,7 @@ Xilinx petalinux是一个定制版的`Yocto`工具，Xilinx已经把BSP准备的
 3.安装petalinux，到[Xilinx Download Center](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html)下载`petalinux [version number] installer`,`[version number]`要和Vivado版本一致，其他的`BSP, sstate`无需下载，`petalinux-build`工程时，会自动download. 运行下述命令安装，
 
 ```
-$ ./petalinux-v2018.1-final-installer.run <path-to-target-install-dir>
+$ ./petalinux-[version NO.]-final-installer.run <path-to-target-install-dir>
 ```
 
 和S家EDA工具安装.run文件一样，不要以sudo权限安装，`permission denial`就`chmod`改下权限. 安装目录自选即可，之前有个Agilent工程师说必须安装在`/opt/pkg/`下，否则可能会crash，也许是`centos`系统原因，`ubuntu`并不存在此问题. 另外，安装进程到`license`时，有限几处会出现`...[y/N]?`，别急着回车，这里默认是`N`，需要手动`y`.
