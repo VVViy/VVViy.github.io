@@ -248,7 +248,7 @@ $ sync
     
     2). 查看nvdla/sw/umd/port/linux/nvdla.c，line 53，说明umd需要使用kmd申请的D128 render实现DMA，
         所以，下板安装kmd驱动后，可以通过查看/dev/dri下是否存在renderD128, /proc/interrupts是否存在
-        nvdla相关的中断项，可确认kmd驱动是否正确安装.
+        nvdla相关的中断项，来确认kmd驱动是否正确安装.
     
 ### Step 8: Download and run tests
 1.下板调试，SD卡插回开发板，调整开发板启动模式开关拨到SD启动，host打开串口调试工具配置`port`. 上电后输入用户名密码进入系统，安装驱动，查看`dri`和`interrupts`，
