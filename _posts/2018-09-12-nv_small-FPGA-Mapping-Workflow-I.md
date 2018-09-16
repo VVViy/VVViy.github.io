@@ -13,9 +13,9 @@ tags:
 ---
 
 ### Preface
-  本文将简要介绍映射nvdla nv_small版本到FPGA过程中可能遇到的‘坑’，旨在给做相同工作的小伙伴一个参考，不作指导性建议. 
+  本文将简要介绍映射`nvdla nv_small`版本到FPGA过程中可能遇到的‘坑’，旨在给做相同工作的小伙伴一个参考，不作指导性建议. 
   
-  本文会尽可能完整地描述从官方源码构建vivado IP工程到最终BD工程网表生成的全部步骤以及每个步骤中容易出错的地方。但需要**==说明==**的是，该映射工作是本人公司项目的一部分，所以，受规则所限，文中不会直接展示官方开源内容以外的设计内容，望谅解.
+  本文会尽可能完整地描述从官方源码构建`vivado IP`工程到最终`BD`工程网表生成的全部步骤以及每个步骤中容易出错的地方。但需要**==说明==**的是，该映射工作是本人公司项目的一部分，所以，受规则所限，文中不会直接展示官方开源内容以外的设计内容，望谅解.
   
  
 ### Development environment setup
@@ -24,12 +24,12 @@ tags:
 * Vivado: 2017.4
 * Petalinux: 2017.4, Linux kernel v4.9.
 
-  (不同版本petalinux的linux kernel版本不同，从而DMA API不同，导致对nvdla/sw/kmd驱动源码的修改方式有些区别)
+  (不同版本`petalinux`的`linux kernel`版本不同，从而`DMA API`不同，导致对`nvdla/sw/kmd`驱动源码的修改方式有些区别)
   
 * Board: Xilinx zcu102 rev1.0
 
 ### Step 1: Build tree and vmod (Linux)
-官方HW工程是通过在branch/spec/defs/下定义不同的spec来对相同源码构建不同的行为模型架构，所以，源码内部有很多的c++和perl相关的条件编译。因此，在搭建vivado工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将nv_small/vmod/nvdla编译为纯RTL source code.
+官方HW工程是通过在`branch/spec/defs/`下定义不同的`spec`对同一源码构建不同的行为模型架构，所以，源码内部有很多的`c++`和`perl`相关的条件编译。因此，在搭建`vivado`工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将`nv_small/vmod/nvdla`编译为纯RTL source code.
 
 **====Tips====** 
 
@@ -51,13 +51,13 @@ CPAN > install YAML
 CPAN > exit
 ```
 
-成功`[TMAKE]:DONE`后，在目录下会生成一个`outdir`目录，目录下便是搭建vivado所需的全部RTL code.
+成功`[TMAKE]:DONE`后，在目录下会生成一个`outdir`目录，目录下便是搭建`vivado`所需的全部`RTL code`.
 
 
 ### Step 2: 新建RTL工程 (Win10)
-1.添加源文件，可按照nv_small/spec/defs/nv_small.spec描述来指定vmod/nvdla/下待添加的内核源文件————small版本不包含bdma，retiming和rubik内核(文件夹)以及其他文件夹中的部分.v————实际中，可先添加top文件下的modules，之后，vivado显示的hierarchy中缺少什么文件，加之即可;
+1.添加源文件，可按照`nv_small/spec/defs/nv_small.spec`描述来指定`vmod/nvdla/`目录下待添加的内核源文件————small版本不包含`bdma`，`retiming`和`rubik`内核(文件夹)以及其他文件夹中的部分`.v`————实际中，可先添加`top`文件下的`modules`. 之后，`vivado`显示的hierarchy中缺少什么文件，加之即可;
 
-2.添加RAM文件时，要选择`outdir/nv_small/vmod/rams/fpga/small_rams/`文件夹下的RAM源文件;
+2.添加`RAM`文件时，要选择`outdir/nv_small/vmod/rams/fpga/small_rams/`文件夹下的`RAM`源文件;
 
 **====Tips====** 
 
@@ -67,7 +67,7 @@ CPAN > exit
     2). 待全部缺失文件补全后，可能会发现在NV_nvdla hierarchy以外，还存在一些modules，这个是因为一个文
         件中定义了多个modules，可以将未用到的modules comment掉.
 	
-3.关闭clock gating，原设计对RAM存储op使用了大量clock gating以降低功耗，但与processor，ASIC不同，FPGA的时钟树是设计好的，clock buf资源有限，若不关闭gating，可能产生很大skew(之前因为部分gating未关闭，测试一直不过)；使用到的clock gating开关宏包括以下4个，我个人是定义了一个.vh文件，define了这些宏，然后将该头文件include到指定.v文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关.v，不过用notepad++全局搜索，效率倒是还可以，大家自行处理;
+3.关闭`clock gating`，原设计对`RAM`存储op使用了大量`clock gating`以降低功耗，但与`processor，ASIC`不同，FPGA的时钟树是设计好的，`clock buf`资源有限，若不关闭`gating`，可能产生很大`skew`(之前因为部分`gating`未关闭，测试一直不过). 使用到的`clock gating`开关宏包括以下4个，我个人是定义了一个`.vh`文件，define了这些宏，然后将该头文件`include`到指定`.v`文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关`.v`，不过用`notepad++`全局搜索，效率倒是还可以，大家自行处理;
 
 - VLIB_BYPASS_POWER_CG
 - NV_FPGA_FIFOGEN
@@ -76,23 +76,23 @@ CPAN > exit
 
 **====Tips====** 
 
-    1). 其实，也可以不关闭gating信号逻辑，使用syth选项支持相关逻辑的clock gating，clk buf会增加, 测试了
+    1). 实际上，也可以不关闭gating信号逻辑，可使用syth选项支持相关逻辑的clock gating，clk buf会增加, 作者测试了
         部分信号, 待测试全部信号的资源消耗和逻辑稳定性.
 	
     2). nvdla_pwrbus_ram_*_pd相关逻辑，可以转化使用BRAM的sleep达到相同效果，待测试.
 
-4.[optional] 之后可在top module里添加generated时钟，进行综合、布局布线，查看资源开销、功耗和时钟频率等信息.
+4.[optional] 之后可在`NV_nvdla`里添加generated时钟，进行综合、布局布线，查看资源开销、功耗和时钟频率等信息.
 
 
 ### Step 3: 封装IP (Win10)
-1.添加wrapper，如果在NV_nvdla里例化了generated clock，请删除，另外，为了在block design中能够与PS的AXI master和slave接口连接，需要在当前工程结构下，再增加一个NV_nvdla_wrapper module封装NV_nvdla和apb2csb modules;
+1.添加wrapper，如果在`NV_nvdla`里例化了`generated clock`，请删除，另外，为了在`block design`中连接`PS`的`AXI master`和`AXI slave`接口，需要在当前工程结构下，增加一个NV_nvdla_wrapper module封装`NV_nvdla`和`NV_NVDLA_apb2csb` modules;
 
 **====Tips====** 
 	
-	也可以将axi apb bridge ip同时封装在wrapper中，这样在BD工程中，PS->nvdla ip方向通信就变成了
-	axi master->axi slave接口互连映射,而非本文采用的axi master->axi apb bridge->apb slave互连模式. 
+	也可以将axi apb bridge IP同时封装在wrapper中，这样在BD工程中，PS->nvdla IP方向通信就变成了
+	axi master->axi slave接口互连映射，而非本文采用的axi master->axi apb bridge->apb slave互连模式. 
 	
-2.补全AXI与APB信号，NVDLA使用AXI和APB协议与MCU通信，但是源码中缺失了部分信号需要按照`AMBA AXI and ACE Protocol Spec`和`AMBA 3 APB Protocol spec`补全缺失的AXI,APB信号，即
+2.补全`AXI`与`APB`信号，`NVDLA`使用`AXI`和`APB`协议与`PS`通信，但源码中缺失了部分`AXI`协议信号，需按照`AMBA AXI and ACE Protocol Spec`和`AMBA 3 APB Protocol spec`补全缺失的`AXI, APB`信号，即
 
 ```
 //append axi signal to NV_nvdla_wrapper signal list
@@ -120,7 +120,7 @@ input   	  M_AXI_RUSER
 output            S_APB_PSLVERR,
 ```
 
-并将相应信号分别添加到NV_nvdla和NV_NVDLA_apb2csb的信号列表中，并分别添加如下赋值代码，
+并将相应信号分别添加到`NV_nvdla`和`NV_NVDLA_apb2csb`的信号列表中，并分别添加如下赋值代码，
 
 ```	
 //add these code to NV_nvdla module
@@ -146,9 +146,9 @@ assign pslverr = 1'b0;
 
 **====Tips====**
 	
-	添加如上信号后，其实已经能够在BD工程中完成interface连接任务了，但是仅作上述修改，BD工程中必须要使用AXI
-	smartconnect做PL和PS的接口互连，如果想使用AXI interconnect或干脆直接将NVDLA master与PS slave互连，
-	还要进一步修改如下信号位宽,否则，BD工程在validate的时候会报错.
+	添加上述信号后，其实已经能够在BD工程中完成interface连接任务了，但是仅作上述修改，BD工程中必须要使用AXI
+	smartconnect IP做PL与PS的接口互连，如果要使用AXI interconnect IP或干脆直接将NVDLA master与PS slave互连，
+	就要进一步修改如下信号位宽, 否则，BD工程在validate时会报错.
 
 ```
 //modify following signal bit width in NV_nvdla module
@@ -167,20 +167,20 @@ output [5:0] 	  nvdla_core2dbb_ar_arid;
 output [7:0] 	  nvdla_core2dbb_ar_arlen;
 ```
 
-实际上，所有的*_id signal只有后4位work. 另外，不要忘了在NV_nvdla module的NV_NVDLA_partition_o u_partition_o{...}实例中修改相应信号位宽，这里就不写了.
+实际上，所有的*_id signal只有后4位work. 另外，不要忘了在`NV_nvdla` module的`NV_NVDLA_partition_o u_partition_o{...}`实例中修改相应信号位宽，这里就不写了.
 
-3.添加xdc，新建两个xdc文件，一个为IP在OOC综合时使用，另一个则是在global syth时使用，OOC xdc可以直接约束两个primary clk，如
+3.添加`xdc`，新建两个`xdc`文件，一个为`nvdla IP`在`OOC`综合时使用，另一个则是在`global syth`时使用，`OOC xdc`可以直接约束两个primary clk，如
 
 ```
 create_clock -period 10.001 -name u_dla_core_clk [get_ports u_dla_core_clk];
 create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 ```
 
-另一个xdc保持空白就行，这里涉及到了一个xdc的scope问题，感兴趣的可以参考Xilinx的UG903.除此之外，在`source`窗口选中OOC版本的xdc，在属性窗口的`USED_IN`属性里添加`out-of-context`选项，否则，BD综合时就出问题了，选中另一版本xdc，在属性窗口中为`PROCESSING_ORDER`属性选择`LATE`.
+另一个`xdc`保持空白即可，这里涉及到了一个`xdc scope`问题，感兴趣的可以参考`xilinx UG903`. 除此之外，在`source`窗口选中`OOC`版本的`xdc`，并在属性窗口中，为`USED_IN`属性添加`out-of-context`选项，否则，`BD`综合时将多出两个主时钟. 选中另一版本`xdc`，在属性窗口中为`PROCESSING_ORDER`属性选择`LATE`, 这样，如果后期在该约束文件中为`nvdla IP`添加新约束，那么`BD`工程综合时不会与全局约束冲突.
 
-4.封装nvdla IP，Tools-->Create and Package New IP-->Package your current project, next and finish;
+4.封装`nvdla IP`，`Tools-->Create and Package New IP-->Package your current project`, next and finish;
 	
-5.AXI master interface推断，点击`Ports and Interfaces`，如Fig-1, 查看是否有自动推断出的master接口，若没有，选中全部master接口信号，右键选择`Auto Infer Interface`，推断出master接口信号后，需要检查位宽是否与源文件中声明的相一致(之前出现过标量矢量化的情况，工具坑)，即`Size Left`，`Size Right`，另外，检查`Driver Value`，如Fig-2, 若官方源码中声明的信号在此列表中显示驱动强度为0，则选中该信号，在属性窗口删除0值，另外，需要对上面我们后添加的master信号，将驱动强度设置为0；
+5.`AXI master` interface推断，点击`Ports and Interfaces`，如Fig-1, 查看信号列表中是否存在自动推断出的`AXI master`接口，若没有，则在信号列表中选中全部`master`接口信号，右键选择`Auto Infer Interface`，推断出`master`接口信号后，需要检查位宽是否与源文件中声明的相一致(之前出现过标量矢量化的情况，工具坑)，即`Size Left`，`Size Right`. 另外，检查`Driver Value`，如Fig-2, 若官方源码中声明的信号在此列表中显示驱动强度为`0`，则选中该信号，在属性窗口删除`0`值，另外，需要对上面我们后添加的`master`信号，将驱动强度设置为`0`；
 	
 ![Interface part](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%231.JPG?raw=true)
 
@@ -190,9 +190,9 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 
                                               Fig-2
 
-6.APB slave interface推断,这个接口不会自动推断，需要选中全部APB信号，右键自动推断，在弹出窗口中依次选择`Advanced`-->`apb_rtl`, 推断出AXI和APB信号后，右键两个接口信号，选择`Associate Clocks`，分别关联两个clk即可，若core和csb跑异步时钟，那么AXI关联core clk，APB关联csb clk；
+6.`APB slave` interface推断,这个接口工具不会自动推断，需要选中全部`APB`信号，右键自动推断，在弹出窗口中依次选择`Advanced`-->`apb_rtl`. 在推断出`AXI`和`APB`信号后，分别右键两个接口信号，选择`Associate Clocks`，分别关联`AXI master`-->`*_core_clk`和`APB slave`-->`*_csb_clk`；
 	
-7.APB memory map, 因为AXI/APB master-slave接口是memory-map机制做数据映射的，我画了一个简图Fig-3. 不同于AXI memory block的自动生成，APB memory block需要额外添加，选择`Addressing and Memory`-->`Memory Maps(for slaves)`，右键`IP Addressing and Memory Wizard`选择APB接口信号，继续右键`Add Address Block`(因为一块连续地址，一个block便可)，如Fig-4；
+7.`APB memory map`, `AXI/APB master-slave`接口是通过`memory-map`机制做数据映射的，作者画了一个映射结构简图Fig-3. 不同于`AXI master memory block`的自动生成. `APB memory block`需要自行添加，选择`Addressing and Memory`-->`Memory Maps(for slaves)`，右键`IP Addressing and Memory Wizard`, 弹出窗口中选择`APB`接口信号，继续右键`Add Address Block`(因为一块连续地址，一个block便可)，弹出窗口键入`reg`，如Fig-4；
 
 ![Memory map](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%233.JPG?raw=true)
 
@@ -206,13 +206,13 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 
 
 ### Step 4: 新建BD工程 (Win10)
-1.新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的IP(nvdla_ip_prj_name.srcs)添加到IP列表，新建BD工程`Flow Navigator`-->`Create Block Design`；
+1.新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的`nvdla IP` (nvdla_ip_prj_name.srcs)添加到IP列表，新建`BD`工程, `Flow Navigator`-->`Create Block Design`；
 	
-2.添加ps，nvdla ip，axi apb bridge，axi interconnect等ip，ps要配置master，slave以及PL-PS中断接口，之后连接接口即可；
+2.添加`ps，nvdla ip，axi apb bridge，axi interconnect`等IP，`ps`要配置`AXI master，AXI slave`以及`pl_ps_irq`中断接口，之后连接接口即可；
 
-3.地址分配，待interface连接完成后，切换到`Address Editor`页面，右键选择`Auto Assign Address`对互连接口进行地址映射，`slave`接口保留64k即可. 之后切换回`Diagram`窗口，`validate`.
+3.地址分配，待interface连接完成后，切换到`Address Editor`页面，右键选择`Auto Assign Address`对互连接口进行地址映射，`slave`接口保留`64k`即可. 之后切换回`Diagram`窗口，`validate`.
 
-4.添加xdc，综合、布局布线和输出bit文件，之后export hardware（复选'include bitstream'）.
+4.添加`xdc`，综合、布局布线和输出`bit`文件，之后`export hardware`（复选'include bitstream'）.
 
 ### Step 5: [optional] 测试
 Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
