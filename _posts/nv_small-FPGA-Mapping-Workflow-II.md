@@ -81,7 +81,7 @@ $ petalinux-config --get-hw-description=./
 ```
 
 * 在配置界面中，选中`DTG settings`-->`template...`, enter进入修改为开发板版本，如`zcu102-rev1.0`，详见`UG1144 Chapter 3，p22`；
-* 进入`Image Packaging Configuration`-->`Root Filesystem Type`，enter进入选中`SD card`. 修改此处后，linux根目录系统`rootfs`将配置到SD中，而非默认的`raminitfs`，后者是将根目录系统镜像在boot阶段加载到内存中，一旦裁剪的kernel较大（大概超过120M），那么系统boot不起来；
+* 进入`Image Packaging Configuration`-->`Root Filesystem Type`，选中`SD card`. 修改此处后，linux根目录系统`rootfs`将配置到SD中，而非默认的`raminitfs`，后者是将根目录系统镜像在boot阶段加载到内存中，一旦裁剪的kernel较大（大概超过120M），那么系统boot不起来；
 * 退出并保存配置.
 
 3.配置kernel，由于`rootfs`配置到SD boot，那么就要取消掉kernel的....ram init....，否则在boot阶段，kernel在内存中找不到rootfs的符号镜像，便会出错，
