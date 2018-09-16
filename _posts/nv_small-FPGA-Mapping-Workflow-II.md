@@ -173,8 +173,7 @@ opendla-objs := .......................
 SRC_URI = "file://makefile \
 ```
    ~~file://opendla.c~~
-```
-           file://cdp.c \
+```           file://cdp.c \
            ...
            file://opendla.h \
            ...
@@ -184,7 +183,7 @@ SRC_URI = "file://makefile \
 ```
 
 ### Step 5: Modify the default device tree for NVDLA identification
-`Device tree`是`ARM`处理器`Bootloader`必备之品，`FSBL`在系统boot阶段将`device tree`加载到内存，之后，kernel才能根据`nodes inside device tree`确定当前环境下有哪些外围设备可供kernel驱使，而这个"确定"过程主要是通过特定`diver`的`probe`函数搜索`DTB`中是否存在匹配的`compatible`属性来实现的. 所以，对于nvdla工程，需要查看`KMD`驱动中`nvdla probe`函数的`compatible`属性值是否与petalinux工程下`device tree`中`PL node`的`compatible`属性值一致. 查看`nvdla/sw/kmd/port/linux/nvdla_core_callbacks.c, line 338`，显示`nvdla probe`函数指定的`compatible`属性值为`.compatible = "nvidia,nvdla_2"` (`nvdla/sw/kmd/Documentation/devicetree/ bindings/nvdla/nvdla.txt`中的`compatible`属性值`compatible = "nvidia,nvdla-1"`是针对`nvdla_full`版本的)，而`<path-to-petalinux-prj>/component/plnx_workspace/device-tree/pl.dtsi`中的节点信息描述了我们在Vivado中创建的`nvdla`工程，其中的`compatible`属性值显然与驱动函数中的不同，需要修改一致. 即在`<path-to-petalinux-prj>/project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi`覆盖掉`compatible`属性值，并添加之前提到的`reserved memory`(`reserved memory`的节点定义可参考[Linux Reserved Memory](http://www.wiki.xilinx.com/Linux+Reserved+Memory))
+`Device tree`是`ARM`处理器`Bootloader`必备之品，`FSBL`在系统boot阶段将`device tree`加载到内存，之后，kernel才能根据`nodes inside device tree`确定当前环境下有哪些外围设备可供kernel驱使，而这个"确定"过程主要是通过特定`diver`的`probe`函数搜索`DTB`中是否存在匹配的`compatible`属性来实现的. 所以，对于nvdla工程，需要查看`KMD`驱动中`nvdla probe`函数的`compatible`属性值是否与petalinux工程下`device tree`中`PL node`的`compatible`属性值一致. 查看`nvdla/sw/kmd/port/linux/nvdla_core_callbacks.c, line 338`，显示`nvdla probe`函数指定的`compatible`属性值为`.compatible = "nvidia,nvdla_2"` (`nvdla/sw/kmd/Documentation/devicetree/bindings/nvdla/nvdla.txt`中的`compatible`属性值`compatible = "nvidia,nvdla-1"`是针对`nvdla_full`版本的)，而`<path-to-petalinux-prj>/component/plnx_workspace/device-tree/pl.dtsi`中的节点信息描述了我们在Vivado中创建的`nvdla`工程，其中的`compatible`属性值显然与驱动函数中的不同，需要修改一致. 即在`<path-to-petalinux-prj>/project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi`覆盖掉`compatible`属性值，并添加之前提到的`reserved memory`(`reserved memory`的节点定义可参考[Linux Reserved Memory](http://www.wiki.xilinx.com/Linux+Reserved+Memory))
 
 ```
 /include/ "system-conf.dtsi"
