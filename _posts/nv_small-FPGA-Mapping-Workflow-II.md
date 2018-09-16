@@ -157,6 +157,7 @@ modules子工程创建后，将`nvdla/sw/kmd/`下的所有`.c,.h`文件拷贝到
 * 对于`nv_small`版本，还要修改`nvdla/sw/kmd/firmware/include/opendla.h`，添加`DLA_SMALL_CONFIG`宏，这样`KMD`驱动才能根据`opendla_small.h`寄存器声明来完成对`nvdla core`内部子内核的裁剪，使其符合`nv_small/spec/defs/nv_small.spec`定义.
 
 3.配置`makefile`和`recipe`，打开目录下的`makefile`文件将构成`opendla.ko`的`.o`对象添加其中，
+
 ```
 opendla-m := opendla.o
 
@@ -217,7 +218,7 @@ SRC_URI = "file://makefile \
         家的Device Tree文档，后期会在Blog里挂出survey and summary文档.
 
 ### Step 6: Build petalinux project and package bootloader files
-1.重新编译petalinux,在之前的`petalinux-build`之后，不仅创建了`modules`子工程，而且修改了`device tree`，所以需要重新编译整个工程，如果仅仅是添加了`apps/modules`，那么只要按照`UG1144 Chapter 7`做增量编译即可.
+1.重新编译petalinux，在之前`petalinux-build`后，我们不仅创建了`modules`子工程，而且修改了`device tree`，所以需要重新编译整个工程，如果仅仅是添加了`apps/modules`，那么只要按照`UG1144 Chapter 7`做增量编译即可.
 
 2.制作`bootloader`， `petalinux bootloader`使用`u-boot`, 可按照下述命令打包`bootloader`相关文件，下板需要使用到`BOOT.BIN`, `image.ub`和`rootfs.ext4`, `BOOT.BIN`包含`fsbl, bitstream, pmu, u-boot`, `image.ub`包含`kernel image, DTB, rootfs image`.
 
