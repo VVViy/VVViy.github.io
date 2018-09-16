@@ -18,7 +18,7 @@ tags:
 参考Part I，基本可以跑起FPGA工程，而对于使用Xilinx heterogeneous architecture FPGA chip的小伙伴，完成PL.hdf设计后，肯定要进一步配置ARM linux，下板跑跑`github.com/nvdla/sw`Sanity测试集，所以，本文将结合作者实践及官网`issue`中的信息，尽可能完整的描述Xilinx petalinux工程构建流程及对官方SW工程源码的定制化修改.
 
 此外，无论是Part I还是本文，文章内容描述方式都以‘How to do’为第一目标，背后的技术点并未阐述，因为不想干扰操作过程。实际上，作者在三个月的摸索过程中，遇到很多值得留意的技术点，特别是在搭多时钟域工程的时候，后期希望与同道讨论后逐步添加到文章中.
-a
+
 ### Step 1: Install petalinux in host
 Xilinx petalinux是一个定制版的`Yocto`工具，Xilinx已经把BSP准备的妥妥的了，我们要做的是定制自己的kernel. 安装过程在Xilinx `UG1144`写的比较清楚，这里做个概述.
 
