@@ -2,7 +2,7 @@
 layout:     post
 title:      nv_small FPGA Mapping Workflow
 subtitle:   Part II-Petalinux project
-date:       2018-09-13
+date:       2018-09-17
 author:     Max
 header-img: img/post-gray-backgroud.jpg
 catalog: true
