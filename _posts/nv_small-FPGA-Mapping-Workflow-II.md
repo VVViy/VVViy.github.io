@@ -80,19 +80,19 @@ $ cd <path-to-petalinux-prj>
 $ petalinux-config --get-hw-description=./
 ```
 
-* 在配置界面中，选中`DTG settings`-->`template...`, enter进入修改为开发板版本，如`zcu102-rev1.0`，详见`UG1144 Chapter 3，p22`；
+* 在配置界面中，选中`DTG settings`-->`(template) MACHINE NAME`, enter进入修改为开发板版本，如`zcu102-rev1.0`，详见`UG1144 Chapter 3，p22`；
 * 进入`Image Packaging Configuration`-->`Root Filesystem Type`，选中`SD card`. 修改此处后，linux根目录系统`rootfs`将配置到SD中，而非默认的`raminitfs`，后者是将根目录系统镜像在boot阶段加载到内存中，一旦裁剪的kernel较大（大概超过120M），那么系统boot不起来；
 * 退出并保存配置.
 
-3.配置kernel，由于`rootfs`配置到SD boot，那么就要取消掉kernel的....ram init....，否则在boot阶段，kernel在内存中找不到rootfs的符号镜像，便会出错，
+3.配置kernel，由于`rootfs`配置到SD boot，那么就要取消掉kernel的`RAM intial`，否则在boot阶段，kernel在内存中找不到rootfs的符号镜像，便会出错，
 
 ```
 $ petalinux-config -c kernel
 ```
 
-弹出窗口中，选择..........................，取消掉.....................，如Fig-1，实际上，可以进一步配置`kernel`，为其"瘦身"，如在`Device Drivers`中取消掉不使用的外设驱动，最后，退出并保存配置.
+弹出窗口中，选择`General setup`，取消掉`Initial RAM filesystem and RAM disk support`，如Fig-1，实际上，可以进一步配置`kernel`，为其"瘦身"，如在`Device Drivers`中取消掉不使用的外设驱动，最后，退出并保存配置.
 
-
+![]()
     Fig-1
 
 ### Step 3: Customize the linux kernel for building UMD
@@ -106,12 +106,12 @@ $ petalinux-config -c kernel
 $ petalinux-config -c rootfs
 ```
 
-弹出界面中，选择..............,选择....，如Fig-2 ~ Fig-3，退出并保存. 如果要实现更复杂的功能，可以选择.....，但该包过大(~10G); 也可以选择添加其他如`ldd`，`sudo`等工具. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
+弹出界面中，选择`Filesystem Packages`-->`misc`,选择`packagegroup-core-buildessential`，如Fig-2 ~ Fig-3，退出并保存. 如果要实现更复杂的功能，可以选择`packagegroup-petalinux-self-hosted`，但该包过大(~10G); 也可以选择添加其他如`ldd`，`sudo`等工具. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
 
-
+![]()
     Fig-2
     
-    
+![]()    
     Fig-3
 
 2.编译petalinux工程，配置到这里可以先编译一次工程，否则，后续修改`device tree`时无法查看`PL nvdla`的节点信息，编译petalinux project
@@ -156,13 +156,13 @@ modules子工程创建后，将`nvdla/sw/kmd/`下的所有`.c,.h`文件拷贝到
 
 * 对于`nv_small`版本，还要修改`nvdla/sw/kmd/firmware/include/opendla.h`，添加`DLA_SMALL_CONFIG`宏，这样`KMD`驱动才能根据`opendla_small.h`寄存器声明来完成对`nvdla core`内部子内核的裁剪，使其符合`nv_small/spec/defs/nv_small.spec`定义.
 
-3.配置`makefile`和`recipe`，打开目录下的`makefile`文件将构成`opendla.ko`的`.o`对象添加其中，
+3.配置`makefile`和`recipe`，打开目录下的`makefile`文件将`nvdla/sw/kmd/`各级子目录`makefile`中构成`opendla.ko`的`.o`对象添加其中，
 
 ```
 opendla-m := opendla.o
 
 ###append all of sources###
-opendla-objs := .......................
+opendla-objs := nvdla_core_callbacks.o ...
 ###########################
 ...
 ```
@@ -258,7 +258,7 @@ $ sync
 1.下板调试，SD卡插回开发板，调整开发板启动模式开关拨到SD启动，host打开串口调试工具配置`port`. 上电后输入用户名密码进入系统，安装驱动，查看`dri`和`interrupts`，
 
 ```
-$ insmod /lib/modules/[kernel version number]_.../.../opendla.ko
+$ insmod /lib/modules/[kernel version]-xilinx-[petalinux version]/extra/opendla.ko
 ...
 $ ls /dev/dri/
 ...
@@ -277,6 +277,7 @@ $ dmesg -n 1
 $ su root ./run_test.sh
 ```
 
+![]()
     Fig-4
 
 **====Tips====**
