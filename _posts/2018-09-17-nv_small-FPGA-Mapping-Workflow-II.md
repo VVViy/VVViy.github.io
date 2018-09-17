@@ -94,7 +94,7 @@ $ petalinux-config -c kernel
 
 ![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%231.jpg?raw=true)
     
-    Fig-1
+                                            Fig-1
 
 ### Step 3: Customize the linux kernel for building UMD
 `nvdla/sw/prebuilt/linux/`中包含了官方在`kernel v4.13.3`下预编译的`nvdla_runtime`ELF文件和依赖库`libnvdla_runtime.o`文件，但`patelinux 2017.4`的kernel是`v4.9`，两个版本的DMA API不同，导致依赖于`DRM`实现`DMA`数据搬移的`KMD`驱动无法工作，从而，`UMD`无法正常运行，因此，需要重新为4.9版本编译`UMD`. 
@@ -111,11 +111,11 @@ $ petalinux-config -c rootfs
 
 ![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%232.jpg?raw=true)
     
-    Fig-2
+                                                Fig-2
     
 ![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%233.jpg?raw=true)    
     
-    Fig-3
+                                                Fig-3
 
 2.编译petalinux工程，配置到这里可以先编译一次工程，否则，后续修改`device tree`时无法查看`PL nvdla`的节点信息，编译petalinux project
 
@@ -282,7 +282,7 @@ $ su root ./run_test.sh
 
 ![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%234.jpg?raw=true)
                             
-    Fig-4
+                                           Fig-4
 
 **====Tips====**
 
