@@ -8,5 +8,5 @@ header-img: img/post-gray-background.jpg
 catalog: true
 tags:
     - DL
-	- Math
+    - Math
 ---
