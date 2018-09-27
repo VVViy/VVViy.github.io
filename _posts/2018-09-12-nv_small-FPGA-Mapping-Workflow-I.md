@@ -182,25 +182,33 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
 	
 5.`AXI master` interface推断，点击`Ports and Interfaces`，如Fig-1, 查看信号列表中是否存在自动推断出的`AXI master`接口，若没有，则在信号列表中选中全部`master`接口信号，右键选择`Auto Infer Interface`，推断出`master`接口信号后，需要检查位宽是否与源文件中声明的相一致(之前出现过标量矢量化的情况，工具坑)，即`Size Left`，`Size Right`. 另外，检查`Driver Value`，如Fig-2, 若官方源码中声明的信号在此列表中显示驱动强度为`0`，则选中该信号，在属性窗口删除`0`值，另外，需要对上面我们后添加的`master`信号，将驱动强度设置为`0`；
 	
-![Interface part](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%231.JPG?raw=true)
+<div align="center">
+	
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%231.JPG?raw=true" />
 
-                                              Fig-1
+Fig-1
 
-![Width and Driver](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%232.JPG?raw=true)
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%232.JPG?raw=true" />
 
-                                              Fig-2
+Fig-2
+
+</div>
 
 6.`APB slave` interface推断,这个接口工具不会自动推断，需要选中全部`APB`信号，右键自动推断，在弹出窗口中依次选择`Advanced`-->`apb_rtl`. 在推断出`AXI`和`APB`信号后，分别右键两个接口信号，选择`Associate Clocks`，分别关联`AXI master`-->`*_core_clk`和`APB slave`-->`*_csb_clk`；
 	
 7.`APB memory map`, `AXI/APB master-slave`接口是通过`memory-map`机制做数据映射的，作者画了一个映射结构简图Fig-3. 不同于`AXI master memory block`的自动生成. `APB memory block`需要自行添加，选择`Addressing and Memory`-->`Memory Maps(for slaves)`，右键`IP Addressing and Memory Wizard`, 弹出窗口中选择`APB`接口信号，继续右键`Add Address Block`(因为一块连续地址，一个block便可)，弹出窗口键入`reg`，如Fig-4；
 
-![Memory map](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%233.JPG?raw=true)
+<div slign="center">
+	
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%233.JPG?raw=true" />
 
-                                              Fig-3
+Fig-3
 
-![Address block](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%234.JPG?raw=true)
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%234.JPG?raw=true" />
 
-                                              Fig-4
+Fig-4
+
+</div>
 
 8.`Review and Package` -->`Package IP`.
 
