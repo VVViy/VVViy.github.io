@@ -24,17 +24,28 @@ tags:
 ### How to work
 以`Xilinx`的`zynq`系统为例，简单了解`DT`在系统启动阶段如何工作，`UG1156`中介绍了`Linux Boot Process on the Target Platfoem`，如Fig-1. 简单的说，`DT`对目标系统中的物理器件进行静态描述，`kernel`通过查找`DT`完成设备检测和驱动配置.  这种设备描述与设备配置过程的解耦，可以在不改变`kernel`的情况下，直接应用于不同的硬件系统(DT).
 
-![]()
+<div align="center">
+
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%233-%231.jpg?raw=true" />
+
 Fig-1
+
+</div>
 
 ### File classification and relationship
 `DT`相关的文件包括`.dts`, `.dtsi`, `.dtb`三类，`.dts, .dtsi`都是对目标系统硬件的描述，区别在于描述级别不同，前者是板级描述文件，后者则是`SoC`级描述，如Fig-2，而`DTB`文件只是`DT compiler`的编译结果，是能够被`kernel`读取的格式. 源文件的处理流程如Fig-3所示，  
 
-![]()
+<div align="center">
+
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%233-%232.jpg?raw=true" />
+
 Fig-2
 
-![]()
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%233-%233.jpg?raw=true" />
+
 Fig-3 
+
+</div>
 
 ### Basic elements within a dtsi
 
