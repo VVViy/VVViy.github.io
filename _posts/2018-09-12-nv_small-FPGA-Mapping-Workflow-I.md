@@ -198,7 +198,7 @@ Fig-2
 	
 7.`APB memory map`, `AXI/APB master-slave`接口是通过`memory-map`机制做数据映射的，作者画了一个映射结构简图Fig-3. 不同于`AXI master memory block`的自动生成. `APB memory block`需要自行添加，选择`Addressing and Memory`-->`Memory Maps(for slaves)`，右键`IP Addressing and Memory Wizard`, 弹出窗口中选择`APB`接口信号，继续右键`Add Address Block`(因为一块连续地址，一个block便可)，弹出窗口键入`reg`，如Fig-4；
 
-<div slign="center">
+<div align="center">
 	
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%233.JPG?raw=true" />
 
