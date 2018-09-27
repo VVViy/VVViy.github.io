@@ -94,7 +94,7 @@ $ petalinux-config -c kernel
 
 <div align="center">
 
-<img src=https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%231.jpg?raw=true />
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%231.jpg?raw=true" />
     
 Fig-1
 
