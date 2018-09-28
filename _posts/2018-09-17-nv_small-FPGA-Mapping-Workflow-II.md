@@ -92,9 +92,13 @@ $ petalinux-config -c kernel
 
 弹出窗口中，选择`General setup`，取消掉`Initial RAM filesystem and RAM disk support`，如Fig-1，实际上，可以进一步配置`kernel`，为其"瘦身"，如在`Device Drivers`中取消掉不使用的外设驱动，最后，退出并保存配置.
 
-![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%231.jpg?raw=true)
+<div align="center">
+
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%231.jpg?raw=true" />
     
-                                            Fig-1
+Fig-1
+
+</div>
 
 ### Step 3: Customize the linux kernel for building UMD
 `nvdla/sw/prebuilt/linux/`中包含了官方在`kernel v4.13.3`下预编译的`nvdla_runtime`ELF文件和依赖库`libnvdla_runtime.o`文件，但`patelinux 2017.4`的kernel是`v4.9`，两个版本的DMA API不同，导致依赖于`DRM`实现`DMA`数据搬移的`KMD`驱动无法工作，从而，`UMD`无法正常运行，因此，需要重新为4.9版本编译`UMD`. 
@@ -109,13 +113,17 @@ $ petalinux-config -c rootfs
 
 弹出界面中，选择`Filesystem Packages`-->`misc`,选择`packagegroup-core-buildessential`，如Fig-2 ~ Fig-3，退出并保存. 如果要实现更复杂的功能，可以选择`packagegroup-petalinux-self-hosted`，但该包过大(~10G); 也可以选择添加其他如`ldd`，`sudo`等工具. `misc`下各种`group`包的功能描述，可参考[Building a Custom Linux Distribution](http://www.informit.com/articles/article.aspx?p=2514911)
 
-![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%232.jpg?raw=true)
+<div align="center">
     
-                                                Fig-2
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%232.jpg?raw=true" />
     
-![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%233.jpg?raw=true)    
+Fig-2
     
-                                                Fig-3
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%233.jpg?raw=true" />    
+    
+Fig-3
+
+</div>
 
 2.编译petalinux工程，配置到这里可以先编译一次工程，否则，后续修改`device tree`时无法查看`PL nvdla`的节点信息，编译petalinux project
 
@@ -279,10 +287,13 @@ $ make TOOLCHAIN_PREFIX=/usr/bin/
 $ dmesg -n 1
 $ su root ./run_test.sh
 ```
-
-![](https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%234.jpg?raw=true)
+<div align="center">
+    
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%232-%234.jpg?raw=true" />
                             
-                                           Fig-4
+Fig-4
+
+</div>
 
 **====Tips====**
 
