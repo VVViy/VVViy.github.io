@@ -56,10 +56,10 @@ Fig-4
 </div>
 
 ### 3. Basic elements within a dts(i)
-1.Tree structure.  前述，每个`.dts(i)`都描述了目标系统的部分硬件模块，且文件内部组织形式皆为树形结构，如Fig-5所示，即每个文件内部都有一个或多个`root node ("/")`，其他每个`Node`都描述了一个device或module.  每个`Node`的基本结构如Fig-6所示，由三部分构成，名称+描述域控制("{ };")+属性，需要说明的是
+1.Tree structure.  前述，每个`.dts(i)`都描述了目标系统的部分硬件模块，且文件内部组织形式皆为树形结构，如Fig-5所示，即每个文件内部都有一个或多个`root node ("/")`，其他每个`Node`都描述了一个device或module.  每个`Node`的基本结构如Code-1所示，由三部分构成，名称+描述域控制("{ };")+属性，需要说明的是
 
-* 与normal node相比，root node没有“label_name: node_name@unit_address”，而是使用“/”作为节点名称；
-* 所有normal node必须在root node的控制域内做“初次声明”，如Fig-6后的实例，有一个例外是在文件中对已声明节点做“属性重载或添加”或“节点重载”时，需要将重载描述写在根节点控制域范围以外. 但作者不确定是否所有vendor都如此，毕竟没有统一标准，至少作 者看见的案例均遵照此规则，如xilinx要求在重载描述的文件中，新添加的("初次声明")节点在根节点控制域内描述，重载描述则在根节点控制域以外添加；（本文档是long-term maintenance，会持续添加新东西.）
+* 与`normal node`相比，`root node`没有`label_name: node_name@unit_address`，而是使用“/”作为节点名称；
+* 所有`normal node`必须在`root node`的控制域内做“初次声明”，如Code-2，有一个例外是在文件中对已声明节点做“属性重载或添加”或“节点重载”时，需要将重载描述写在根节点控制域范围以外. 但作者不确定是否所有vendor都如此，毕竟没有统一标准，至少作 者看见的案例均遵照此规则，如`xilinx`要求在重载描述的文件中，新添加的("初次声明")节点在根节点控制域内描述，重载描述则在根节点控制域以外添加；（本文档是`long-term maintenance`，会持续添加新东西.）
 * 一个文件中的根节点数目并不是唯一的，可以同时存在多个根节点，即一个.dts(i)内部可以是树或森林；从Fig-4可以看到，所有的.dts(i)最后会组成一个“top”文件，所以，不同文件中即使存在多个根节点最后都会融合在一起.  实际上，所谓的“描述控制域”是作者自定义的说法，其主要意义在于将“brother nodes”和“parent-child nodes”圈定，但不同根节点控制域之间的关系，作者尚不知晓，若有同道了解其中原理还请告知；
 
 <div align="center">
@@ -68,16 +68,17 @@ Fig-4
 
 Fig-5 [3]
 
+</div>
+
 ```
-//normal node definition
+//Code-1：normal node definition
 label:node_name@unit_addrss{
     all of properties declaration;
 };
 ```
 
-</div>
-
-``` //example
+``` 
+//Code-2：example
 / {
     compatible = "acme,coyotes-revenge";
     #address-cells = <1>;
