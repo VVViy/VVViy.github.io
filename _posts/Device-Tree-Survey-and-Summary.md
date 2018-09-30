@@ -9,10 +9,11 @@ catalog: true
 tags:
     - Devicetree
 ---
-### 0. Preface
-本文主要介绍嵌入式系统`Bootloader`中的设备树`(Device Tree)`，援引`Wikipedia`对其定义如下， 简单归纳，`DT`文件是由一系列`Node`构成的树形结构，其中每个`Node`都对应硬件系统中的一个`device`，如`CPU`, `I2C controller`. 目前，`Device Tree (DT)`尚无行业标准，仍在发展中，内容上相对还不庞杂.
 
-本文不会简单综合文档资源进行内容罗列，而是简明概括文档中值得注意的点进行介绍，所以，如果要了解具体的语法和定义，可参考文末的文档列表.
+### 0. Preface
+本文主要介绍嵌入式系统`Bootloader`中的设备树`(Device Tree)`，援引`Wikipedia`对其定义如下， 简单归纳，`DT`文件是由一系列`Node`构成的树形结构，其中每个`Node`都对应硬件系统中的一个`device`，如`CPU`, `I2C controller`. 目前，`Device Tree (DT)`尚无行业标准，仍在发展中，内容上还不算庞杂，短时间内可掌握，其对参与嵌入式开源项目，特别是RISC-V还是有一定价值的.
+
+本文不会简单综合文档资源进行内容罗列，而是简明概括文档中值得注意的点，所以，在内容完整性和连贯性上可能欠佳，如果要了解全部语法和定义，可参考文末的文档列表.
 
 > In computing, a device tree (also written devicetree) is a data structure describing the physical hardware components of a particular
 > computer so that the operating system's kernel can use and manage those components, including the CPU or CPUs, the memory, the
@@ -63,8 +64,12 @@ Fig-4
 
 [2] Toradex AG. Device Tree Customization. [Online]: https://developer.toradex.com/device-tree-customization
 
-[3]
+[3] Power.org. Embedded Power Architecture™ Platform Requirements(ePAPR).[Online]: https://elinux.org/images/c/cf/Power_ePAPR_APPROVED_v1.1.pdf
 
-[4]
+[4] Devicetree.org. Devicetree Specification (rev0.2). [Online]: https://www.devicetree.org/specifications/
 
-[5]
+[5] eLinux.org. Device Tree Usage. [Online]: https://elinux.org/Device_Tree_Usage
+
+[6] NXP. Introduction to Device Trees. [Online]: https://www.nxp.com/docs/en/application-note/AN5125.pdf
+
+[7] Raspberry PI Foudation. DEVICE TREES, OVERLAYS, AND PARAMETERS. [Online]: https://www.raspberrypi.org/documentation/configuration/device-tree.md
