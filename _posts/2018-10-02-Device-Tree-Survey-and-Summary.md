@@ -62,7 +62,7 @@ Fig-4
 ### IV. Basic elements within a dts(i)
 1.Tree structure.  前述，每个`.dts(i)`都描述了目标系统的部分硬件模块，且文件内部组织形式皆为树形结构，如Fig-5所示，即每个文件内部都有一个或多个`root node ("/")`，其他每个`Node`都描述了一个device或module.  每个`Node`的基本结构如Code-1代码段所示，由三部分构成，`名称+描述域控制("{ };")+属性/子节点定义`，需要说明的是:
 
-* 与`normal node`相比，`root node`没有`label_name: node_name@unit_address`，而是使用“/”作为节点名称, 同时，除了根节点，每个`normal node`都有一个父节点；
+* 与`normal node`相比，`root node`没有`label_name: node_name@unit_address`，而是使用`“/”`作为节点名称, 同时，除了根节点，每个`normal node`都有一个父节点；
 * 所有`normal node`必须在`root node`的控制域内做“初次声明”，如Code-2代码段，有一个例外是在文件中对已声明节点做“属性重载或添加”或“节点重载”时，需要将重载描述写在根节点控制域范围以外. 但作者不确定是否所有manufacturer都如此，毕竟没有统一标准，至少作者看见的案例均遵照此规则，如`xilinx`要求在重载描述的文件中，新添加的("初次声明")节点在根节点控制域内描述，重载描述则在根节点控制域以外添加（本文档是`long-term maintenance`，会持续添加新东西.）;
 * 一个文件中的根节点数目并不是唯一的，可以同时存在多个根节点，即一个.dts(i)内部可以是树或森林；从Fig-4可以看到，所有的.dts(i)最后会组成一个“top”文件，所以，不同文件中即使存在多个根节点最后都会融合在一起.  实际上，所谓的“描述控制域”是作者自定义的说法，其主要意义在于将“brother nodes”和“parent-child nodes”圈定，但不同根节点控制域之间的关系，作者尚不知晓，若有同道了解其中原理还请告知.
 
@@ -109,7 +109,7 @@ Fig-5 [3]
 
 2.Node structure.  Fig-7~Fig-8描述了`node`结构中的组成元素，需要说明的是:
 * `unit-address`: 对于访问`DT`的程序而言，`unit-address`是访问`node`的主要入口地址，其值需与`node`内部的`reg=<address，length>`属性中的`address`匹配，若某`node`无`reg`属性，那么节点名称需去掉`@unit-address`部分；
-* `cell`: 节点内部大多数非字符串属性值，以`cell` 为单位，32-bit，如在32-bit系统中某节点属性`reg=<0x0 0x10>`，表示该节点对应的`device`占用一块起始地址为`0x00000000`，大小为16 bit的存储空间，而若在64-bit系统中描述该节点，则要应改写为`reg=<0x0 0x0 0x0 0x10>`，即分别使用两个`cell`表示起始地址和空间大小；
+* `cell`: 节点内部大多数非字符串属性值，以`cell` 为单位，32-bit，如在32-bit系统中某节点属性`reg=<0x0 0x10>`，表示该节点对应的`device`占用一块起始地址为`0x00000000`，大小为16 bit的存储空间，而若在64-bit系统中描述该节点，则要改写为`reg=<0x0 0x0 0x0 0x10>`，即分别使用两个`cell`表示起始地址和空间大小；
 * `label`: 节点前的`label`是可选的，另外，`label`不仅可以放在节点名称前，还可以放在节点内部的属性前，即`label-name: property=property-value`;
 * `property value`: 属性值类型随属性的不同而不同，可参考文档，需要说明的是，有些属性的值可以为"空"，即只保留属性名，如`ranges；`，而"空"所代表的意义依赖于其所依附的"属性"，请参考文档定义；
 * `phandle`: 类似于windows编程里的“指针句柄”，只不过在那里指向窗口控件，而这里是指向一个`node`，有两种基本用法，即
