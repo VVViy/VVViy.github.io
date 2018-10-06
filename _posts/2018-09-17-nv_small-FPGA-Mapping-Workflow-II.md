@@ -173,7 +173,7 @@ modules子工程创建后，将`nvdla/sw/kmd/`下的所有`.c,.h`文件拷贝到
 opendla-m := opendla.o
 
 ###append all of sources###
-opendla-objs := nvdla_core_callbacks.o ...
+opendla-objs := nvdla_core_callbacks.o nvdla_gem.o scheduler.o engine.o bdma.o conv.o sdp.o cdp.o pdp.o rubik.o cache.o common.o engine_data.o engine_isr.o engine_debug.o
 ###########################
 ...
 ```
