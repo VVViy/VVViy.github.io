@@ -107,7 +107,7 @@ Fig-5 [3]
 };
 ```
 
-2.Node structure.  Fig-7~Fig-8描述了`node`结构中的组成元素，需要说明的是:
+2.Node structure.  Fig-6~Fig-7描述了`node`结构中的组成元素，需要说明的是:
 * `unit-address`: 对于访问`DT`的程序而言，`unit-address`是访问`node`的主要入口地址，其值需与`node`内部的`reg=<address，length>`属性中的`address`匹配，若某`node`无`reg`属性，那么节点名称需去掉`@unit-address`部分；
 * `cell`: 节点内部大多数非字符串属性值，以`cell` 为单位，32-bit，如在32-bit系统中某节点属性`reg=<0x0 0x10>`，表示该节点对应的`device`占用一块起始地址为`0x00000000`，大小为16 bit的存储空间，而若在64-bit系统中描述该节点，则要改写为`reg=<0x0 0x0 0x0 0x10>`，即分别使用两个`cell`表示起始地址和空间大小；
 * `label`: 节点前的`label`是可选的，另外，`label`不仅可以放在节点名称前，还可以放在节点内部的属性前，即`label-name: property=property-value`;
@@ -148,11 +148,11 @@ another-device-node {
 
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%233-%237.jpg?raw=true" />
 
-Fig-7 [1]
+Fig-6 [1]
 
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%233-%238.jpg?raw=true" />
 
-Fig-8 [2]
+Fig-7 [2]
 
 </div>
 
@@ -225,7 +225,115 @@ existed-node-label: existed-node {
 };
 ```
 
-3....
+3.Interrupts
+
+中断是DT里很重要的组成部分，而且工作结构上也自成体系，并非与DT的树形结构保持一致. 此外，不同处理器的中断协议和DT书写格式也稍有差异，下面就共性与个性分别简述.
+
+**General**
+
+1). 工作结构：如前所述，`DT`是一个树形结构，访问`DT`的程序在该树形结构中通过寻址(`@unit-address`)来查找`node`，提取设备信息；而设备中断的工作方式与数据结构中的"链表"相似，是通过`phandel`在`node`间建立"link"来实现，如Fig-8，可以看到，上半部分是`DT`的树形结构，而下半部分是根据`DT`中节点的`interrupts`属性设置生成的`interrupt tree`(介绍"常用属性"后，说明如何生成的中断树)，显然二者并不一致.
+
+<div align="center">
+
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%233-%239.jpg?raw=true">
+
+Fig-8 [3]
+
+</div>
+
+2). 常用属性：常见中断相关属性包括以下4个，按照中断源和中断控制器划分两类(`interrupt source`--->`interrupt controller`--->`CPU`).
+
+   - interrupt-controller: "空"属性值，表明拥有该属性的`node`是中断控制器；
+   - interrupt-cells: 定义中断控制器参数域的尺寸——`cell`数量，归属于中断控制器节点；
+   - interrupt-parent: "指向"中断控制器，需要注意的是，该属性具有继承性，归属中断源节点；
+   - interrupts: 中断输出信号说明列表，归属于中断源节点.
+
+根据上述属性，简单分析Fig-8中断树的生成过程，i)open-pic是`DT`节点中唯一具有`interrupt-controller`属性的节点，所以作为中断树的根节点；ii)device1, gpioctrl, pci-host的`interrupt-parent`的属性值皆为`&open-pic`，所以这三个节点为中断树的二级节点；同理，device2，device3，slot0和slot1为叶子节点.
+
+我们可以进一步查看下面Code-8所示的例子，i)根节点("/")包含`interrupt-parent`属性，那么其所有子节点都继承该属性，不必二次声明，label为`intc，gpio`的节点显然为controller节点；ii)节点`i2c@7000c000`直接定义`interrupts`属性即可，而另一`DT`中的节点`wm8903`则还需要定义`interrupt-parent`属性；iii)intc和gpio的`#address-cells`属性分别为`3，2`，所以i2c@7000c000和wm8903的`interrupts`属性值分别使用3个cells、2个cells表示中断输出项.
+
+```
+//Code-8：interrupts exmaple
+/ { 
+    interrupt-parent = <&intc>; 
+
+    intc: interrupt-controller { 
+                                   compatible = "arm,cortex-a9-gic"; 
+                                   reg = <0x50041000 0x1000 0x50040100 0x0100>; 
+                                   interrupt-controller; 
+                                   #interrupt-cells = <3>; 
+    }; 
+
+    i2c@7000c000 { 
+                    compatible = "nvidia,tegra20-i2c"; 
+                    reg = <0x7000c000 0x100>; 
+                    interrupts = <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>; 
+                    #address-cells = <1>; 
+                    #size-cells = <0>;
+                    ...
+    }; 
+
+    gpio: gpio { 
+                  compatible = "nvidia,tegra20-gpio"; 
+                  reg = <0x6000d000 0x1000>; 
+                  interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>, ...; 
+                  #gpio-cells = <2>; 
+                  gpio-controller; 
+                  #interrupt-cells = <2>; 
+                  interrupt-controller; 
+    }; 
+};
+
+/ {
+    ...
+
+    i2c@7000c000 { 
+                   status = "okay"; 
+                   clock-frequency = <400000>; 
+                                    
+                   wm8903: wm8903@1a { 
+                                       compatible = "wlf,wm8903"; 
+                                       reg = <0x1a>; 
+                                       interrupt-parent = <&gpio>; 
+                                       interrupts = <tegra_gpio(x,3) IRQ_TYPE_LEVEL_HIGH>; 
+                                       ...
+                   };
+    };
+};
+```
+
+**Specific**：`interrupts`属性值所表示的意义依赖于不同厂家的CPU，看到有差异的主要是NXP和ARM两家，即
+
+1). NXP [4]: NXP处理器`DT`中`node`的`#interrupt-cells`属性值通常是4或2，如QorIQ P1010 "interrupts = <42 2 0 0>;"
+
+   - 1st cell: 指示xIVPR寄存器`index`值，<=16表示SoC外部中断源，其余为内部中断源，42-16=26对应"DUART"中断；
+   - 2nd cell：电平敏感信息
+       - 0 = low-to-high edge sensitive type enabled
+       - 1 = active-low level sensitive type enabled
+       - 2 = active-high level sensitive type enabled
+       - 3 = high-to-low edge sensitive type enabled
+   - 3rd cell：中断类型——"interrupt-type", 如MPIC
+       - 0 = normal
+       - 1 = error interrupt
+       - 2 = MPIC inter-processor interrupt
+       - 3 = MPIC timer interrupt
+   - 4th cell：中断类型信息——"type-info", 主要用于指示"error interrupt number".
+
+2). ARM：ARM处理器`DT`中`node`的`#interrupt-cells`属性值通常是3，如"interrupts = <0 89 4>;"
+
+   - 1st cell：指示GIC中断类型，private peripheral interrupts (PPI)或shared peripheral interrupts (SPI)；
+       - 0 = SPI interrupts
+       - 1 = PPI interrupts
+   - 2nd cell：GIC interrupt number，SPI interrupts number 0-987，PPI interrupts number 0-15(需要注意的是，在linux系统中查看interrupt ID时，会与这里的定义的值不同，即kernel interrupt ID=GIC NO. + 32, 源于kernel定义32~255为user-defined interrupts，所以user-space的中断会+32)；
+   - 3rd cell：
+       - 1 = low-to-high edge sensitive
+       - 2 = high-to-low edge sensitive
+       - 4 = active-high level sensitive
+       - 8 = active-low level-sensitive
+
+4.Comment：DT源文件支持单行注释`//`和多行注释`/* */`.
+
+5.....
 
 **====说明====**
 
