@@ -25,7 +25,7 @@ tags:
 > Power Architecture Platform Reference including some Apple Macintoshes).
 
 ### II. How to work
-以`Xilinx`的`zynq`系统为例，简单了解`DT`在系统启动阶段如何工作，`UG1156`中介绍了`Linux Boot Process on the Target Platform`，如Fig-1. 简单的说，`DT`对目标系统中的物理器件进行静态描述，`kernel`通过查找`DT（.dtb）`完成设备检测和驱动配置.  这种设备描述与设备配置过程的解耦，可以在不改变`kernel`的情况下，直接应用于不同的硬件系统(DT).
+以`Xilinx`的`zynq`系统为例，简单了解`DT`在系统启动阶段如何工作，`UG1165`中介绍了`Linux Boot Process on the Target Platform`，如Fig-1. 简单的说，`DT`对目标系统中的物理器件进行静态描述，`kernel`通过查找`DT（.dtb）`完成设备检测和驱动配置.  这种设备描述与设备配置过程的解耦，可以在不改变`kernel`的情况下，直接应用于不同的硬件系统(DT).
 
 <div align="center">
 
