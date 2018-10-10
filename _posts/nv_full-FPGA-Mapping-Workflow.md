@@ -17,6 +17,7 @@ tags:
 <div align="center">
     
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%234-%231.jpg?raw=true" />
+
 Fig. Utilization of synthesized design
     
 </div>
