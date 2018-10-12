@@ -80,7 +80,26 @@ layout: default
                     </li>
                     {% endif %}
                 </ul>
-
+		
+		<!--Gitment begin-->
+		{% if site.gitment.enable %}
+		<div id="gitmentContainer"></div>
+		<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+		<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+		<script>
+    			var gitment = new Gitment({
+			id: '<%= page.date %>',
+        		owner: '{{site.gitment.owner}}',
+        		repo: '{{site.gitment.repo}}',
+        		oauth: {
+            			client_id: '{{site.gitment.clientID}}',
+            			client_secret: '{{site.gitment.clientSecret}}',
+        		},
+    			});
+    			gitment.render('gitmentContainer')
+		</script>
+		{% endif %} 
+		<!--Gitment end-->    
 
                 <!--Gitalk评论start  -->
                 {% if site.gitalk.enable %}
