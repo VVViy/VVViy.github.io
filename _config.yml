@@ -51,13 +51,18 @@ kramdown:
 
 # Gitalk
 gitalk:
-  enable: true    
+  enable: false    
   clientID: 683b5d989f59724115c3                           
   clientSecret: 48f283e00ce9135b8c6540597a23fa87d1c51c04   
   repo: VVViy.github.io   
   owner: VVViy    
   admin: VVViy
   distractionFreeMode: true 
+  
+# Gitment
+comment_gitment_repo: VVViy.github.io
+comment_gitment_clientId: 683b5d989f59724115c3
+comment_gitment_clientSecret: 48f283e00ce9135b8c6540597a23fa87d1c51c04
 
 
 # Analytics settings
