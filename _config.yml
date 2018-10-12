@@ -61,7 +61,7 @@ gitalk:
   
 # Gitment
 gitment:
-  enable: true
+  enable: false
   repo: VVViy.github.io
   owner: VVViy
   clientID: d7dd31629b248b9aa5eb
