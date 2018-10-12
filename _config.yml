@@ -9,11 +9,11 @@ url: "http://VVViy.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/VVViy/VVViy.github.io.git" # you code repository
 
+
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
 sidebar-about-description: "It's not the gods' thing, it's people."
 sidebar-avatar: /img/avatar-max.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
-
 
 
 # SNS settings
@@ -31,12 +31,9 @@ exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
 anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
 
 
-
 # Gems
 # from PR#40, to support local preview for Jekyll 3.0
 gems: [jekyll-paginate]
-
-
 
 
 # Markdown settings
@@ -48,21 +45,19 @@ highlighter: rouge
 kramdown:
   input: GFM                            # use Github Flavored Markdown !important
 
+
 # Disqus（https://disqus.com/）
 # disqus_username: qiubaiying
-
 
 
 # Analytics settings
 # Baidu Analytics
 ba_track_id: dc6952b6bed2215a315af325680caedf
 
+
 # Google Analytics
 ga_track_id: 'UA-122325447-1'            # Format: UA-xxxxxx-xx
 ga_domain: auto             
-
-
-
 
 
 # Featured Tags
@@ -70,11 +65,9 @@ featured-tags: true
 featured-condition-size: 1
 
 
-
 # Progressive Web Apps
 chrome-tab-theme-color: "#000000"
 service-worker: true
-
 
 
 # Friends
