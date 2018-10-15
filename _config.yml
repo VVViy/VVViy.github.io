@@ -18,9 +18,9 @@ sidebar-avatar: /img/avatar-max.jpg      # use absolute URL, seeing it's used in
 
 # SNS settings
 RSS: false
-zhihu_username:     VVViy
-github_username:    VVViy
-facebook_username:  
+# zhihu_username:     VVViy
+# github_username:    VVViy
+# facebook_username:  
 
 
 # Build settings
