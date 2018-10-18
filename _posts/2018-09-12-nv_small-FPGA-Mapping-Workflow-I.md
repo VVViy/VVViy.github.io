@@ -216,9 +216,9 @@ Fig-4
 ### Step 4: 新建BD工程 (Win10)
 1.新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的`nvdla IP` (nvdla_ip_prj_name.srcs)添加到IP列表，新建`BD`工程, `Flow Navigator`-->`Create Block Design`；
 	
-2.添加`ps，nvdla ip，axi apb bridge，axi interconnect`等IP，`ps`要配置`AXI master，AXI slave`以及`pl_ps_irq`中断接口，之后连接接口即可；
+2.添加`ps，nvdla ip，axi apb bridge，axi interconnect`等IP，`ps`要配置`AXI master，AXI slave`以及`pl_ps_irq`中断接口，之后连接接口即可. 对于`nvdla ip`的几个接口信号————`global_clk_ovr_on, tmc2slcg_disable_clock_gating, test_mode，nvdla_pwrbus_ram_*_pd`按照官网`small`版本[Integrator’s Manual](http://nvdla.org/hw/v2/integration_guide.html#integrator-s-manual)建议，使用`Constant ip`直接拉低；
 
-3.地址分配，待interface连接完成后，切换到`Address Editor`页面，右键选择`Auto Assign Address`对互连接口进行地址映射，`slave`接口保留`64k`即可. 之后切换回`Diagram`窗口，`validate`.
+3.地址分配，待interface连接完成后，切换到`Address Editor`页面，右键选择`Auto Assign Address`对互连接口进行地址映射，`slave`接口保留`64k`即可(官网已指明`small`版本的[Address space layout](http://nvdla.org/hw/v2/scalability.html#address-space-layout)所占空间为`56KB`,所以这里分配`64k`足矣). 之后切换回`Diagram`窗口，`validate`.
 
 4.添加`xdc`，综合、布局布线和输出`bit`文件，之后`export hardware`（复选'include bitstream'）.
 
