@@ -51,7 +51,7 @@ kramdown:
 
 # Gitalk
 gitalk:
-  enable: false    
+  enable: true    
   clientID: 683b5d989f59724115c3                           
   clientSecret: 48f283e00ce9135b8c6540597a23fa87d1c51c04   
   repo: VVViy.github.io   
