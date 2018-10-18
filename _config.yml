@@ -52,9 +52,7 @@ kramdown:
 # Gitalk
 gitalk:
   enable: true    
-  #clientID: 683b5d989f59724115c3        
-  clientID: d7dd31629b248b9aa5eb
-  #clientSecret: 48f283e00ce9135b8c6540597a23fa87d1c51c04   
+  clientID: d7dd31629b248b9aa5eb   
   clientSecret: 0adeaa9e187cb75e6c79d2431defe0902a1cfb4e
   repo: VVViy.github.io   
   owner: VVViy    
