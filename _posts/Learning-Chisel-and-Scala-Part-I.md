@@ -107,7 +107,7 @@ a.b: Int = 4
 ```
 
 2.数值类型
-* Scala中包含以下6种数值类型，scala中没有`built-in`类型，全部都是`class`.
+* Scala中包含以下6种数值类型，与其他高级编程语言不同的是，scala中没有`built-in`类型，全部都是`class`.
 
 Table 1. Numeric types
 
@@ -177,27 +177,98 @@ Fig-1
 
 </div>
 
-4.Scala运算符：scala支持的运算符和优先级与其他语言相比没有特殊之处，只是**不支持三元运算符(? :)**，请自行参考书籍.
+4.Scala运算符：scala支持的运算符和优先级与其他语言相比没有特殊之处，只是**不支持三元运算符(? :)**，详细内容请参考相关材料.
     
 ### III. Expression and Built-in control structure
-
+1.表达式
+* 定义表达式
+* 嵌套表达式(Nest)
+* 语句(Statements)
+2.控制语句
+* if...else
+* match
+* loops
+  - for
+  
+    1）Range复合数据类型
+    
+    2）iterator guard
+    
+    3）嵌套迭代器
+    
+    4）值绑定
+    
+  - while与do...while
 
 ### IV. Functions and Functional programming
+1.函数
 
+* 纯函数
+* 函数的定义与调用
+  - 一般定义形式
+  - 无参数定义的两种形式
+  - 参数列表
+  
+    1）参数默认值
+    
+    2）Vararg参数匹配
+    
+    3）参数分组
+    
+  - 函数调用
+  
+    1）命名参数与位置参数
+  
+    2）表达式块参数
+    
+  - 函数返回值
+* Procedure
+* 递归函数
+* 嵌套函数
+* 泛型函数
+
+2.函数式编程与电路
+
+3.First-class function
+* 高阶函数
+* 函数类型与值
+* 函数字面量
+  - 定义
+  - 背后原理
+* 占位符
+* Partially Applied Functions and Currying
+* By-Name Parameters
+* Partial Functions
+* 函数字面量块参数
 
 ### V. Advanced data type: Collections
 
+<div align="center">
+    
+<img src="">
+
+Fig-
+
+</div>
+
 1.Immutable collections
-* Range
 * String
-* Tuple
+  - 创建字符串
+  - 转义字符与运算符
+  - 字符串内插
+* Tuple: 三种构造形式
+  - 
+  - 
+  - 
 * List
+  - List构造
+  - 
 * Map
 * Set
 
 2.Mutable collections
 
-### VI.  Classes
+### VI. Classes
 
 
 ### VII. Special classes: Objects, Case classes, and Traits
@@ -206,5 +277,11 @@ Fig-1
 ### VIII. Some tips
 | Item | Description |
 |------|-------------|
-
+| =>操作符应用|  |
+| 可嵌套类型 |  |
+| 无名函数/类 |  |
+| 函数类型的进化 |  |
+| class扩展途径 |  |
+| 类内定义的元素 |  |
+| 被忽视的符号 |  |
     
