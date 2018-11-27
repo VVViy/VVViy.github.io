@@ -19,8 +19,8 @@ NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的
 文末作者将对一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如'=>'操作符可应用于Match控制逻辑，也可应用于函数字面量等等.
 
 ### II. Data type
-1.常量/变量定义
-* 常量定义
+1.Value and variable
+* Value
 
 ```scala
 Syntax:
@@ -38,15 +38,15 @@ aval: String = hello
 scala> val bval: String = "world"
 bval: String = world
 ```
-* 惰性常量
+* Lazy value
 
 ```scala
 Syntax:
 
-//lazy关键字修饰val定义惰性常量，只有常量第一次被访问时才计算<data>进行初始化，而非定义时，将在介绍class属性时进一步说明
+//lazy关键字修饰val定义惰性值，只有该值第一次被访问时才计算<data>进行初始化，而非定义时，将在介绍class属性时进一步说明
 lazy val <identifier> [: <type>] = <data>
 ```
-* 变量定义
+* Variable
 
 ```scala
 Syntax:         
@@ -180,7 +180,9 @@ Fig-1
 4.Scala运算符：scala支持的运算符和优先级与其他语言相比没有特殊之处，只是**不支持三元运算符(? :)**，详细内容请参考相关材料.
     
 ### III. Expression and Built-in control structure
-1.表达式
+1.表达式(expression)
+  表达式是函数式编程的基础构成元素，因为表达式通过描述"映射"实现了一个输入`value`到一个输出`value`的对应关系，这体现了函数式编程中的一个核心思想，即新值存储在新的value中，而不是修改已存在的varible，这有什么区别？
+
 * 定义表达式
 * 嵌套表达式(Nest)
 * 语句(Statements)
