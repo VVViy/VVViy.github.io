@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Learning Chisel and scala
-subtitle:   Part I-Scala
+subtitle:   Scala Part I
 date:       2018-11-24
 author:     Max
 header-img: img/post-gray-background.jpg
@@ -16,16 +16,18 @@ NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的
 
 作者在学习过程中，主要参考了`Learning Scala`和`Programming in Scala, 3rd Edition`，将自认为的核心内容在本文进行介绍，内容编排上做了一些调整，对一些Scala特性会与C++/Java进行一些简单对比，辅助理解，不足与遗漏之处，请路过的小伙伴指出. (Scala的一些参考书在Blog的[books repo](https://github.com/VVViy/VVViy.github.io/tree/master/books/scala)可以找到，仅供个人参考，请勿用于商业用途)
 
-文末作者将对一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如'=>'操作符可应用于Match控制逻辑，也可应用于函数字面量等等.
+由于scala内容比较多，所以会分成两篇介绍，在第二篇文末作者将对Scala语言中一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如'=>'操作符可应用于Match控制逻辑，也可应用于函数字面量，还可以用于import package时的alias等.
 
 ### II. Data type
 1.Value and variable
 * Value
 
+  `Value`是一个具有特定类型的存储单元，定义赋值后，其值保持不变且不可重复赋值. 就定义而言，`value`似乎就是其他编程语言中的常量值，但实际上，Scala中的`value`是数学意义上的概念，可以看作是一个数学常量的符号表示，如`x=5`. `value`是函数式编程的基础元素，函数式程序中几乎都是使用`value`实现计算逻辑，后续会随内容逐步介绍.
+
 ```scala
 Syntax:
 
-//val关键字，scala编译器具备根据<data>推断<type>的能力，所以可以选择省略<type>
+//val关键字，scala编译器具备根据<data>推断<type>的能力，所以<type>是可选的
 val <identifier> [: <type>] = <data>      
 
 Example:
@@ -43,15 +45,17 @@ bval: String = world
 ```scala
 Syntax:
 
-//lazy关键字修饰val定义惰性值，只有该值第一次被访问时才计算<data>进行初始化，而非定义时，将在介绍class属性时进一步说明
+//lazy关键字修饰val定义惰性值，只有在第一次被访问该值时才用<data>初始化value，而非定义时，将在介绍class属性时进一步说明
 lazy val <identifier> [: <type>] = <data>
 ```
 * Variable
 
+  `Variable`与其他编程范式中定义的变量相同，表示堆或栈上分配的一段存储空间，记录了值在生命周期中的存储状态变化，只要存储空间不被回收，便可以重复赋值. 对于`value`和`variable`之间的关系，做个不成熟的比喻，`variable`表示数学中的定义域或值域，即在取值范围内，`variable`可以取任意值，而`value`表示取值范围内的某一点.
+  
 ```scala
 Syntax:         
 
-//var关键字
+//var关键字，虽然可对变量重复赋值，但只能赋予定义类型或兼容类型的值
 var <identifier> [: <type>] = <data>    
 
 Example：
@@ -66,7 +70,7 @@ avar: Int = 2
 
 * 转型
   - 与其他强类型语言相似，scala支持低精度向高精度数值类型自动转换
-  - 但不支持自动由高精度向低精度截断，需要使用to<Type>方法进行人工转型，如
+  - 但不支持自动由高精度向低精度的截断转型，需要使用to<Type>方法进行人工转型，如
     
 ```scala
 scala> val cval: Byte = 1
@@ -153,7 +157,7 @@ Table 3. Core nonnumeric types
 | Nothing | 唯一一个可以作为Type使用的类型，一般在函数或方法异常退出时的返回值类型 | No |
 | Null | "空"类型，如val a: String = null 或 val b：String = " ", 表明该a/b未指向内存中任何实例 | No |
 | Char | 兼容数值类型 | Yes |
-| Boolean | scala中的Boolean类型只有true和false两个值，不支持数值类型向true或false的自动转换 | Yes |
+| Boolean | scala中的Boolean类型只有true和false两个值，**不支持其他类型向true或false的自动转换**，如非空字符串不会转换为true，数值0也不会被当作false等 | Yes |
 | String | 在scala中属于复合数据类型(collection)，是字符的集合 | Yes |
 | Unit | 类似于C++中的void关键字，说明函数或表达式无返回值，可以为常量或变量赋Unit类型值，Unit的表示方法为空括号"()"，如 scala> val nov=(), nov: Unit=() | No |
 
@@ -181,7 +185,10 @@ Fig-1
     
 ### III. Expression and Built-in control structure
 1.表达式(expression)
-  表达式是函数式编程的基础构成元素，因为表达式通过描述"映射"实现了一个输入`value`到一个输出`value`的对应关系，这体现了函数式编程中的一个核心思想，即新值存储在新的value中，而不是修改已存在的varible，这有什么区别？
+
+  表达式是函数式程序的基础构成，因为表达式实现了函数式编程中的一个核心思想，即新值存储在新的value中，而不是修改已存在的varible，这什么意思？
+  
+  在探讨这个问题之前，可以先回顾一下其他编程范式中程序逻辑的实现方式，如在命令式编程中，我们首先会抽象出一系列处理逻辑，然后将变量按照特定顺序依次通过，最后变量中的值就是程序的功能体现，如简单的自增运算`x = x + 1`. 绕了这么大个圈子，就是要说明
 
 * 定义表达式
 * 嵌套表达式(Nest)
@@ -242,45 +249,3 @@ Fig-1
 * By-Name Parameters
 * Partial Functions
 * 函数字面量块参数
-
-### V. Advanced data type: Collections
-
-<div align="center">
-    
-<img src="">
-
-Fig-
-
-</div>
-
-1.Immutable collections
-* String
-  - 创建字符串
-  - 转义字符与运算符
-  - 字符串内插
-* Tuple: 三种构造形式
-* List
-  - List构造
-  - 
-* Map
-* Set
-
-2.Mutable collections
-
-### VI. Classes
-
-
-### VII. Special classes: Objects, Case classes, and Traits
-
-
-### VIII. Some tips
-| Item | Description |
-|------|-------------|
-| =>操作符应用|  |
-| 可嵌套类型 |  |
-| 无名函数/类 |  |
-| 函数类型的进化 |  |
-| class扩展途径 |  |
-| 类内定义的元素 |  |
-| 被忽视的符号 |  |
-    
