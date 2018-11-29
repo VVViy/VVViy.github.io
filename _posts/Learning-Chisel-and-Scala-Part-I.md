@@ -12,11 +12,11 @@ tags:
 ---
 
 ### I. Preface
-NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的加入到RISC-V的学习中，想通过阅读几个RV开源处理器的源码，深刻体会一下RV ISA和Chisel. 但当阅读Chisel的官方Cheatsheet时，感觉还是要学习一下`Scala`，一方面，scala作为chisel基础，要玩转chisel，scala必不可少，另一方面，官网的`"A Short Users Guide to Chisel "`，内容太简洁，缺少了语法的一般性定义，编写和调试可能会感觉无从下手，所以有了本文对Scala的介绍.
+NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的加入到RISC-V的学习中，想通过阅读几个RV开源处理器的源码，深刻体会一下`RV ISA`，`SpinalHDL`和`Chisel`. 但当阅读Chisel的官方Cheatsheet时，感觉还是要学习一下`Scala`，一方面，scala作为chisel基础，要玩转chisel，scala必不可少，另一方面，官网的`"A Short Users Guide to Chisel "`，内容太简洁，缺少了语法的一般性定义，编写和调试可能会感觉无从下手，所以有了本文对Scala的介绍.
 
 作者在学习过程中，主要参考了`Learning Scala`和`Programming in Scala, 3rd Edition`，将自认为的核心内容在本文进行介绍，内容编排上做了一些调整，对一些Scala特性会与C++/Java进行一些简单对比，辅助理解，不足与遗漏之处，请路过的小伙伴指出. (Scala的一些参考书在Blog的[books repo](https://github.com/VVViy/VVViy.github.io/tree/master/books/scala)可以找到，仅供个人参考，请勿用于商业用途)
 
-由于scala内容比较多，所以会分成两篇介绍，在第二篇文末作者将对Scala语言中一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如'=>'操作符可应用于Match控制逻辑，也可应用于函数字面量，还可以用于import package时的alias等.
+由于scala内容比较多，所以会分成两篇介绍，在第二篇文末作者将对Scala语言中一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如`=>`操作符可应用于Match控制逻辑，也可应用于函数字面量，还可以用于import package时的alias等.
 
 ### II. Data type
 1.Value and variable
@@ -25,12 +25,8 @@ NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的
   `Value`是一个具有特定类型的存储单元，定义赋值后，其值保持不变且不可重复赋值. 就定义而言，`value`似乎就是其他编程语言中的常量值，但实际上，Scala中的`value`是数学意义上的概念，可以看作是一个数学常量的符号表示，如`x=5`. `value`是函数式编程的基础元素，函数式程序中几乎都是使用`value`实现计算逻辑，后续会随内容逐步介绍.
 
 ```scala
-Syntax:
-
-//val关键字，scala编译器具备根据<data>推断<type>的能力，所以<type>是可选的
+//syntax: val关键字，scala编译器具备根据<data>推断<type>的能力，所以<type>是可选的
 val <identifier> [: <type>] = <data>      
-
-Example:
 
 //example 1
 scala> val aval = "hello"
@@ -43,9 +39,7 @@ bval: String = world
 * Lazy value
 
 ```scala
-Syntax:
-
-//lazy关键字修饰val定义惰性值，只有在第一次被访问该值时才用<data>初始化value，而非定义时，将在介绍class属性时进一步说明
+//syntax: lazy关键字修饰val定义惰性值，只有在第一次被访问该值时才用<data>初始化value，而非定义时，将在介绍class属性时进一步说明
 lazy val <identifier> [: <type>] = <data>
 ```
 * Variable
@@ -53,12 +47,8 @@ lazy val <identifier> [: <type>] = <data>
   `Variable`与其他编程范式中定义的变量相同，表示堆或栈上分配的一段存储空间，记录了值在生命周期中的存储状态变化，只要存储空间不被回收，便可以重复赋值. 对于`value`和`variable`之间的关系，做个不成熟的比喻，`variable`表示数学中的定义域或值域，即在取值范围内，`variable`可以取任意值，而`value`表示取值范围内的某一点.
   
 ```scala
-Syntax:         
-
-//var关键字，虽然可对变量重复赋值，但只能赋予定义类型或兼容类型的值
+//syntax: var关键字，虽然可对变量重复赋值，但只能赋予定义类型或兼容类型的值
 var <identifier> [: <type>] = <data>    
-
-Example：
 
 //example
 scala> var avar = 1
@@ -190,14 +180,107 @@ Fig-1
   
   在探讨这个问题之前，可以先回顾一下其他编程范式中程序逻辑的实现方式，如在命令式编程中，我们首先会抽象出一系列处理逻辑，然后将变量按照特定顺序依次通过，最后变量中的值就是程序的功能体现，如简单的自增运算`x = x + 1`. 
   
-  相比之下，函数式编程则采用了完全不同的实现方式，即针对问题模型，其首先构建出类似数学上的函数方程来描述功能逻辑，之后将函数方程分解成一系列的低阶子函数的运算链条，最后通过求解子函数链条得到最终的功能输出，而在数学中，函数的定义是`f: x -> y`，是描述一个集合到另一个集合的"映射"，例如，集合`A`中的元素`a`在法则`f`作用下，映射到集合`B`中的元素`b`上，显然，在得到输出`b`的同时，输入`a`并未发生改变，所以，`x = x + 1`在数学上是不成立的. 绕了这么大个圈子，就是要说明scala中的表达式描述了这种"映射"关系，其根据输入val产生新的输出val，而非修改已存在的值.
+  相比之下，函数式编程则采用了完全不同的实现方式，即针对问题模型，其首先构建出类似数学上的函数方程来描述功能逻辑，之后将函数方程分解成一系列的低阶子函数的运算链条，最后通过求解子函数链条得到最终的功能输出，而在数学中，函数的定义是`f: x -> y`，是描述一个集合到另一个集合的"映射"，例如，集合`A`中的元素`a`在法则`f`作用下，映射到集合`B`中的元素`b`上，显然，在得到输出`b`的同时，输入`a`并未发生改变，所以，`x = x + 1`在数学上是不成立的. 绕了这么大个圈子，就是要说明scala中的表达式描述了这种"映射"关系，其根据输入val产生新的输出val，而非修改已存在的值. 当然，scala也支持面向对象，所以我们依然可以用表达式实现命令式编程逻辑.
 
 * 定义表达式
-* 嵌套表达式(Nest)
+
+  表达式就是个具有返回值的代码单元，表达式的返回值可作为另一个表达式的输入值或保存在value和variable中，由此可以重新定义value和variable的语法，即
+  
+```scala
+//syntax
+val <identifier> [: <type>] = <expression> 
+var <identifier> [: <type>] = <expression> 
+```
+
+   多条表达式可以构成一个表达式块，内部可以包含局部val或var用于表达式块内部，表达式块的最后一个表达式为整个表达式块的返回值; 表达式块有如下两种常用的表现形式：
+  
+```scala
+//方式一：使用{}的一般形式
+{ expr1 ; expr2 ; ... } 
+
+或
+
+{ expr1  //多行可省略分号
+| expr2  //左侧的"|"是REPL中为标识多行语句自动添加的符号
+| ...
+|}
+```
+
+```scala
+//方式二：省略{}并用分号间隔，仅限单行
+expr1 ; expr2 ; ...
+```
+
+* 嵌套表达式(Nested expression)
+  
+  表达式可嵌套，内嵌语句需用{}进行分割，{}也同时界定了不同内嵌层次语句块中value和variable的作用域，如
+  
+```scala
+scala> { val a = 1; { val b = a * 2; { val c = b + 4; c } } }
+res0: Int = 6     //REPL中自动生成的res0可在后续输入中显式使用，类似于matlab中的ans
+```
+  
 * 语句(Statements)
+
+  语句是没有返回值版的表达式，Scala中的println()和val或var的定义式都是语句，语句虽然没有返回值，但有返回类型——`Unit`，如
+  
+```scala
+scala> val aval = println("aloha")
+aloha
+aval: Unit = ()
+```
+
 2.控制语句
 * if...else
+
+  Scala中条件控制语句支持`if`和`if else`两种，定义形式如下:
+  
+```scala
+//syntax: if后面的表达式可以是单行或多行表达式块，且有返回值
+if (<Boolean expression>) <expression>
+
+//example
+scala> val result = if ( false ) "what does this return?"
+result: Any = ()
+```
+
+注意到，上例返回值为Fig-1中的`root`类型，这是因为布尔条件为真时，if返回类型为`String`(`AnyRef`子类)，为假时返回`Unit`(`AnyVal`子类)，编译器无法确定准确的返回类型，只能返回根类型.
+
+```scala
+//syntax: if...else不存在类型不确定的问题，且可嵌套，从而形成了if...else...if...else...
+if (<Boolean expression>) <expression>
+else <expression>
+
+//example
+scala> val x = 10; val y = 20
+x: Int = 10
+y: Int = 20
+
+scala> val max = if (x > y) x else y
+max: Int = 20
+```
+
 * match
+
+  Scala中的`match`控制语句类似于C++，Java中的`switch...case`或verilog中的`case...endcase`，定义形式如下：
+  
+```scala
+//syntax
+<expression> match {
+       case <pattern match> => <expression>
+      [case...]
+}
+
+//example
+scala> val day = "MON"
+day: String = MON
+
+scala> val kind = day match {
+     | case "MON" |  "TUE" | "WED" | "THU" | "FRI" => "weekday" 
+     | case "SAT" | "SUN" => "weekend"
+     | }
+```
+
 * loops
   - for
   
@@ -215,9 +298,12 @@ Fig-1
 1.函数
 
 * 纯函数
+
 * 函数的定义与调用
   - 一般定义形式
+  
   - 无参数定义的两种形式
+  
   - 参数列表
   
     1）参数默认值
@@ -233,21 +319,35 @@ Fig-1
     2）表达式块参数
     
   - 函数返回值
+  
 * Procedure
+
 * 递归函数
+
 * 嵌套函数
+
 * 泛型函数
 
 2.函数式编程与电路
 
 3.First-class function
+
 * 高阶函数
+
 * 函数类型与值
+
 * 函数字面量
   - 定义
+  
   - 背后原理
+  
 * 占位符
+
 * Partially Applied Functions and Currying
+
 * By-Name Parameters
+
 * Partial Functions
+
 * 函数字面量块参数
+
