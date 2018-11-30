@@ -18,6 +18,8 @@ NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的
 
 由于scala内容比较多，所以会分成两篇介绍，在第二篇文末作者将对Scala语言中一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如`=>`操作符可应用于Match控制逻辑，也可应用于函数字面量，还可以用于import package时的alias等.
 
+---
+
 ### II. Data type
 #### 1. Value and variable
 * Value
@@ -100,6 +102,8 @@ scala> val `a.b` = 4
 <console>: a.b: Int = 4
 ```
 
+---
+
 #### 2. 数值类型
 * Scala中包含以下6种数值类型，与其他高级编程语言不同的是，scala中没有`built-in`类型，全部都是`class`.
 
@@ -133,6 +137,8 @@ Table 2. Numeric literals
 scala> val fval = 5d
 <console>: fval: Double = 5.0
 ```
+
+---
 
 #### 3. Scala核心类型继承体系
   Scala中核心的`Type`体系如Fig-1所示，各类型含义及所有类型支持的方法可简述如下
@@ -171,8 +177,12 @@ Fig-1
 
 </div>
 
+---
+
 #### 4. Scala运算符：scala支持的运算符和优先级与其他语言相比没有特殊之处，只是**不支持三元运算符(? :)**，详细内容请参考相关材料.
-    
+
+---
+
 ### III. Expression and Built-in control structure
 #### 1. 表达式(expression)
 
@@ -229,6 +239,8 @@ scala> val aval = println("aloha")
 <console>: aloha
 aval: Unit = ()
 ```
+
+---
 
 #### 2. Scala内置控制表达式
 * if...else
@@ -316,7 +328,9 @@ scala> status = message match {
      | }
 <console> couldn't parse ok
 status: Int = -1
+```
 
+```scala
 //syntax: wildcard underscore
 case _ => <expression or expression block> //case关键字与下划线间有空格
 
@@ -402,7 +416,9 @@ scala> 1 to 3 by 1
 //example
 scala> 1 until 3
 <console>: res5: scala.collection.immutable.Range = Range（1，2）
+```
 
+```scala
 //syntax：直接使用Range类创建，等效于使用until关键字
 
 //example
@@ -426,7 +442,9 @@ scala> for ( t <- quote.split(",") ; if t != null ; if t.size > 0 ) { println(t)
 <console>: Faith 
 Hope
 Charity
+```
 
+```scala
 //example：curly-braces based
 scala> val quote = "Faith,Hope,,Charity" 
 <console>: quote: String = Faith,Hope,,Charity
@@ -460,20 +478,100 @@ scala> for { x <- 1 to 2
 <console>: (1,1) (1,2) (1,3) (2,1) (2,2) (2,3)
 ```
     
-   6）值绑定：
+   6）值绑定：所谓值绑定与C++，Java中`for(init ; condition ; changed value)`d `init`初始化值相似，但功能要更强，其语法定义如下，在迭代器中建立的局部value能够简化掉`for`表达式块中的很多工作，而且其不仅可以用于定义其他嵌套迭代器，还可用于`iterator guard`，其他绑定值以及表达式块.
     
-  - while与do...while
+```scala
+//syntax:
+for (<identifier 1> <- <iterator>; <identifier 2> = <expression>) ...
+
+//example
+scala> val powersOf2 = for (i <- 0 to 8; pow = 1 << i) yield pow
+<console>: powersOf2: scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 4, 8, 16, 32, 64, 128, 256)
+```
+    
+  - while与do...while：这两种形式与其他语言中的很类似，不过多介绍.
+  
+```scala
+//syntax: 
+while (<Boolean expression>) statement  //注意这里是语句，而非表达式
+
+//example 1
+scala> var x = 10; while (x > 0) x -= 1 
+<console>: x: Int = 0
+
+//example 2
+scala> do println(s"Here I am, x = $x") while (x > 0) 
+<console>: Here I am, x = 0
+```
+
+---
 
 ### IV. Functions and Functional programming
 #### 1. 函数
-
+   
+   Scala中的函数就是添加了名称的表达式，同样是Scala函数式编程范式的基础结构. 
+   
+   定义函数的目的就是为了提高代码复用率，特别是在函数式程序中，在前面介绍表达式时，我们提到了函数式的数学逻辑，就是将复杂函数方程分解成一系列的低阶子函数运算链条，通过求解子函数链条得到最终的功能输出，这里的子函数等价于Scala函数，所以我们在定义函数时应尽量遵守设计模式中的"单一功能"原则，使函数尽量短小，功能单一，这样不仅能提高复用率，而且也符合数学逻辑，因为多功能的Scala函数定义等价于数学上未完全分解的子函数. 
+   
 * 纯函数
+
+  纯函数是具有数学意义上的函数，也是函数式程序中的主体部分，其主要特征包括：
+  
+  - 有一个或多个输入参数;
+  - 函数体内部只使用输入参数进行运算;
+  - 有返回值;
+  - 相同输入相同输出;
+  - 不使用或影响函数体外部变量;
+  - 函数返回值不会被外部变量影响.
+
+然而，一个功能健全的程序不可能不受外部数据的影响，如文件, 数据库, 网络数据流，所以可以考虑的基本原则是最小化非纯函数数量.
 
 * 函数的定义与调用
   - 一般定义形式
   
-  - 无参数定义的两种形式
+```scala
+//syntax: 因为Scala编译器的类型推断能力，函数类型也是可选的
+def <identifier>(<identifier>: <type>[, ... ]): [<type>] = <expression or expression block>
+
+//example
+scala> def multiplier(x: Int, y: Int): Int = { x * y }
+<console>: multiplier: (x: Int, y: Int)Int
+
+scala> multiplier(6, 7)
+<console>: res0: Int = 42
+```
   
+  - 无参数函数的两种定义形式
+
+```scala
+//方式一：无参数列表相关符号
+def <identifier>: [<type>] = <expression>
+
+//example
+scala> def hi: String = "hi" 
+<console>: hi: String
+
+scala> hi   //第一章介绍Scala核心类型结构时，提到过Scala的所有类型都继承了Java的toString方法
+res2: String = hi
+```
+
+```scala
+//方式二：使用空括号定义
+def <identifier>()[: <type>] = <expression>
+
+//example
+scala> def hi(): String = "hi" 
+<console>: hi: ()String
+
+scala> hi()
+<console>: res1: String = hi 
+
+scala> hi
+<console>: res2: String = hi
+```
+
+相较于第一种无参数定义形式，第二种方式显然更好，因为在使用括号调用函数时，很容易与val或var相区分，另外，方式二的例子中，函数调用时的括号是可选的，但需要**注意**的是如果按照第一种定义形式定义无参函数，那么调用时不能带括号.
+
   - 参数列表
   
     1）参数默认值
@@ -498,7 +596,11 @@ scala> for { x <- 1 to 2
 
 * 泛型函数
 
-#### 2. 函数式编程与电路
+---
+
+#### 2. 函数式与电路
+
+---
 
 #### 3. First-class function
 
