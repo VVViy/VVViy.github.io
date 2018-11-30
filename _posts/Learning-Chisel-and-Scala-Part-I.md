@@ -521,7 +521,7 @@ scala> do println(s"Here I am, x = $x") while (x > 0)
   - 不使用或影响函数体外部变量;
   - 函数返回值不会被外部变量影响.
 
-然而，一个功能健全的程序不可能不受外部数据的影响，如文件, 数据库, 网络数据流，所以可以考虑的基本原则是最小化非纯函数数量.
+  然而，一个功能健全的程序不可能不受外部数据的影响，如文件, 数据库, 网络数据流，所以可以考虑的基本原则是最小化非纯函数数量.
 
 * 函数的一般定义形式
   
@@ -782,24 +782,278 @@ class Mux4 extends Module {
 ---
 
 #### 3. First-class function
+  `first-class function`是函数式的最核心实现基础，没有对它的支持就无法实现函数式，维基上对它的解释挺抽象的，这里我们引用一下书上的定义，如下
 
+> One of the core values of functional programming is that functions should be first-class. The term indicates that they are not only 
+> declared and invoked but can be used in every segment of the language as just another data type. A first-class function may, as with 
+> other data types, be created in literal form without ever having been assigned an identifier; be stored in a container such as a 
+> value, variable, or data structure; and be used as a parameter to another function or used as the return value from another function.
+
+   简单总结下来就是，`first-class function`是一种数据类型，和`Int，Double`一样可以定义value，variable，可以用在任何类型能够使用的地方. 这就成函数式的核心基础了?
+   
+   可以再回顾之前在介绍表达式时分析得到的数学逻辑，将复杂函数方程分解成一系列的低阶子函数运算链条，通过求解子函数链条得到最终的功能输出，实际上，子函数链条的连接正是通过`first-class function`，举个栗子来看看，假设要用函数式程序实现下式：
+   
+<div align="center">
+    
+f(x, y) = e<sup>sin(x<sup>2</sup> - y)</sup>
+
+</div>
+
+按照我们分析过的数学逻辑，我们应该做如下分解，构成一个从低阶子函数到最终输出的计算链条，在不使用变量的情况下，这个链条是如何连接的? 是不是可以通过使用`first-class function`的概念，依次在后级表达式中定义前级函数的参数，最后只要传递最低阶函数的对象便可完成了呢. 另一方面，以函数作为参数或/和返回值的函数称为"高阶函数". 这些在Scala中都是支持的，下面逐一介绍.
+
+y<sup>1/2</sup> ---> (x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>) ---> sin((x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>)) ---> e<sup>sin((x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>))</sup> = f(x , y)       
 
 * 函数类型与值
 
+1）定义函数类型值的一般定义形式：函数的类型是由其输入参数类型和返回值类型组合而成的.
+
+```scala
+//syntax：如果函数的参数列表中只有一个输入参数，可以省略掉输入参数的括号
+([<type>, ...]) => <type>  //函数输入参数类型列表 => 函数返回值类型
+
+//example
+scala> def double(x: Int): Int = x * 2
+<console>: double: (x: Int)Int
+
+scala> val myDouble: (Int) => Int = double  //注意这里的定义值的方式 val <identifier> : <function type> = <function identifier>
+<console>： myDouble: Int => Int = <function1>
+
+
+scala> val yourDouble: Int => Int = double  //只有一个输入参数，省略掉括号
+<console>： yourDouble: Int => Int = <function1>
+
+scala> myDouble(5)                 //myDouble就是个普通的value，但却有函数的功能
+<console>: res1: Int = 10
+
+scala> val myDoubleCopy = myDouble //在使用方式上，函数定义的值与Int等其他类型值没有区别
+<console>: myDoubleCopy: Int => Int = <function1>
+
+scala> myDoubleCopy(5)
+<console>: res2: Int = 10
+```
+
+2）函数类型隐式定义：上面例子定义`myDouble`时，显式声明了该`value`的函数类型，也可以使用下划线通配符来简化类型的书写.
+
+```scala
+//syntax
+val <identifier> = <function name> _ //注意<function name>和下划线之间有空格
+
+//example
+scala> def double(x: Int): Int = x * 2
+<console>: double: (x: Int)Int
+
+scala> val myDouble = double _      //简化函数类型值的定义形式
+<console>: myDouble: Int => Int = <function1>
+```
+
+3）无输入参数函数类型：定义这种函数类型值时许注意，在定义函数时要使用带括号的版本，否则在不使用函数字面量的情况下，无法定义值. (这种方式以被官网声明弃用，但依然可以使用，最好使用后面介绍的函数字面量)
+
+```scala
+//example
+scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //如果定义成 def logStart = ...，下面定义值时便会报错
+<console>: logStart: ()String
+
+scala> val start: () => String = logStart    //在新版2.12.7 REPL中将报warning
+<console>: start: () => String = <function0>
+
+scala> println( start() )
+<console>:
+==================================================
+Starting NOW
+==================================================
+```
+
 * 高阶函数
 
+  本节开头提到过高阶函数，就是以函数作为参数或/和返回值的函数，如
+
+```scala
+//example
+scala> def safeStringOp(s: String, f: String => String) = { //注意函数类型参数的形式，para：函数输入参数类型列表 => 函数返回值类型
+     | if (s != null) f(s) else s
+     | }
+<console>: safeStringOp: (s: String, f: String => String)String
+
+scala> def reverser(s: String) = s.reverse
+<console>: reverser: (s: String)String
+
+scala> safeStringOp(null, reverser) //和定义函数类型值一样，直接使用函数名调用
+<console>: res4: String = null
+
+scala> safeStringOp("Ready", reverser)
+<console>: res5: String = ydaeR
+```
+
 * 函数字面量
-  - 定义
-  
-  - 背后原理
+
+1）定义
+
+```scala
+//syntax
+([<identifier>: <type>, ... ]) => <expression>
+
+//example
+scala> val doubler = (x: Int) => x * 2  //实际上，从编译器类型推断的角度，有了参数列表和函数体也就知道了输入和输出类型
+<console>: doubler: Int => Int = <function1> 
+
+scala> val doubled = doubler(22)
+<console>: doubled: Int = 44
+```
+
+ 2）背后原理
   
 * 占位符
 
+```scala
+//example 1
+scala> val doubler: Int => Int = _ * 2
+<console>: doubler: Int => Int = <function1>
+```
+
+```scala
+//example 2: 应用于高阶函数
+scala> def safeStringOp(s: String, f: String => String) = {
+     | if (s != null) f(s) else s
+     | }
+<console>: safeStringOp: (s: String, f: String => String)String
+
+scala> safeStringOp(null, _.reverse) //注意这里_不仅替代了参数，也省略了参数列表
+<console>: res11: String = null
+
+scala> safeStringOp("Ready", _.reverse)
+<console>: res12: String = ydaeR
+```
+
+```scala
+//example 3: 应用于高阶泛型函数
+scala> def tripleOp[A,B](a: A, b: A, c: A, f: (A, A, A) => B) = f(a,b,c)
+<console>: tripleOp: [A, B](a: A, b: A, c: A, f: (A, A, A) => B)B
+
+scala> tripleOp[Int,Int](23, 92, 14, _ * _ + _)
+<console>: res15: Int = 2130
+
+scala> tripleOp[Int,Double](23, 92, 14, 1.0 * _ / _ / _)
+<console>: res16: Double = 0.017857142857142856
+
+scala> tripleOp[Int,Boolean](93, 92, 14, _ > _ + _)
+<console>: res17: Boolean = false
+```
+
 * Partially Applied Functions and Currying
+
+1）Partially Applied Functions
+
+
+
+```scala
+//example
+scala> def factorOf(x: Int, y: Int) = y % x == 0  //原始定义
+<console>: factorOf: (x: Int, y: Int)Boolean
+
+scala> val f = factorOf _   //如果两个参数值都将改变  
+<console>: f: (Int, Int) => Boolean = <function2>
+
+scala> val x = f(7, 20)    //需提供两个参数值才能正常调用
+<console>: x: Boolean = false
+
+scala> val multipleOf3 = factorOf(3, _: Int)  //如果只想改变部分参数，其他参数取定值，并使用underscore声明要改变的参数
+<console>: multipleOf3: Int => Boolean = <function1>
+
+scala> val y = multipleOf3(78)  //调用时仅给出一个参数值即可
+<console>: y: Boolean = true
+```
+
+2）Currying: 指参数列表分组，即一个拥有多输入参数的函数，应将参数分为静态分组与动态分组两类，应用时只改变动态分组的参数.
+
+```scala
+//example
+scala> def factorOf(x: Int)(y: Int) = y % x == 0
+<console>: factorOf: (x: Int)(y: Int)Boolean
+
+scala> val isEven = factorOf(2) _ //定义静态分组参数值
+<console>: isEven: Int => Boolean = <function1>
+
+scala> val z = isEven(32) //应用动态分组参数
+<console>: z: Boolean = true
+```
 
 * By-Name Parameters
 
+```scala
+//syntax
+<identifier>: => <type>
+
+//example
+scala> def doubles(x: => Int) = {   //传入的函数参数的返回值必须是Int类型
+     | println("Now doubling " + x)
+     | x * 2
+     | }
+<console>: doubles: (x: => Int)Int
+
+scala> doubles(5)  //可看作常数函数，返回值为Int
+<console>: Now doubling 5
+res18: Int = 10
+
+scala> def f(i: Int) = { println(s"Hello from f($i)"); i }
+<console>: f: (i: Int)Int
+
+scala> doubles( f(8) )  //返回值为Int
+<console>: Hello from f(8)
+Now doubling 8
+Hello from f(8)
+res19: Int = 16
+```
+
 * Partial Functions
+
+  所谓partial函数是与total函数相对应的，二者是从函数所表示的数学函数对应的定义域加以区分的，如果定义去为R，那么是total函数，如x^2, 若只是部分子集，就是partial，如负数开根号，除0，partial函数也是一种函数字面量；
+  
+```scala
+//example
+scala> val statusHandler: Int => String = {
+     | case 200 => "Okay"
+     | case 400 => "Your Error"
+     | case 500 => "Our error"
+     | }
+<console>: statusHandler: Int => String = <function1>
+
+scala> statusHandler(200)
+<console>：res20: String = Okay
+```
 
 * 函数字面量块参数
 
+  前面介绍过使用表达式语句块作为函数调用的参数值，同样的，在高阶函数中也可以使用函数字面量块作为参数值调用高阶函数.
+
+```scala
+//example 1
+scala> def safeStringOp(s: String, f: String => String) = {
+     | if (s != null) f(s) else s
+     | }
+<console>: safeStringOp: (s: String, f: String => String)String
+
+scala> val uuid = java.util.UUID.randomUUID.toString
+<console>: uuid: String = bfe1ddda-92f6-4c7a-8bfc-f946bdac7bc9
+
+scala> val timedUUID = safeStringOp(uuid, { s =>
+     | val now = System.currentTimeMillis
+     | val timed = s.take(24) + now
+     | timed.toUpperCase
+     | })
+<console>: timedUUID: String = BFE1DDDA-92F6-4C7A-8BFC-1394546043987
+```
+
+```scala
+//example 2: 使用参数分组更符合单一功能原则，即对参数列表进行独立封装
+scala> def safeStringOp(s: String)(f: String => String) = {
+     | if (s != null) f(s) else s
+     | }
+<console>：safeStringOp: (s: String)(f: String => String)String
+
+scala> val timedUUID = safeStringOp(uuid) { s =>
+     | val now = System.currentTimeMillis
+     | val timed = s.take(24) + now
+     | timed.toUpperCase
+     | }
+<console>: timedUUID: String = BFE1DDDA-92F6-4C7A-8BFC-1394546915011
+```
