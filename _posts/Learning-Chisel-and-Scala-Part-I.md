@@ -801,7 +801,11 @@ f(x, y) = e<sup>sin(x<sup>2</sup> - y)</sup>
 
 按照我们分析过的数学逻辑，我们应该做如下分解，构成一个从低阶子函数到最终输出的计算链条，在不使用变量的情况下，这个链条是如何连接的? 是不是可以通过使用`first-class function`的概念，依次在后级表达式中定义前级函数的参数，最后只要传递最低阶函数的对象便可完成了呢. 另一方面，以函数作为参数或/和返回值的函数称为"高阶函数". 这些在Scala中都是支持的，下面逐一介绍.
 
-y<sup>1/2</sup> ---> (x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>) ---> sin((x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>)) ---> e<sup>sin((x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>))</sup> = f(x , y)       
+<div align="center">
+    
+y<sup>1/2</sup> ---> (x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>) ---> sin((x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>)) ---> e<sup>sin((x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>))</sup> = f(x , y)     
+
+</div>
 
 * 函数类型与值
 
