@@ -8,6 +8,7 @@ header-img: img/post-gray-background.jpg
 catalog: true
 tags:
     - Chisel
+    - SpinalHDL
     - Scala
 ---
 
@@ -295,7 +296,7 @@ scala> val max = x > y match {
 <console>: max: Int = 20
 ```
 
-   1）多匹配项：`match`支持在同一个`case`中存在多个匹配项，与匹配项中任一`pattern`匹配，便执行该`case`，定义如下：
+   1）匹配项组合：`match`支持在同一个`case`中存在多个匹配项，与匹配项中任一`pattern`匹配，便执行该`case`，定义如下：
   
 ```scala
 //syntax
@@ -349,10 +350,10 @@ scala> val status = message match {
 status: Int = -1
 ```
   
-   3）pattern guard：是将`if`控制逻辑添加到`case pattern`，只有在满足特定条件时才进行匹配，定义如下，需要注意的是，`if`后条件表达式的括号是可选的.
+   3）Pattern guard：是将`if`控制逻辑添加到`case pattern`，只有在满足特定条件时才进行匹配，定义如下，需要注意的是，`if`后条件表达式的括号是可选的.
 
 ```scala
-//syntax: 
+//syntax
 case <pattern> if <Boolean expression> => <expression or expression block>
 
 //example
@@ -367,7 +368,7 @@ scala> resp match {
    4）类型匹配：顾名思义，是与数据类型匹配，定义如下，匹配类型`<type>`前的`<indentifier>`定义了一个合法名称的局部变量`variable`，且变量名必须以**小写字母开头**，另外，数据类型匹配支持多态.
    
 ```scala
-//syntax:
+//syntax
 case <identifier>: <type> => <expression or expression block>
 
 //example
@@ -387,11 +388,9 @@ scala> y match {
 <console>: res9: String = 12180i
 ```
   
-* loops
-
-  Scala中的循环控制表达式包括`for, while, do...while`三种，相关定义如下.
+* for loop
   
-  - for：Scala中最常用的迭代控制表达式，定义如下：
+  Scala中最常用的迭代控制表达式，定义如下：
   
 ```scala
 //syntax: 定义式与其他语言中的for循环差异比较大，特别是变量x在迭代器中的移动采用<-操作符，后面对内部元素逐一介绍
@@ -420,11 +419,9 @@ scala> 1 until 3
 
 ```scala
 //syntax：直接使用Range类创建，等效于使用until关键字
-
-//example
-//syntax：
 Range(<starting integer>, <ending integer>, [by increment])
 
+//example
 scala> Range(1, 5, 1)
 <console>: res5: scala.collection.immutable.Range = Range（1，3）
 ```
@@ -460,10 +457,10 @@ Hope
 Charity
 ```
     
-   4）iterator guard：上列我们已经见识了加`guard`的迭代器了，实际上，就是加了迭代条件，这和C++,Java中`for(init ; condition ; changed value)`的条件检查一致. 与`match`类似，这里`if`后条件表达式的括号也是可选的.
+   4）Iterator guard：上列我们已经见识了加`guard`的迭代器了，实际上，就是加了迭代条件，这和C++,Java中`for(init ; condition ; changed value)`的条件检查一致. 与`match`类似，这里`if`后条件表达式的括号也是可选的.
    
 ```scala
-//syntax: 
+//syntax
 for (<identifier> <- <iterator> if <Boolean expression>) ...
 ```
     
@@ -481,18 +478,18 @@ scala> for { x <- 1 to 2
    6）值绑定：所谓值绑定与C++，Java中`for(init ; condition ; changed value)`d `init`初始化值相似，但功能要更强，其语法定义如下，在迭代器中建立的局部value能够简化掉`for`表达式块中的很多工作，而且其不仅可以用于定义其他嵌套迭代器，还可用于`iterator guard`，其他绑定值以及表达式块.
     
 ```scala
-//syntax:
+//syntax
 for (<identifier 1> <- <iterator>; <identifier 2> = <expression>) ...
 
 //example
 scala> val powersOf2 = for (i <- 0 to 8; pow = 1 << i) yield pow
 <console>: powersOf2: scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 4, 8, 16, 32, 64, 128, 256)
 ```
-    
-  - while与do...while：这两种形式与其他语言中的很类似，不过多介绍.
+   
+* while loop与do...while loop：这两种形式与其他语言中的很类似，不过多介绍.
   
 ```scala
-//syntax: 
+//syntax
 while (<Boolean expression>) statement  //注意这里是语句，而非表达式
 
 //example 1
@@ -526,8 +523,7 @@ scala> do println(s"Here I am, x = $x") while (x > 0)
 
 然而，一个功能健全的程序不可能不受外部数据的影响，如文件, 数据库, 网络数据流，所以可以考虑的基本原则是最小化非纯函数数量.
 
-* 函数的定义与调用
-  - 一般定义形式
+* 函数的一般定义形式
   
 ```scala
 //syntax: 因为Scala编译器的类型推断能力，函数类型也是可选的
@@ -541,7 +537,7 @@ scala> multiplier(6, 7)
 <console>: res0: Int = 42
 ```
   
-  - 无参数函数的两种定义形式
+* 无参数函数的两种定义形式
 
 ```scala
 //方式一：无参数列表相关符号
@@ -552,7 +548,7 @@ scala> def hi: String = "hi"
 <console>: hi: String
 
 scala> hi   //第一章介绍Scala核心类型结构时，提到过Scala的所有类型都继承了Java的toString方法
-res2: String = hi
+<console>: res2: String = hi
 ```
 
 ```scala
@@ -572,41 +568,225 @@ scala> hi
 
 相较于第一种无参数定义形式，第二种方式显然更好，因为在使用括号调用函数时，很容易与val或var相区分，另外，方式二的例子中，函数调用时的括号是可选的，但需要**注意**的是如果按照第一种定义形式定义无参函数，那么调用时不能带括号.
 
-  - 参数列表
+* 参数列表
   
-    1）参数默认值
-    
-    2）Vararg参数匹配
-    
-    3）参数分组
-    
-  - 函数调用
+1）参数默认值：与其他语言类似，可以在定义Scala函数参数时，指定部分或全部参数的默认值，这样在调用函数时，可以省略部分参数值.
   
-    1）命名参数与位置参数
-  
-    2）表达式块参数
+```scala
+//syntax
+def <identifier>(<identifier>: <type> = <value>): <type>
+
+//example
+scala> def greet(prefix: String = "", name: String) = s"$prefix$name"
+<console>: greet: (prefix: String, name: String)String
+```
     
-  - 函数返回值
+  2）Vararg参数：与Java中的同名参数相似，Scala也支持定义可变长度参数列表，即在参数类型后追加通配符`*`来匹配0或多个同类型参数. 在函数实现的表达式块中，vararg参数被当作复合数据对象使用，可直接应用于`for`的迭代器中. 
   
-* Procedure
+```scala
+//example
+scala> def sum(items: Int*): Int = {
+     | var total = 0
+     | for (i <- items) total += i
+     | total  //表达式块的最后一条作为返回值
+     | }
+<console>: sum: (items: Int*)Int
+
+scala> sum(10, 20, 30) //匹配3个Int类型值
+<console>: res11: Int = 60
+
+scala> sum() //匹配0个
+<console>: res12: Int = 0
+```
+    
+  3）参数分组：用括号对参数列表分别封装进行分组，这种处理似乎没什么亮点，但在后面介绍`Partially Applied Functions and Currying`时可以看到，这是一种符合设计模式的处理方式，即将稳定的和易变的逻辑分别封装，降低耦合度.
+  
+```scala
+//example
+scala> def max(x: Int)(y: Int) = if (x > y) x else y 
+<console>: max: (x: Int)(y: Int)Int
+
+scala> val larger = max(20)(39) 
+<console>: larger: Int = 39
+```
+    
+* 函数调用
+  
+1）命名参数与位置参数：对于熟悉verilog的小伙伴来说，这两个概念并不陌生，在例化模块实例时肯定会用到其中一种, 实际上，在C++等语言介绍默认参数值也会讲到. 命名参数调用就是在调用函数时同时给出参数名称和参数值，而位置调用则是按照参数列表中参数顺序提供参数值，但在调用存在默认参数值的函数时需要注意，应该先位置参数值，后命名参数值调用相对稳妥.
+  
+```scala
+//example 1：命名与位置参数调用
+scala> def greet(prefix: String, name: String) = s"$prefix $name" 
+<console>: greet: (prefix: String, name: String)String
+
+scala> val greeting1 = greet("Ms", "Brown")  //位置参数调用
+<console>: greeting1: String = Ms Brown
+
+scala> val greeting2 = greet(name = "Brown", prefix = "Mr") //命名参数调用 
+<console>: greeting2: String = Mr Brown
+
+//example 2：混合调用
+scala> def greet(prefix: String = "", name: String) = s"$prefix$name"
+<console>: greet: (prefix: String, name: String)String
+
+scala> val greeting1 = greet(name = "Paul") //必须使用命名调用，否则，编译器无法确定给定参数值是属于哪个参数
+<console>: greeting1: String = Paul
+
+//exaple 3：混合调用
+scala> def greet(name: String, prefix: String = "") = s"$prefix$name"
+<console>: greet: (name: String, prefix: String)String
+
+scala> val greeting2 = greet("Ola") //调整参数列表中参数位置后，可以不适用命名参数调用
+<console>: greeting2: String = Ola
+```
+  
+  2）表达式块参数：表达式块调用是将调用函数参数值的计算过程整体作为调用参数进行传递，这种方式不仅可以极大提高代码的可读性，而且对于一些"一次性计算"的函数调用，可以通过这种缩短参数生命周期的方式，节省系统资源. 表达式块调用的背后，需要先计算表达式块，得到返回值后，作为参数值调用函数. 需要**注意**的是，使用表达式块调用时，()要改用{}.
+    
+```scala
+//syntax
+<function identifier> <expression block>
+
+//example
+scala> def formatEuro(amt: Double) = f"€$amt%.2f"
+<console>: formatEuro: (amt: Double)String
+
+scala> formatEuro(3.4645) //值调用
+<console>: res4: String = €3.46
+
+scala> formatEuro { val rate = 1.32; 0.235 + 0.7123 + rate * 5.32 } //表达式块调用
+<console>: res5: String = €7.97
+```
+    
+  3）return关键字：Scala函数也有`return`关键字，但与C++等不同的是，其作用是检测到异常输入时，提前返回，阻止程序继续运行.
+  
+```scala
+//example
+scala> def safeTrim(s: String): String = {
+| if (s == null) return null
+| s.trim()
+| }
+<console>: safeTrim: (s: String)String
+```
+  
+* Procedure：没有返回值的函数，即`Unit`类型函数，如果函数体的表达式是个语句，且未显式定义函数类型，那么就会被编译器推断为`procedure`.
+
+```scala
+//example
+scala> def log(d: Double) = println(f"Got value $d%.2f") //隐式推断
+<console>: log: (d: Double)Unit
+
+scala> def log(d: Double): Unit = println(f"Got value $d%.2f") //显式声明
+<console>: log: (d: Double)Unit
+
+scala> def log(d: Double) { println(f"Got value $d%.2f") } //非正式版procedure定义
+<console>: log: (d: Double)Unit
+
+scala> def foo = { val he = "heja" } //val或var的定义属于语句
+<console>: foo: Unit
+```
 
 * 递归函数
 
+  递归函数在函数式程序中比较常见，因为它提供了一种不使用变量就能实现对值进行迭代计算的途径，很多Scala中的数据结构也用了递归. 本身没什么特别，使用时注意`stack overflow`.
+
+```scala
+//example
+scala> def power(x: Int, n: Int): Long = {
+     | if (n >= 1) x * power(x, n-1)
+     | else 1
+     | }
+<console>: power: (x: Int, n: Int)Long
+
+scala> power(2, 8)
+<console>: res6: Long = 256
+```
+
 * 嵌套函数
 
+  在之前的表达式一节中，介绍表达式是可嵌套的，函数作为命名版的表达式，当然也是可嵌套，内嵌函数是局部函数，可以直接在函数体内使用，而且可以"重载".
+  
+```scala
+//example 1
+scala> def max (x: Int, y: Int) = {
+     | def mul (x: Int, y: Int) = x * y
+     | if (x > mul(x, y)) x else mul(x, y)
+     | }
+<console>: max: (x: Int, y: Int)Int
+
+scala> max(3,4)
+<console>: res10: Int = 12
+
+//example 2
+scala> def max(a: Int, b: Int, c: Int) = {
+     | def max(x: Int, y: Int) = if (x > y) x else y //虽然内外函数名相同，但参数列表不同，编译可以区分
+     | max(a, max(b, c))                             //即使函数名和参数列表都相同，也不会冲突，因为在外部函数体内内嵌函数优先级高于外部函数
+     | }
+<console>: max: (a: Int, b: Int, c: Int)Int
+
+scala> max(42, 181, 19) 
+<console>: res10: Int = 181
+```
+
 * 泛型函数
+
+  熟悉面向对象语言的对泛型肯定不陌生，要是没泛型，也就没有C++的STL了. 简单的说，泛型就是函数逻辑与参数类型无关. Scala也支持泛型，定义函数时将函数类型声明为变量，调用函数时，除了参数值，还可以选择传递类型参数，用于指示函数参数类型或返回值类型.
+  
+```scala
+//syntax
+def <function-name>[type-name](parameter-name>: <type-name>): <type-name>...
+
+//example
+scala> def identity[A](a: A): A = a
+identity: [A](a: A)A
+
+scala> val s: String = identity[String]("Hello") //调用时，显式声明函数类型
+s: String = Hello
+
+scala> val s: String = identity("Hello") //Scala编译器有类型推断能力，所以可以省略类型说明
+s: String = Hello
+```
 
 ---
 
 #### 2. 函数式与电路
+   看完Scala在研究Chisel的过程中，才有点明白为什么UCB用函数式语言作为Chisel的基底，细想之下，数字电路的实现逻辑确实和函数式是相似的，寄存器中的操作数经过一系列的组合逻辑，最后得到一个输出信号，这就是函数式的程序逻辑，如[Chisel wiki: Functional Module Creation](https://github.com/freechipsproject/chisel3/wiki/Functional-Module-Creation)，路过的小伙伴有何思路，留言聊聊?
 
+```scala
+//functional sub-module
+object Mux2 {
+   def apply(sel: UInt, in0: UInt, in1: UInt) = {
+       val m = Module(new Mux2)
+       m.io.in0 := in0
+       m.io.in1 := in1
+       m.io.sel := sel
+       m.io.out
+   }
+}
+
+//macro module
+class Mux4 extends Module {
+  val io = IO(new Bundle {
+    val in0 = Input(UInt(1.W))
+    val in1 = Input(UInt(1.W))
+    val in2 = Input(UInt(1.W))
+    val in3 = Input(UInt(1.W))
+    val sel = Input(UInt(2.W))
+    val out = Output(UInt(1.W))
+  })
+  io.out := Mux2(io.sel(1),
+                 Mux2(io.sel(0), io.in0, io.in1),   //此处确实契合了两个本不相关的概念
+                 Mux2(io.sel(0), io.in2, io.in3))
+}
+
+```
 ---
 
 #### 3. First-class function
 
-* 高阶函数
 
 * 函数类型与值
+
+* 高阶函数
 
 * 函数字面量
   - 定义
