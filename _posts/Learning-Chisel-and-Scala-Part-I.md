@@ -19,7 +19,7 @@ NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的
 由于scala内容比较多，所以会分成两篇介绍，在第二篇文末作者将对Scala语言中一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如`=>`操作符可应用于Match控制逻辑，也可应用于函数字面量，还可以用于import package时的alias等.
 
 ### II. Data type
-1.Value and variable
+#### 1. Value and variable
 * Value
 
   `Value`是一个具有特定类型的存储单元，定义赋值后，其值保持不变且不可重复赋值. 就定义而言，`value`似乎就是其他编程语言中的常量值，但实际上，Scala中的`value`是数学意义上的概念，可以看作是一个数学常量的符号表示，如`x=5`. `value`是函数式编程的基础元素，函数式程序中几乎都是使用`value`实现计算逻辑，后续会随内容逐步介绍.
@@ -30,11 +30,11 @@ val <identifier> [: <type>] = <data>
 
 //example 1
 scala> val aval = "hello"
-aval: String = hello
+<console>: aval: String = hello
 
 //example 2
 scala> val bval: String = "world"
-bval: String = world
+<console>: bval: String = world
 ```
 * Lazy value
 
@@ -52,10 +52,10 @@ var <identifier> [: <type>] = <data>
 
 //example
 scala> var avar = 1
-avar: Int = 1
+<console>: avar: Int = 1
 
 scala> avar = 2
-avar: Int = 2
+<console>: avar: Int = 2
 ```
 
 * 转型
@@ -64,31 +64,31 @@ avar: Int = 2
     
 ```scala
 scala> val cval: Byte = 1
-cval: Byte = 1
+<console>: cval: Byte = 1
 
 scala> val dval: Double = cval
-dval: Double = 1.0
+<console>: dval: Double = 1.0
 
 scala> val eval: Int = dval
 <console>: error: type mismatch;
 
 scala> val eval: Int = dval.toInt
-eval: Int = 1
+<console>: eval: Int = 1
 ```
 
 * 命名规则
-  - 构成字符: `字母`，`数字`，`下划线`，`特殊字符`(如*，+，π，φ等，但**不包括[]和.两个**)及`反引号`('ESC'键下面)五类 (注：对于非特殊字符中的周期符号(.)，在对象引用方法时需要留意，scala中例化对象时与java不同，若class没有定义初始化参数，那么例化时不加()，如val cli = new AClass，但在例化的同时引用其中的方法，则必须加括号，如val cli = new AClass().foo)
+  - 构成字符: `字母`，`数字`，`下划线`，`特殊字符`(如*，+，π，φ等，但**不包括[]和.两个**)及`反引号`('ESC'键下面)五类 (注：对于非特殊字符中的周期符号(.)，在对象引用方法时需要留意，scala中例化对象时与java不同，若class没有定义初始化参数，那么例化时不加()，如`val cli = new AClass`，但在例化的同时引用其中的方法，则必须加括号，如`val cli = new AClass().foo)`
   - 开头字符: 只能以`字母`，`特殊字符`或\``，如
   
 ```scala
 scala> val π = 3.14159
-π: Double = 3.14159
+<console>: π: Double = 3.14159
 
 scala> val $ = "USD currency symbol"
-$: String = USD currency symbol
+<console>: $: String = USD currency symbol
 
 scala> val o_O = "Hmm"
-o_O: String = Hmm
+<console>: o_O: String = Hmm
 
 scala> val 50cent = "$0.50"
 <console>:1: error: Invalid literal number val 50cent = "$0.50" ^
@@ -97,10 +97,10 @@ scala> val a.b = 25
 <console>:7: error: not found: value a val a.b = 25
 
 scala> val `a.b` = 4
-a.b: Int = 4
+<console>: a.b: Int = 4
 ```
 
-2.数值类型
+#### 2. 数值类型
 * Scala中包含以下6种数值类型，与其他高级编程语言不同的是，scala中没有`built-in`类型，全部都是`class`.
 
 Table 1. Numeric types
@@ -131,10 +131,10 @@ Table 2. Numeric literals
 ```scala
 //example
 scala> val fval = 5d
-fval: Double = 5.0
+<console>: fval: Double = 5.0
 ```
 
-3.Scala核心类型继承体系
+#### 3. Scala核心类型继承体系
   Scala中核心的`Type`体系如Fig-1所示，各类型含义及所有类型支持的方法可简述如下
 
 Table 3. Core nonnumeric types
@@ -171,10 +171,10 @@ Fig-1
 
 </div>
 
-4.Scala运算符：scala支持的运算符和优先级与其他语言相比没有特殊之处，只是**不支持三元运算符(? :)**，详细内容请参考相关材料.
+#### 4. Scala运算符：scala支持的运算符和优先级与其他语言相比没有特殊之处，只是**不支持三元运算符(? :)**，详细内容请参考相关材料.
     
 ### III. Expression and Built-in control structure
-1.表达式(expression)
+#### 1. 表达式(expression)
 
   表达式是函数式程序的基础构成，因为表达式实现了函数式编程中的一个核心思想，即新值存储在新的value中，而不是修改已存在的varible，这什么意思？
   
@@ -217,7 +217,7 @@ expr1 ; expr2 ; ...
   
 ```scala
 scala> { val a = 1; { val b = a * 2; { val c = b + 4; c } } }
-res0: Int = 6     //REPL中自动生成的res0可在后续输入中显式使用，类似于matlab中的ans
+<console>: res0: Int = 6     //REPL中自动生成的res0可在后续输入中显式使用，类似于matlab中的ans
 ```
   
 * 语句(Statements)
@@ -226,11 +226,11 @@ res0: Int = 6     //REPL中自动生成的res0可在后续输入中显式使用�
   
 ```scala
 scala> val aval = println("aloha")
-aloha
+<console>: aloha
 aval: Unit = ()
 ```
 
-2.控制语句
+#### 2. Scala内置控制表达式
 * if...else
 
   Scala中条件控制语句支持`if`和`if else`两种，定义形式如下:
@@ -241,7 +241,7 @@ if (<Boolean expression>) <expression>
 
 //example
 scala> val result = if ( false ) "what does this return?"
-result: Any = ()
+<console>: result: Any = ()
 ```
 
 注意到，上例返回值为Fig-1中的`root`类型，这是因为布尔条件为真时，if返回类型为`String`(`AnyRef`子类)，为假时返回`Unit`(`AnyVal`子类)，编译器无法确定准确的返回类型，只能返回根类型.
@@ -253,49 +253,219 @@ else <expression>
 
 //example
 scala> val x = 10; val y = 20
-x: Int = 10
+<console>: x: Int = 10
 y: Int = 20
 
 scala> val max = if (x > y) x else y
-max: Int = 20
+<console>: max: Int = 20
 ```
 
 * match
-
-  Scala中的`match`控制语句类似于C++，Java中的`switch...case`或verilog中的`case...endcase`，定义形式如下：
+  
+  Scala中的`match`表达式结构类似于C++，Java中的`switch...case`或verilog中的`case...endcase`，定义形式如下，但从实现方式上来讲，更像verilog，因为`match`至多只能与一个`case`匹配，而不需要额外添加`break`控制，`match`匹配遵守位置优先原则，执行完匹配的`case`后立即退出；另外，与其他高级编程语言不同的是，`match`不仅仅能与"值"比较，还能与"类型、正则式、数值范围及数据类型内部成员"进行比较匹配.
   
 ```scala
 //syntax
 <expression> match {
-       case <pattern match> => <expression>
+       case <pattern match> => <expression or expression block>
       [case...]
 }
 
 //example
-scala> val day = "MON"
-day: String = MON
+scala> val x = 10; val y = 20 
+<console>: x: Int = 10 
+y: Int = 20
 
-scala> val kind = day match {
-     | case "MON" |  "TUE" | "WED" | "THU" | "FRI" => "weekday" 
-     | case "SAT" | "SUN" => "weekend"
+scala> val max = x > y match { 
+     | case true => x 
+     | case false => y 
      | }
+<console>: max: Int = 20
 ```
 
-* loops
-  - for
+   1）多匹配项：`match`支持在同一个`case`中存在多个匹配项，与匹配项中任一`pattern`匹配，便执行该`case`，定义如下：
   
-    1）Range复合数据类型
+```scala
+//syntax
+case <pattern 1> | <pattern 2> .. => <expression or expression block>
+
+//example
+scala> val day = "MON"
+<console>: day: String = MON
+
+scala> val kind = day match {
+     | case "MON" |  "TUE" | "WED" | "THU" | "FRI" => "weekday" //除最左侧REPL自动添加的多行符号，其余"|"为逻辑或
+     | case "SAT" | "SUN" => "weekend"
+     | }
+<console>: kind: String = weekday
+```
+  
+   2）默认匹配项：容易发现，在`match`定义式中并没有`default`选项，那么在上述例子中，如果没有匹配项，那么会报`scala.MatchError`错误. 为了避免报错，Scala提供两种方式处理`default`，即值绑定和使用下划线通配符，其中下划线通配符可与任何input匹配，但二者不是绑定关系，所以无法对下划线进行引用.
+   
+```scala
+//syntax：值绑定
+case <identifier> => <expression or expression block> //<identifier>是与match前<expression>返回值绑定在一起的任意合法标识符
+
+//example
+scala> val message = "ok"
+scala> status = message match {
+     | case "false" => 200
+     | case other => {       //other标识符与值"ok"绑定
+     | println(s"couldn't parse $other") //println内部使用了字符串内插的一种格式s，将在介绍String类型的时候介绍
+     | -1 }
+     | }
+<console> couldn't parse ok
+status: Int = -1
+
+//syntax: wildcard underscore
+case _ => <expression or expression block> //case关键字与下划线间有空格
+
+//example
+scala> val message = "Unauthorized"
+<console>: message: String = Unauthorized
+
+scala> val status = message match {
+     | case "Ok" => 200
+     | case _ => {
+     |     println(s"Couldn't parse $message")  //由于无法引用下划线，这里直接引用了输入message
+     |     -1
+     | }
+     | }
+<console>: Couldn't parse Unauthorized
+status: Int = -1
+```
+  
+   3）pattern guard：是将`if`控制逻辑添加到`case pattern`，只有在满足特定条件时才进行匹配，定义如下，需要注意的是，`if`后条件表达式的括号是可选的.
+
+```scala
+//syntax: 
+case <pattern> if <Boolean expression> => <expression or expression block>
+
+//example
+scala> val resp:String = null
+scala> resp match {
+     | case s if s != null =>println(s"recieved '$s'")
+     | case s => println("error")
+     | }
+<console>: error
+```
+  
+   4）类型匹配：顾名思义，是与数据类型匹配，定义如下，匹配类型`<type>`前的`<indentifier>`定义了一个合法名称的局部变量`variable`，且变量名必须以**小写字母开头**，另外，数据类型匹配支持多态.
+   
+```scala
+//syntax:
+case <identifier>: <type> => <expression or expression block>
+
+//example
+scala> val x: Int = 12180
+<console>: x: Int = 12180
+
+scala> val y: Any = x   //子类对象赋值父类引用
+<console>: y: Any = 12180  
+
+scala> y match {
+     | case x: String => s"'x'"
+     | case x: Double => f"$x%.2f"
+     | case x: Float => f"$x%.2f"
+     | case x: Long => s"${x}l"
+     | case x: Int => s"${x}i"   //匹配时，是与子类对象的实际类型匹配
+     | }
+<console>: res9: String = 12180i
+```
+  
+* loops
+
+  Scala中的循环控制表达式包括`for, while, do...while`三种，相关定义如下.
+  
+  - for：Scala中最常用的迭代控制表达式，定义如下：
+  
+```scala
+//syntax: 定义式与其他语言中的for循环差异比较大，特别是变量x在迭代器中的移动采用<-操作符，后面对内部元素逐一介绍
+for (<identifier> <- <iterator>) [yield] [<expression or expression block>]
+
+//example
+scala> for (x <- 1 to 7) yield { s"Day $x:" }
+<console>: res10: scala.collection.immutable.IndexedSeq[String] 
+           = Vector(Day 1:, Day 2:, Day 3:, Day 4:, Day 5:, Day 6:, Day 7:)
+```
+  
+   1）Range复合数据类型: `for`循环中的迭代器是一个复合数据类型`Range`，表示一段连续的取值范围，与`python`的`range()`函数类似，定义形式有以下3种:
+   
+```scala
+//syntax: 使用关键字to和unti，使用to则取值范围包含结尾的<ending integer>，until则不包含结尾元素，可选的数字间隔参数[by increment]
+<starting integer> [to|until] <ending integer> [by increment]
+
+//example
+scala> 1 to 3 by 1
+<console>: res5: scala.collection.immutable.Range = Range（1，3）
+
+//example
+scala> 1 until 3
+<console>: res5: scala.collection.immutable.Range = Range（1，2）
+
+//syntax：直接使用Range类创建，等效于使用until关键字
+
+//example
+//syntax：
+Range(<starting integer>, <ending integer>, [by increment])
+
+scala> Range(1, 5, 1)
+<console>: res5: scala.collection.immutable.Range = Range（1，3）
+```
     
-    2）iterator guard
+   2）yield关键字: 虽然和`python`中的`yield`同名，但这里的`yield`可不是一个生成器指示符，它只是将表达式的计算结果收集起来，统一保存为Vector复合数据类型对象，就像`for`语法定义的例子中所显示的.
     
-    3）嵌套迭代器
+   3）迭代器的表示形式：`for`定义中的`(<identifier> <- <iterator>)`存在两种表示形式用来支持多迭代器及其他合法项，即使用括号`(item1 ; item2 ; ...)`，内部用分号分割，另一种则使用花括号，每个`item`占一行，结尾分号可选，如
+   
+```scala
+//example: parentheses based
+scala> val quote = "Faith,Hope,,Charity" 
+<console>: quote: String = Faith,Hope,,Charity
+
+scala> for ( t <- quote.split(",") ; if t != null ; if t.size > 0 ) { println(t) }
+<console>: Faith 
+Hope
+Charity
+
+//example：curly-braces based
+scala> val quote = "Faith,Hope,,Charity" 
+<console>: quote: String = Faith,Hope,,Charity
+
+scala> for { 
+     | t <- quote.split(",") 
+     | if t != null 
+     | if t.size > 0 
+     | }
+     | { println(t) }
+<console>: Faith 
+Hope
+Charity
+```
     
-    4）值绑定
+   4）iterator guard：上列我们已经见识了加`guard`的迭代器了，实际上，就是加了迭代条件，这和C++,Java中`for(init ; condition ; changed value)`的条件检查一致. 与`match`类似，这里`if`后条件表达式的括号也是可选的.
+   
+```scala
+//syntax: 
+for (<identifier> <- <iterator> if <Boolean expression>) ...
+```
+    
+   5）嵌套迭代器：这个与一般的循环嵌套有点区别，循环嵌套中每层循环可能要执行不同的逻辑，但这里只是迭代器嵌套，适合一些高等代数中矩阵的运算.
+   
+```scala
+//example
+scala> for { x <- 1 to 2
+    |  y <- 1 to 3 }
+    |  { print(s"($x,$y) ") 
+    |}
+<console>: (1,1) (1,2) (1,3) (2,1) (2,2) (2,3)
+```
+    
+   6）值绑定：
     
   - while与do...while
 
 ### IV. Functions and Functional programming
-1.函数
+#### 1. 函数
 
 * 纯函数
 
@@ -328,9 +498,9 @@ scala> val kind = day match {
 
 * 泛型函数
 
-2.函数式编程与电路
+#### 2. 函数式编程与电路
 
-3.First-class function
+#### 3. First-class function
 
 * 高阶函数
 
