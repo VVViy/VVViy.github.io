@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      Learning Chisel and scala
+title:      Learning Chisel and Scala
 subtitle:   Scala Part I
 date:       2018-12-01
 author:     Max
