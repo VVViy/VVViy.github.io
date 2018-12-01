@@ -40,8 +40,9 @@ Fig-
 
 ### VII. Special classes: Objects, Case classes, and Traits
 
+### VIII. Review Tuple and Funcation literal
 
-### VIII. Some tips
+### IX. Some tips
 | Item | Description |
 |------|-------------|
 | =>操作符应用|  |
@@ -51,3 +52,7 @@ Fig-
 | class扩展途径 |  |
 | 类内定义的元素 |  |
 | 被忽视的符号 |  |
+
+**====说明====**
+
+
