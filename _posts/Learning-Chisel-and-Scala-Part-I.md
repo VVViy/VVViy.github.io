@@ -15,7 +15,7 @@ tags:
 ### I. Preface
 NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的加入到RISC-V的学习中，想通过阅读几个RV开源处理器的源码，深刻体会一下`RV ISA`，`SpinalHDL`和`Chisel`. 但当阅读Chisel的官方Cheatsheet时，感觉还是要学习一下`Scala`，一方面，scala作为chisel基础，要玩转chisel，scala必不可少，另一方面，官网的`"A Short Users Guide to Chisel "`，内容太简洁，缺少了语法的一般性定义，编写和调试可能会感觉无从下手，所以有了本文对Scala的介绍.
 
-作者在学习过程中，主要参考了`Learning Scala`和`Programming in Scala, 3rd Edition`，将自认为的核心内容在本文进行介绍，内容编排上做了一些调整，对一些Scala特性会与C++/Java进行一些简单对比，辅助理解，不足与遗漏之处，请路过的小伙伴指出. (Scala的一些参考书在Blog的[books repo](https://github.com/VVViy/VVViy.github.io/tree/master/books/scala)可以找到，仅供个人参考，请勿用于商业用途)
+作者在学习过程中，主要参考了`Learning Scala`和`Programming in Scala, 3rd Edition`，将自认为的核心内容在本文进行介绍，结合个人理解在内容编排上做了一些调整，对一些Scala特性会与C++/Java进行一些简单对比，辅助理解，不足与遗漏之处，请路过的小伙伴指出. (Scala的一些参考书在Blog的[books repo](https://github.com/VVViy/VVViy.github.io/tree/master/books/scala)可以找到，仅供个人参考，请勿用于商业用途)
 
 由于scala内容比较多，所以会分成两篇介绍，在第二篇文末作者将对Scala语言中一些容易造成混淆和存在关联性的内容进行简单总结，便于查找区分，如`=>`操作符可应用于Match控制逻辑，也可应用于函数字面量，还可以用于import package时的alias等.
 
@@ -850,7 +850,7 @@ scala> val myDouble = double _      //简化函数类型值的定义形式
 <console>: myDouble: Int => Int = <function1>
 ```
 
-3）无输入参数函数类型：定义这种函数类型值时许注意，在定义函数时要使用带括号的版本，否则在不使用函数字面量的情况下，无法定义值. (这种方式以被官网声明弃用，但依然可以使用，最好使用后面介绍的函数字面量)
+3）无参数函数类型：定义这种函数类型值时许注意，在定义函数时要使用带括号的版本，否则在不使用函数字面量的情况下，无法定义值. (这种方式以被官网声明弃用，但依然可以使用，最好使用后面介绍的函数字面量)
 
 ```scala
 //example
@@ -889,7 +889,9 @@ scala> safeStringOp("Ready", reverser)
 ```
 
 * 函数字面量
-
+  
+  前面的例子中，是先定义函数再定义变量，实际上，很多函数式中的子函数出现频率并不高，那么将其定义为函数以备复用的目的就会打折，这种情况下，选择用本节介绍的`函数字面量`，或*无名函数、Lambda表达式，Lambdas*等等，特别在Scala中，编译器会根据函数字面量的输入参数个数用*function0，function1, ...functionN*这样的别名来表示.
+  
 1）定义
 
 ```scala
@@ -897,14 +899,54 @@ scala> safeStringOp("Ready", reverser)
 ([<identifier>: <type>, ... ]) => <expression>
 
 //example
-scala> val doubler = (x: Int) => x * 2  //实际上，从编译器类型推断的角度，有了参数列表和函数体也就知道了输入和输出类型
+scala> val doubler = (x: Int) => x * 2  //从编译器类型推断的角度，有了参数列表和函数体也就知道了输入和输出类型
 <console>: doubler: Int => Int = <function1> 
 
 scala> val doubled = doubler(22)
 <console>: doubled: Int = 44
 ```
 
- 2）背后原理
+2）无参数函数字面量：在前面介绍无参数函数定义变量时，曾提到新版编译器会对一般定义形式报`warning`，同时推荐使用函数字面量的方式定义变量，即
+
+```scala
+//example
+scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //前面的例子中必须使用无参数括号，否则无法定义函数类型的value和variable
+<console>: logStart: ()String
+
+scala> def logStartNoParentheses = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //但使用函数字面量则不受有无括号的限制
+<console>: logStart: ()String
+
+scala> val start = () => "=" * 50 + "\nStarting NOW\n" + "=" * 50  //方式一
+<console>: start: () => String = <function0>
+
+scala> println( start() )
+==================================================
+Starting NOW
+==================================================
+
+scala> val start = () => logStart()  //方式二不具有一般意义，只有定义了有名函数才有此等价定义
+<console>: start: () => String = <function0>
+
+scala> val start = () => logStartNoParentheses   //无参数函数定义value
+<console>: start: () => String = <function0>
+
+```
+
+3）高阶函数调用：因为没有显式的命名函数定义，所以在高阶函数调用时，函数字面量的定义放在函数调用中的，有种特殊情况是，当函数字面量只有一个输入参数时，输入参数的类型和括号都是可选的，因为函数字面量的输入和输出类型都已经在高阶函数中定义过了，所以很容易推断，但要注意该省略形式**仅限于单输入参数**的情况.
+
+```scala
+//example
+scala> def safeStringOp(s: String, f: String => String) = {
+     | if (s != null) f(s) else s
+     | }
+<console>: safeStringOp: (s: String, f: String => String)String
+
+scala> safeStringOp("Ready", (s: String) => s.reverse)
+<console>: res8: String = ydaeR
+
+scala> safeStringOp("Ready", s => s.reverse)  //省略单输入参数的类型和括号
+<console>: res10: String = ydaeR
+```
   
 * 占位符
 
