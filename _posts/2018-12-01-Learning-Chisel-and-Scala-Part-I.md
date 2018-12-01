@@ -2,13 +2,12 @@
 layout:     post
 title:      Learning Chisel and scala
 subtitle:   Scala Part I
-date:       2018-11-24
+date:       2018-12-01
 author:     Max
 header-img: img/post-gray-background.jpg
 catalog: true
 tags:
     - Chisel
-    - SpinalHDL
     - Scala
 ---
 
@@ -185,7 +184,7 @@ Fig-1
 ---
 
 ### III. Expression and Built-in control structure
-#### 1. 表达式(expression)
+#### 1. 表达式(Expression)
 
   表达式是函数式程序的基础构成，因为表达式实现了函数式编程中的一个核心思想，即新值存储在新的value中，而不是修改已存在的varible，这什么意思？
   
@@ -510,7 +509,7 @@ scala> do println(s"Here I am, x = $x") while (x > 0)
    
    定义函数的目的就是为了提高代码复用率，特别是在函数式程序中，在前面介绍表达式时，我们提到了函数式的数学逻辑，就是将复杂函数方程分解成一系列的低阶子函数运算链条，通过求解子函数链条得到最终的功能输出，这里的子函数等价于Scala函数，所以我们在定义函数时应尽量遵守设计模式中的"单一功能"原则，使函数尽量短小，功能单一，这样不仅能提高复用率，而且也符合数学逻辑，因为多功能的Scala函数定义等价于数学上未完全分解的子函数. 
    
-* 纯函数
+* 纯函数(Pure functions)
 
   纯函数是具有数学意义上的函数，也是函数式程序中的主体部分，其主要特征包括：
   
@@ -685,7 +684,7 @@ scala> def foo = { val he = "heja" } //val或var的定义属于语句
 <console>: foo: Unit
 ```
 
-* 递归函数
+* 递归函数(Recursive functions)
 
   递归函数在函数式程序中比较常见，因为它提供了一种不使用变量就能实现对值进行迭代计算的途径，很多Scala中的数据结构也用了递归. 本身没什么特别，使用时注意`stack overflow`.
 
@@ -701,7 +700,7 @@ scala> power(2, 8)
 <console>: res6: Long = 256
 ```
 
-* 嵌套函数
+* 嵌套函数(Nested functions)
 
   在之前的表达式一节中，介绍表达式是可嵌套的，函数作为命名版的表达式，当然也是可嵌套，内嵌函数是局部函数，可以直接在函数体内使用，而且可以"重载".
   
@@ -727,7 +726,7 @@ scala> max(42, 181, 19)
 <console>: res10: Int = 181
 ```
 
-* 泛型函数
+* 泛型函数(Generic functions)
 
   熟悉面向对象语言的对泛型肯定不陌生，要是没泛型，也就没有C++的STL了. 简单的说，泛型就是函数逻辑与参数类型无关. Scala也支持泛型，定义函数时将函数类型声明为变量，调用函数时，除了参数值，还可以选择传递类型参数，用于指示函数参数类型或返回值类型.
   
@@ -749,7 +748,7 @@ s: String = Hello
 ---
 
 #### 2. 函数式与电路
-   看完Scala在研究Chisel的过程中，才有点明白为什么UCB用函数式语言作为Chisel的基底，细想之下，数字电路的实现逻辑确实和函数式是相似的，寄存器中的操作数经过一系列的组合逻辑，最后得到一个输出信号，这就是函数式的程序逻辑，如[Chisel wiki: Functional Module Creation](https://github.com/freechipsproject/chisel3/wiki/Functional-Module-Creation)，路过的小伙伴有何思路，留言聊聊?
+   看完Scala再研究Chisel，有点明白为什么UCB用函数式语言作为Chisel的基底，细想之下，数字电路的实现逻辑确实和函数式是相似的，寄存器中的操作数经过一系列的组合逻辑，最后得到一个输出信号，这就是函数式的程序逻辑，如[Chisel wiki: Functional Module Creation](https://github.com/freechipsproject/chisel3/wiki/Functional-Module-Creation)，路过的小伙伴有何思路，留言聊聊?
 
 ```scala
 //functional sub-module
@@ -867,7 +866,7 @@ Starting NOW
 ==================================================
 ```
 
-* 高阶函数
+* 高阶函数(Higher-order functions)
 
   本节开头提到过高阶函数，就是以函数作为参数或/和返回值的函数，如
 
@@ -888,9 +887,9 @@ scala> safeStringOp("Ready", reverser)
 <console>: res5: String = ydaeR
 ```
 
-* 函数字面量
+* 函数字面量(Function literal)
   
-  前面的例子中，是先定义函数再定义变量，实际上，很多函数式中的子函数出现频率并不高，那么将其定义为函数以备复用的目的就会打折，这种情况下，选择用本节介绍的`函数字面量`，或*无名函数、Lambda表达式，Lambdas*等等，特别在Scala中，编译器会根据函数字面量的输入参数个数用*function0，function1, ...functionN*这样的别名来表示.
+  前面的例子中，是先定义函数再定义变量，实际上，很多函数式中的子函数出现频率并不高，那么将其定义为函数以备复用的目的就会打折，这种情况下，选择用本节介绍的`函数字面量`，或`无名函数、Lambda表达式，Lambdas`等等，特别在Scala中，编译器会根据函数字面量的输入参数个数用*function0，function1, ...functionN*这样的别名来表示.
   
 1）定义
 
@@ -947,12 +946,21 @@ scala> safeStringOp("Ready", (s: String) => s.reverse)
 scala> safeStringOp("Ready", s => s.reverse)  //省略单输入参数的类型和括号
 <console>: res10: String = ydaeR
 ```
-  
-* 占位符
 
+**====Tips====**
+
+    函数字面量背后的原理涉及到类和一些特殊的类方法，所以在下一篇blog介绍完类之后，会再次谈函数字面量的一些进阶玩法.
+  
+* 占位符(Placeholder)
+
+  函数字面量简化掉了命名函数的定义过程，占位符是则**函数字面量**的基础上，进一步简化掉了参数列表，占位符使用下划线`_`表示，所谓"占位"是用下划线按位置顺序占据参数列表中参数的位置，以达到替代表示的目的，占位符的使用需满足两个条件：
+  
+  - 函数字面量的输入输出类型必须在字面量外部显式定义;
+  - 参数列表中的每个参数最多只能被使用一次.
+  
 ```scala
 //example 1
-scala> val doubler: Int => Int = _ * 2
+scala> val doubler: Int => Int = _ * 2  //等号后_ * 2就是简化版字面量.函数的类型在val类型说明中指定，仅有的一个输入参数也只被使用一次，所以满足应用条件
 <console>: doubler: Int => Int = <function1>
 ```
 
@@ -963,23 +971,32 @@ scala> def safeStringOp(s: String, f: String => String) = {
      | }
 <console>: safeStringOp: (s: String, f: String => String)String
 
-scala> safeStringOp(null, _.reverse) //注意这里_不仅替代了参数，也省略了参数列表
-<console>: res11: String = null
+scala> safeStringOp("Ready", (s: String) => s.reverse) //字面量原始版
+<console>: res8: String = ydaeR
 
-scala> safeStringOp("Ready", _.reverse)
+scala> safeStringOp("Ready", s => s.reverse)  //单参数简化版
+<console>: res10: String = ydaeR
+
+scala> safeStringOp("Ready", _.reverse) //占位符简化版，对比原始版容易理解，函数输入输出类型已在高阶函数参数中指定，占位符替代了s, (s: String)已无表示必要
 <console>: res12: String = ydaeR
 ```
 
 ```scala
-//example 3: 应用于高阶泛型函数
+//example 3: 占位符是按位置顺序替代
+scala> def combination(x: Int, y: Int, f: (Int,Int) => Int) = f(x,y) 
+<console>: combination: (x: Int, y: Int, f: (Int, Int) => Int)Int
+
+scala> combination(23, 12, _ * _)  //两输入，按高阶函数参数中函数类型参数的位置占位
+<console>: res13: Int = 276
+```
+
+```scala
+//example 4: 应用于高阶泛型函数
 scala> def tripleOp[A,B](a: A, b: A, c: A, f: (A, A, A) => B) = f(a,b,c)
 <console>: tripleOp: [A, B](a: A, b: A, c: A, f: (A, A, A) => B)B
 
 scala> tripleOp[Int,Int](23, 92, 14, _ * _ + _)
 <console>: res15: Int = 2130
-
-scala> tripleOp[Int,Double](23, 92, 14, 1.0 * _ / _ / _)
-<console>: res16: Double = 0.017857142857142856
 
 scala> tripleOp[Int,Boolean](93, 92, 14, _ > _ + _)
 <console>: res17: Boolean = false
@@ -987,36 +1004,39 @@ scala> tripleOp[Int,Boolean](93, 92, 14, _ > _ + _)
 
 * Partially Applied Functions and Currying
 
-1）Partially Applied Functions
+1）Partially Applied Functions：除了具有默认值参数的函数，大多数语言在调用函数时，都要提供完整的参数，即使是具有默认值的函数，也是在定义函数时指定一个值，那么函数的灵活性就局限在了被调函数. 
 
-
+如果主调函数是多参数的，且在一些应用场景下，部分参数为常数或测试时要做增量测试，即灵活性需要掌握在主调函数手中，那么现有大多数语言都是无法满足这个需求的. 但Scala中的部分参数调用机制是可以实现这种逻辑的，这也许得益于其对函数式的支持，因为数学上这种情况非常多(作者本科数学专业，所以有些了解)，例如数学分析中的多元函数，无论求解极限还是微积分都是要将多元转化一元来实现的，所以作为函数式语言，部分参数调用机制是十分必要的.
 
 ```scala
-//example
-scala> def factorOf(x: Int, y: Int) = y % x == 0  //原始定义
+//syntax：使用函数时用下划线通配符标识可变参数，可变参数类型不可省略，这里实际上是重定义了函数，所以类型用来生成函数
+([value], _: <type>,...)
+
+//example：对比完整调用与部分调用
+scala> def factorOf(x: Int, y: Int) = y % x == 0  //完整调用
 <console>: factorOf: (x: Int, y: Int)Boolean
 
 scala> val f = factorOf _   //如果两个参数值都将改变  
 <console>: f: (Int, Int) => Boolean = <function2>
 
-scala> val x = f(7, 20)    //需提供两个参数值才能正常调用
+scala> val x = f(7, 20)    //提供两个参数值才能正常调用
 <console>: x: Boolean = false
 
-scala> val multipleOf3 = factorOf(3, _: Int)  //如果只想改变部分参数，其他参数取定值，并使用underscore声明要改变的参数
+scala> val multipleOf3 = factorOf(3, _: Int)  //部分调用，使用时标明可变与不可变参数，
 <console>: multipleOf3: Int => Boolean = <function1>
 
 scala> val y = multipleOf3(78)  //调用时仅给出一个参数值即可
 <console>: y: Boolean = true
 ```
 
-2）Currying: 指参数列表分组，即一个拥有多输入参数的函数，应将参数分为静态分组与动态分组两类，应用时只改变动态分组的参数.
+2）Currying: 更灵活且符合设计模式的方式是对参数列表分组，这样对于一个拥有多输入参数的函数，方便管理静态参数与动态参数，应用时只改变动态分组的参数.
 
 ```scala
 //example
 scala> def factorOf(x: Int)(y: Int) = y % x == 0
 <console>: factorOf: (x: Int)(y: Int)Boolean
 
-scala> val isEven = factorOf(2) _ //定义静态分组参数值
+scala> val isEven = factorOf(2) _ //定义静态参数值
 <console>: isEven: Int => Boolean = <function1>
 
 scala> val z = isEven(32) //应用动态分组参数
@@ -1025,8 +1045,10 @@ scala> val z = isEven(32) //应用动态分组参数
 
 * By-Name Parameters
 
+  `by-name parameters`是用来优化高阶函数参数的，调用高阶函数时，这类参数能够接受常规类型`value`和函数类型值，这种形式的参数进一步提升了高阶函数的灵活性，但有一个潜在的**性能风险**是，如果调用时传递的是函数类型值，那么高阶函数体内每次访问对应参数时会反复调用，所以可能会带来不一致的问题，而且对执行代价比较大的函数，如数据库查询操作，会带来性能下降问题，所以在定义这类参数时要注意或减少对这类参数的访问.
+
 ```scala
-//syntax
+//syntax：灵活性在于这类参数仅限定返回值类型，而输入类型无要求，这符合之前分析的数学上子函数链条的计算逻辑，后一个子函数的输入只与前一函数输出相关.
 <identifier>: => <type>
 
 //example
@@ -1036,14 +1058,14 @@ scala> def doubles(x: => Int) = {   //传入的函数参数的返回值必须是
      | }
 <console>: doubles: (x: => Int)Int
 
-scala> doubles(5)  //可看作常数函数，返回值为Int
+scala> doubles(5)       //value作为参数值
 <console>: Now doubling 5
 res18: Int = 10
 
 scala> def f(i: Int) = { println(s"Hello from f($i)"); i }
 <console>: f: (i: Int)Int
 
-scala> doubles( f(8) )  //返回值为Int
+scala> doubles( f(8) )  //函数作为参数值，返回值类型为Int
 <console>: Hello from f(8)
 Now doubling 8
 Hello from f(8)
@@ -1052,7 +1074,9 @@ res19: Int = 16
 
 * Partial Functions
 
-  所谓partial函数是与total函数相对应的，二者是从函数所表示的数学函数对应的定义域加以区分的，如果定义去为R，那么是total函数，如x^2, 若只是部分子集，就是partial，如负数开根号，除0，partial函数也是一种函数字面量；
+  `partial`函数与`total`函数相对应，可以从数学上的函数定义域来理解这二者的差异，数学上有些函数定义域为整个实数域`R`，如x<sup>2</sup>，那么在调用这类函数时，提供定义域内任何值，函数都能够正确处理，这类函数称为`total function`；而另外一些函数的定义域为R<sup>+</sup>，如`ln(x)`，那么一旦传入0或负数，函数是无法处理的，即函数只能应用于部分输入，这类函数就称为`partial function`.
+  
+  Scala中的`partial function`就是描述这类函数的，个人理解，这种方式就是将其他编程语言中需要进行异常检测处理的内容搬到了函数定义中，像除0，负数开根号等，部分函数属于函数字面量的一种.
   
 ```scala
 //example
@@ -1065,14 +1089,23 @@ scala> val statusHandler: Int => String = {
 
 scala> statusHandler(200)
 <console>：res20: String = Okay
+
+scala> statusHandler(400)
+res21: String = Your Error
+
+scala> statusHandler(401)  //非限定输入会报匹配错误，====partial函数允许使用match中介绍的下划线通配符来提供默认选项====
+scala.MatchError: 401 (of class java.lang.Integer)
+at $anonfun$1.apply(<console>:7)
+at $anonfun$1.apply(<console>:7)
+... 32 elided
 ```
 
 * 函数字面量块参数
 
-  前面介绍过使用表达式语句块作为函数调用的参数值，同样的，在高阶函数中也可以使用函数字面量块作为参数值调用高阶函数.
+  前面介绍过使用表达式语句块作为函数调用的参数值，同样的，在高阶函数调用时也可以使用函数字面量块作为参数值，准确的说，还是使用的表达式块，只不过表达式块是函数字面量的组成部分.
 
 ```scala
-//example 1
+//example 1：参数混合调用
 scala> def safeStringOp(s: String, f: String => String) = {
      | if (s != null) f(s) else s
      | }
@@ -1081,7 +1114,7 @@ scala> def safeStringOp(s: String, f: String => String) = {
 scala> val uuid = java.util.UUID.randomUUID.toString
 <console>: uuid: String = bfe1ddda-92f6-4c7a-8bfc-f946bdac7bc9
 
-scala> val timedUUID = safeStringOp(uuid, { s =>
+scala> val timedUUID = safeStringOp(uuid, { s =>  //单参数与块参数混合调用
      | val now = System.currentTimeMillis
      | val timed = s.take(24) + now
      | timed.toUpperCase
@@ -1090,7 +1123,7 @@ scala> val timedUUID = safeStringOp(uuid, { s =>
 ```
 
 ```scala
-//example 2: 使用参数分组更符合单一功能原则，即对参数列表进行独立封装
+//example 2: 使用参数分组
 scala> def safeStringOp(s: String)(f: String => String) = {
      | if (s != null) f(s) else s
      | }
