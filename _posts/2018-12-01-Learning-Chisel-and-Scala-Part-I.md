@@ -26,22 +26,26 @@ NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的
 
   `Value`是一个具有特定类型的存储单元，定义赋值后，其值保持不变且不可重复赋值. 就定义而言，`value`似乎就是其他编程语言中的常量值，但实际上，Scala中的`value`是数学意义上的概念，可以看作是一个数学常量的符号表示，如`x=5`. `value`是函数式编程的基础元素，函数式程序中几乎都是使用`value`实现计算逻辑，后续会随内容逐步介绍.
 
-```
+```scala
 //syntax: val关键字，scala编译器具备根据<data>推断<type>的能力，所以<type>是可选的
+
 val <identifier> [: <type>] = <data>      
 
 //example 1
+
 scala> val aval = "hello"
 <console>: aval: String = hello
 
 //example 2
+
 scala> val bval: String = "world"
 <console>: bval: String = world
 ```
 * Lazy value
 
 ```scala
-//syntax：lazy关键字修饰val定义惰性值，只有在第一次被访问该值时才用<data>初始化value，而非定义时，将在介绍class属性时进一步说明
+//syntax: lazy关键字修饰val定义惰性值，只有在第一次被访问该值时才用<data>初始化value，而非定义时，将在介绍class属性时进一步说明
+
 lazy val <identifier> [: <type>] = <data>
 ```
 * Variable
@@ -50,9 +54,11 @@ lazy val <identifier> [: <type>] = <data>
   
 ```scala
 //syntax: var关键字，虽然可对变量重复赋值，但只能赋予定义类型或兼容类型的值
+
 var <identifier> [: <type>] = <data>    
 
 //example
+
 scala> var avar = 1
 <console>: avar: Int = 1
 
@@ -134,6 +140,7 @@ Table 2. Numeric literals
 
 ```scala
 //example
+
 scala> val fval = 5d
 <console>: fval: Double = 5.0
 ```
@@ -198,6 +205,7 @@ Fig-1
   
 ```scala
 //syntax
+
 val <identifier> [: <type>] = <expression> 
 var <identifier> [: <type>] = <expression> 
 ```
@@ -206,6 +214,7 @@ var <identifier> [: <type>] = <expression>
   
 ```scala
 //方式一：使用{}的一般形式
+
 { expr1 ; expr2 ; ... } 
 
 或
@@ -218,6 +227,7 @@ var <identifier> [: <type>] = <expression>
 
 ```scala
 //方式二：省略{}并用分号间隔，仅限单行
+
 expr1 ; expr2 ; ...
 ```
 
@@ -249,9 +259,11 @@ aval: Unit = ()
   
 ```scala
 //syntax: if后面的表达式可以是单行或多行表达式块，且有返回值
+
 if (<Boolean expression>) <expression>
 
 //example
+
 scala> val result = if ( false ) "what does this return?"
 <console>: result: Any = ()
 ```
@@ -260,10 +272,12 @@ scala> val result = if ( false ) "what does this return?"
 
 ```scala
 //syntax: if...else不存在类型不确定的问题，且可嵌套，从而形成了if...else...if...else...
+
 if (<Boolean expression>) <expression>
 else <expression>
 
 //example
+
 scala> val x = 10; val y = 20
 <console>: x: Int = 10
 y: Int = 20
@@ -278,12 +292,14 @@ scala> val max = if (x > y) x else y
   
 ```scala
 //syntax
+
 <expression> match {
        case <pattern match> => <expression or expression block>
       [case...]
 }
 
 //example
+
 scala> val x = 10; val y = 20 
 <console>: x: Int = 10 
 y: Int = 20
@@ -299,9 +315,11 @@ scala> val max = x > y match {
   
 ```scala
 //syntax
+
 case <pattern 1> | <pattern 2> .. => <expression or expression block>
 
 //example
+
 scala> val day = "MON"
 <console>: day: String = MON
 
@@ -316,9 +334,11 @@ scala> val kind = day match {
    
 ```scala
 //syntax：值绑定
+
 case <identifier> => <expression or expression block> //<identifier>是与match前<expression>返回值绑定在一起的任意合法标识符
 
 //example
+
 scala> val message = "ok"
 scala> status = message match {
      | case "false" => 200
@@ -332,9 +352,11 @@ status: Int = -1
 
 ```scala
 //syntax: wildcard underscore
+
 case _ => <expression or expression block> //case关键字与下划线间有空格
 
 //example
+
 scala> val message = "Unauthorized"
 <console>: message: String = Unauthorized
 
@@ -353,9 +375,11 @@ status: Int = -1
 
 ```scala
 //syntax
+
 case <pattern> if <Boolean expression> => <expression or expression block>
 
 //example
+
 scala> val resp:String = null
 scala> resp match {
      | case s if s != null =>println(s"recieved '$s'")
@@ -368,9 +392,11 @@ scala> resp match {
    
 ```scala
 //syntax
+
 case <identifier>: <type> => <expression or expression block>
 
 //example
+
 scala> val x: Int = 12180
 <console>: x: Int = 12180
 
@@ -393,9 +419,11 @@ scala> y match {
   
 ```scala
 //syntax: 定义式与其他语言中的for循环差异比较大，特别是变量x在迭代器中的移动采用<-操作符，后面对内部元素逐一介绍
+
 for (<identifier> <- <iterator>) [yield] [<expression or expression block>]
 
 //example
+
 scala> for (x <- 1 to 7) yield { s"Day $x:" }
 <console>: res10: scala.collection.immutable.IndexedSeq[String] 
            = Vector(Day 1:, Day 2:, Day 3:, Day 4:, Day 5:, Day 6:, Day 7:)
@@ -405,22 +433,27 @@ scala> for (x <- 1 to 7) yield { s"Day $x:" }
    
 ```scala
 //syntax: 使用关键字to和unti，使用to则取值范围包含结尾的<ending integer>，until则不包含结尾元素，可选的数字间隔参数[by increment]
+
 <starting integer> [to|until] <ending integer> [by increment]
 
-//example
+//example: to manner
+
 scala> 1 to 3 by 1
 <console>: res5: scala.collection.immutable.Range = Range（1，3）
 
-//example
+//example: until manner
+
 scala> 1 until 3
 <console>: res5: scala.collection.immutable.Range = Range（1，2）
 ```
 
 ```scala
 //syntax：直接使用Range类创建，等效于使用until关键字
+
 Range(<starting integer>, <ending integer>, [by increment])
 
 //example
+
 scala> Range(1, 5, 1)
 <console>: res5: scala.collection.immutable.Range = Range（1，3）
 ```
@@ -431,6 +464,7 @@ scala> Range(1, 5, 1)
    
 ```scala
 //example: parentheses based
+
 scala> val quote = "Faith,Hope,,Charity" 
 <console>: quote: String = Faith,Hope,,Charity
 
@@ -442,6 +476,7 @@ Charity
 
 ```scala
 //example：curly-braces based
+
 scala> val quote = "Faith,Hope,,Charity" 
 <console>: quote: String = Faith,Hope,,Charity
 
@@ -460,6 +495,7 @@ Charity
    
 ```scala
 //syntax
+
 for (<identifier> <- <iterator> if <Boolean expression>) ...
 ```
     
@@ -467,6 +503,7 @@ for (<identifier> <- <iterator> if <Boolean expression>) ...
    
 ```scala
 //example
+
 scala> for { x <- 1 to 2
     |  y <- 1 to 3 }
     |  { print(s"($x,$y) ") 
@@ -478,9 +515,11 @@ scala> for { x <- 1 to 2
     
 ```scala
 //syntax
+
 for (<identifier 1> <- <iterator>; <identifier 2> = <expression>) ...
 
 //example
+
 scala> val powersOf2 = for (i <- 0 to 8; pow = 1 << i) yield pow
 <console>: powersOf2: scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 4, 8, 16, 32, 64, 128, 256)
 ```
@@ -489,13 +528,16 @@ scala> val powersOf2 = for (i <- 0 to 8; pow = 1 << i) yield pow
   
 ```scala
 //syntax
+
 while (<Boolean expression>) statement  //注意这里是语句，而非表达式
 
 //example 1
+
 scala> var x = 10; while (x > 0) x -= 1 
 <console>: x: Int = 0
 
 //example 2
+
 scala> do println(s"Here I am, x = $x") while (x > 0) 
 <console>: Here I am, x = 0
 ```
@@ -526,9 +568,11 @@ scala> do println(s"Here I am, x = $x") while (x > 0)
   
 ```scala
 //syntax: 因为Scala编译器的类型推断能力，函数类型也是可选的
+
 def <identifier>(<identifier>: <type>[, ... ]): [<type>] = <expression or expression block>
 
 //example
+
 scala> def multiplier(x: Int, y: Int): Int = { x * y }
 <console>: multiplier: (x: Int, y: Int)Int
 
@@ -540,9 +584,11 @@ scala> multiplier(6, 7)
 
 ```scala
 //方式一：无参数列表相关符号
+
 def <identifier>: [<type>] = <expression>
 
 //example
+
 scala> def hi: String = "hi" 
 <console>: hi: String
 
@@ -552,9 +598,11 @@ scala> hi   //第一章介绍Scala核心类型结构时，提到过Scala的所�
 
 ```scala
 //方式二：使用空括号定义
+
 def <identifier>()[: <type>] = <expression>
 
 //example
+
 scala> def hi(): String = "hi" 
 <console>: hi: ()String
 
@@ -573,9 +621,11 @@ scala> hi
   
 ```scala
 //syntax
+
 def <identifier>(<identifier>: <type> = <value>): <type>
 
 //example
+
 scala> def greet(prefix: String = "", name: String) = s"$prefix$name"
 <console>: greet: (prefix: String, name: String)String
 ```
@@ -584,6 +634,7 @@ scala> def greet(prefix: String = "", name: String) = s"$prefix$name"
   
 ```scala
 //example
+
 scala> def sum(items: Int*): Int = {
      | var total = 0
      | for (i <- items) total += i
@@ -602,6 +653,7 @@ scala> sum() //匹配0个
   
 ```scala
 //example
+
 scala> def max(x: Int)(y: Int) = if (x > y) x else y 
 <console>: max: (x: Int)(y: Int)Int
 
@@ -615,6 +667,7 @@ scala> val larger = max(20)(39)
   
 ```scala
 //example 1：命名与位置参数调用
+
 scala> def greet(prefix: String, name: String) = s"$prefix $name" 
 <console>: greet: (prefix: String, name: String)String
 
@@ -625,6 +678,7 @@ scala> val greeting2 = greet(name = "Brown", prefix = "Mr") //命名参数调用
 <console>: greeting2: String = Mr Brown
 
 //example 2：混合调用
+
 scala> def greet(prefix: String = "", name: String) = s"$prefix$name"
 <console>: greet: (prefix: String, name: String)String
 
@@ -632,6 +686,7 @@ scala> val greeting1 = greet(name = "Paul") //必须使用命名调用，否则�
 <console>: greeting1: String = Paul
 
 //exaple 3：混合调用
+
 scala> def greet(name: String, prefix: String = "") = s"$prefix$name"
 <console>: greet: (name: String, prefix: String)String
 
@@ -643,9 +698,11 @@ scala> val greeting2 = greet("Ola") //调整参数列表中参数位置后，可
     
 ```scala
 //syntax
+
 <function identifier> <expression block>
 
 //example
+
 scala> def formatEuro(amt: Double) = f"€$amt%.2f"
 <console>: formatEuro: (amt: Double)String
 
@@ -660,6 +717,7 @@ scala> formatEuro { val rate = 1.32; 0.235 + 0.7123 + rate * 5.32 } //表达式�
   
 ```scala
 //example
+
 scala> def safeTrim(s: String): String = {
 | if (s == null) return null
 | s.trim()
@@ -671,6 +729,7 @@ scala> def safeTrim(s: String): String = {
 
 ```scala
 //example
+
 scala> def log(d: Double) = println(f"Got value $d%.2f") //隐式推断
 <console>: log: (d: Double)Unit
 
@@ -690,6 +749,7 @@ scala> def foo = { val he = "heja" } //val或var的定义属于语句
 
 ```scala
 //example
+
 scala> def power(x: Int, n: Int): Long = {
      | if (n >= 1) x * power(x, n-1)
      | else 1
@@ -706,6 +766,7 @@ scala> power(2, 8)
   
 ```scala
 //example 1
+
 scala> def max (x: Int, y: Int) = {
      | def mul (x: Int, y: Int) = x * y
      | if (x > mul(x, y)) x else mul(x, y)
@@ -716,6 +777,7 @@ scala> max(3,4)
 <console>: res10: Int = 12
 
 //example 2
+
 scala> def max(a: Int, b: Int, c: Int) = {
      | def max(x: Int, y: Int) = if (x > y) x else y //虽然内外函数名相同，但参数列表不同，编译可以区分
      | max(a, max(b, c))                             //即使函数名和参数列表都相同，也不会冲突，因为在外部函数体内内嵌函数优先级高于外部函数
@@ -732,9 +794,11 @@ scala> max(42, 181, 19)
   
 ```scala
 //syntax
+
 def <function-name>[type-name](parameter-name>: <type-name>): <type-name>...
 
 //example
+
 scala> def identity[A](a: A): A = a
 identity: [A](a: A)A
 
@@ -752,6 +816,7 @@ s: String = Hello
 
 ```scala
 //functional sub-module
+
 object Mux2 {
    def apply(sel: UInt, in0: UInt, in1: UInt) = {
        val m = Module(new Mux2)
@@ -763,6 +828,7 @@ object Mux2 {
 }
 
 //macro module
+
 class Mux4 extends Module {
   val io = IO(new Bundle {
     val in0 = Input(UInt(1.W))
@@ -812,9 +878,11 @@ y<sup>1/2</sup> ---> (x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>) ---> sin((x - y<
 
 ```scala
 //syntax：如果函数的参数列表中只有一个输入参数，可以省略掉输入参数的括号
+
 ([<type>, ...]) => <type>  //函数输入参数类型列表 => 函数返回值类型
 
 //example
+
 scala> def double(x: Int): Int = x * 2
 <console>: double: (x: Int)Int
 
@@ -839,9 +907,11 @@ scala> myDoubleCopy(5)
 
 ```scala
 //syntax
+
 val <identifier> = <function name> _ //注意<function name>和下划线之间有空格
 
 //example
+
 scala> def double(x: Int): Int = x * 2
 <console>: double: (x: Int)Int
 
@@ -853,6 +923,7 @@ scala> val myDouble = double _      //简化函数类型值的定义形式
 
 ```scala
 //example
+
 scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //如果定义成 def logStart = ...，下面定义值时便会报错
 <console>: logStart: ()String
 
@@ -872,6 +943,7 @@ Starting NOW
 
 ```scala
 //example
+
 scala> def safeStringOp(s: String, f: String => String) = { //注意函数类型参数的形式，para：函数输入参数类型列表 => 函数返回值类型
      | if (s != null) f(s) else s
      | }
@@ -895,9 +967,11 @@ scala> safeStringOp("Ready", reverser)
 
 ```scala
 //syntax
+
 ([<identifier>: <type>, ... ]) => <expression>
 
 //example
+
 scala> val doubler = (x: Int) => x * 2  //从编译器类型推断的角度，有了参数列表和函数体也就知道了输入和输出类型
 <console>: doubler: Int => Int = <function1> 
 
@@ -909,6 +983,7 @@ scala> val doubled = doubler(22)
 
 ```scala
 //example
+
 scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //前面的例子中必须使用无参数括号，否则无法定义函数类型的value和variable
 <console>: logStart: ()String
 
@@ -935,6 +1010,7 @@ scala> val start = () => logStartNoParentheses   //无参数函数定义value
 
 ```scala
 //example
+
 scala> def safeStringOp(s: String, f: String => String) = {
      | if (s != null) f(s) else s
      | }
@@ -960,12 +1036,14 @@ scala> safeStringOp("Ready", s => s.reverse)  //省略单输入参数的类型�
   
 ```scala
 //example 1
+
 scala> val doubler: Int => Int = _ * 2  //等号后_ * 2就是简化版字面量.函数的类型在val类型说明中指定，仅有的一个输入参数也只被使用一次，所以满足应用条件
 <console>: doubler: Int => Int = <function1>
 ```
 
 ```scala
 //example 2: 应用于高阶函数
+
 scala> def safeStringOp(s: String, f: String => String) = {
      | if (s != null) f(s) else s
      | }
@@ -983,6 +1061,7 @@ scala> safeStringOp("Ready", _.reverse) //占位符简化版，对比原始版�
 
 ```scala
 //example 3: 占位符是按位置顺序替代
+
 scala> def combination(x: Int, y: Int, f: (Int,Int) => Int) = f(x,y) 
 <console>: combination: (x: Int, y: Int, f: (Int, Int) => Int)Int
 
@@ -992,6 +1071,7 @@ scala> combination(23, 12, _ * _)  //两输入，按高阶函数参数中函数�
 
 ```scala
 //example 4: 应用于高阶泛型函数
+
 scala> def tripleOp[A,B](a: A, b: A, c: A, f: (A, A, A) => B) = f(a,b,c)
 <console>: tripleOp: [A, B](a: A, b: A, c: A, f: (A, A, A) => B)B
 
@@ -1010,9 +1090,11 @@ scala> tripleOp[Int,Boolean](93, 92, 14, _ > _ + _)
 
 ```scala
 //syntax：使用函数时用下划线通配符标识可变参数，可变参数类型不可省略，这里实际上是重定义了函数，所以类型用来生成函数
+
 ([value], _: <type>,...)
 
 //example：对比完整调用与部分调用
+
 scala> def factorOf(x: Int, y: Int) = y % x == 0  //完整调用
 <console>: factorOf: (x: Int, y: Int)Boolean
 
@@ -1033,6 +1115,7 @@ scala> val y = multipleOf3(78)  //调用时仅给出一个参数值即可
 
 ```scala
 //example
+
 scala> def factorOf(x: Int)(y: Int) = y % x == 0
 <console>: factorOf: (x: Int)(y: Int)Boolean
 
@@ -1049,9 +1132,11 @@ scala> val z = isEven(32) //应用动态分组参数
 
 ```scala
 //syntax：灵活性在于这类参数仅限定返回值类型，而输入类型无要求，这符合之前分析的数学上子函数链条的计算逻辑，后一个子函数的输入只与前一函数输出相关.
+
 <identifier>: => <type>
 
 //example
+
 scala> def doubles(x: => Int) = {   //传入的函数参数的返回值必须是Int类型
      | println("Now doubling " + x)
      | x * 2
@@ -1080,6 +1165,7 @@ res19: Int = 16
   
 ```scala
 //example
+
 scala> val statusHandler: Int => String = {
      | case 200 => "Okay"
      | case 400 => "Your Error"
@@ -1106,6 +1192,7 @@ at $anonfun$1.apply(<console>:7)
 
 ```scala
 //example 1：参数混合调用
+
 scala> def safeStringOp(s: String, f: String => String) = {
      | if (s != null) f(s) else s
      | }
@@ -1124,6 +1211,7 @@ scala> val timedUUID = safeStringOp(uuid, { s =>  //单参数与块参数混合�
 
 ```scala
 //example 2: 使用参数分组
+
 scala> def safeStringOp(s: String)(f: String => String) = {
      | if (s != null) f(s) else s
      | }
