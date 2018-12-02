@@ -27,7 +27,7 @@ NVDLA源码分析是个漫长的痛并快乐着的过程，所以忙里偷闲的
   `Value`是一个具有特定类型的存储单元，定义赋值后，其值保持不变且不可重复赋值. 就定义而言，`value`似乎就是其他编程语言中的常量值，但实际上，Scala中的`value`是数学意义上的概念，可以看作是一个数学常量的符号表示，如`x=5`. `value`是函数式编程的基础元素，函数式程序中几乎都是使用`value`实现计算逻辑，后续会随内容逐步介绍.
 
 ```scala
-//syntax: val关键字，scala编译器具备根据<data>推断<type>的能力，所以<type>是可选的
+//syntax：val关键字，scala编译器具备根据<data>推断<type>的能力，所以<type>是可选的
 val <identifier> [: <type>] = <data>      
 
 //example 1
@@ -41,7 +41,7 @@ scala> val bval: String = "world"
 * Lazy value
 
 ```scala
-//syntax: lazy关键字修饰val定义惰性值，只有在第一次被访问该值时才用<data>初始化value，而非定义时，将在介绍class属性时进一步说明
+//syntax：lazy关键字修饰val定义惰性值，只有在第一次被访问该值时才用<data>初始化value，而非定义时，将在介绍class属性时进一步说明
 lazy val <identifier> [: <type>] = <data>
 ```
 * Variable
