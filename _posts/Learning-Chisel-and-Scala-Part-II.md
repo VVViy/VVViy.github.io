@@ -40,12 +40,17 @@ Fig-
 
 ### VII. Special classes: Objects, Case classes, and Traits
 
+
 ### VIII. Review Tuple and Funcation literal
 
+
 ### IX. Some tips
+
+
 | Item | Description |
 |------|-------------|
 | =>操作符应用|  |
+| 下划线通配符的应用 |  |
 | 可嵌套类型 |  |
 | 无名函数/类 |  |
 | 函数类型的进化 |  |
