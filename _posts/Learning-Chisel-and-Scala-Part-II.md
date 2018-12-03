@@ -111,7 +111,7 @@ Fig-1
 
 #### 3. Importing instance members
 
-### VIII. Review Tuple and Function
+### IX. Review Tuple and Function
 
 #### 1. Tuple class
 
@@ -119,7 +119,7 @@ Fig-1
 
 #### 3. Implicit parameters
 
-### IX. Advanced features of data type
+### X. Advanced features of data type
 
 #### 1. Type aliases
 
@@ -129,7 +129,7 @@ Fig-1
 
 #### 4. Type variance
 
-### X. Some tips
+### XI. Some tips
 
 
 | Item | Description |
