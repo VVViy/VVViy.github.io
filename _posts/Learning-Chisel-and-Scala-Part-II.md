@@ -17,7 +17,7 @@ tags:
     
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%235-%232.jpg?raw=true">
 
-Fig-1
+Fig-1. Collections hierarchy
 
 </div>
 
