@@ -178,7 +178,7 @@ Table 4. Common type operations
     
 <div align="center">
     
-<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%235-%231.jpg?raw=true" />
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%235-%231.jpg?raw=true" width="1200" height="700" />
 
 Fig-1
 
