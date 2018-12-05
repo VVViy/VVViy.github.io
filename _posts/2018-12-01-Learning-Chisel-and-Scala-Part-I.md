@@ -180,7 +180,7 @@ Table 4. Common type operations
     
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%235-%231.jpg?raw=true" width="1200" height="700" />
 
-Fig-1
+Fig-1. Scala core types hierarchy
 
 </div>
 
