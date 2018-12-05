@@ -29,7 +29,7 @@ Fig-1
 
 * 字符串内插
 
-##### Tuple collection
+##### Tuple classes
 
 * 三种构造形式
 
@@ -57,7 +57,7 @@ Fig-1
 
 #### 2. Mutable collections
 
-##### General
+##### Buffer
 
 * 构造方法
 
