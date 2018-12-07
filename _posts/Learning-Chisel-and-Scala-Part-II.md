@@ -126,12 +126,49 @@ scala> f"Enjoying this $item ${355/113.0}%.5f times today"
 ```
 
 ##### Tuple classes
+   Scala的`Tuple`是一个包含至少两个相同或不同类型值的容器，类似于`python`中的元组类型，实际上，`Tuple`并不属于`collection`类型，其实际上是一系列的`case class`构成的(后面介绍case class)，即每次定义`Tuple`对象时，都是例化了形如`TupleX[Y]`的一个对象，其中`X`取值范围为`1~22`表示内部元素的个数，`Y`则指定了`X`个输入参数，从背后的原理也说明，只能定义不超过22个参数的`Tuple`对象. 之所以和`collection`放在一起，主要考虑都属于多元素的"容器"，而且`Tuple`是介绍的类型中唯一一种能包含不同类型值的类型.
+   
+* 构造方式：Tuple有三种构造方式，即
 
-* 三种构造形式
+```scala
+//example 1: 括号内的逗号表达式
+
+scala> val lyric = ("country","road", "take me", 2, "home")
+<console>: lyric：(Sring, String, String, Int, String) = (country, road, take me, 2, home) 
+```
+
+```scala
+//example 2: 使用操作符->构造二元组，是二元组
+
+scala> val lyric = "country" -> 2
+<console>: lyric: (String, Int) = (country, 2)  //如果连续多个就会生成嵌套Tuple
+
+scala> val lyric = "country" -> "road" -> 2
+<console>: lyric: ((String, String), Int) = ((country, road), 2) //如果这是你想要的，你也可以这么干
+```
+
+```scala
+//example 3：直接使用TupleX[Y]
+
+scala> val lyric = Tuple3("country", "road", 2)
+<console>: lyric: (String, String, Int) = (country, road, 2) 
+```
+
+* 访问内部元素：使用`_index`形式访问`Tuple`内部元素，需要**注意**的是`index`起始点为1，如
+
+```scala
+//example
+
+scala> val tval = 1 -> "0xff0000"
+<console>: tval: (Int, String) = (1, 0xff0000)
+
+scala> tval._1
+<console>: res0: Int = 1
+```
 
 ##### List collection
 
-* 定义
+* 定义: List是`immutable`类型中最基本的数据类型，`List`支持是方法也基本都支持`Set`和`Map`类型.
 
 * 成员函数
 
@@ -153,6 +190,8 @@ scala> f"Enjoying this $item ${355/113.0}%.5f times today"
 
 * 复合类型模式匹配
 
+---
+
 #### 2. Mutable collections
 
 ##### Buffer
@@ -171,6 +210,8 @@ scala> f"Enjoying this $item ${355/113.0}%.5f times today"
 
  Try and Future
 
+---
+
 ### VI. Classes
 
 * 定义
@@ -179,9 +220,15 @@ scala> f"Enjoying this $item ${355/113.0}%.5f times today"
 
 #### 1. Abstract class
 
+---
+
 #### 2. Anonymous class
 
+---
+
 #### 3. More field and method toyes
+
+---
 
 #### 4. Privacy control
 
@@ -189,43 +236,75 @@ scala> f"Enjoying this $item ${355/113.0}%.5f times today"
 
 * 私有访问修饰符
 
+---
+
 #### 5. Final and Sealed classes
 
+---
+
 #### 6. Implicit class
+
+---
 
 ### VII. Special classes: Objects, Case classes, and Traits
 
 #### 1. Objects
 
+---
+
 #### 2. Case classes
 
+---
+
 #### 3. Traits
+
+---
 
 ### VIII. Package
 
 #### 1. Packaging
 
+---
+
 #### 2. Package objects
 
+---
+
 #### 3. Importing instance members
+
+---
 
 ### IX. Review Tuple and Function
 
 #### 1. Tuple class
 
+---
+
 #### 2. Function value
 
+---
+
 #### 3. Implicit parameters
+
+---
 
 ### X. Advanced features of data type
 
 #### 1. Type aliases
 
+---
+
 #### 2. Abstract types
+
+---
 
 #### 3. Bounded types
 
+---
+
 #### 4. Type variance
+
+---
 
 ### XI. Some tips
 
@@ -240,6 +319,8 @@ scala> f"Enjoying this $item ${355/113.0}%.5f times today"
 | class扩展途径 |  |
 | 类内定义的元素 |  |
 | 被忽视的符号 |  |
+
+---
 
 **====说明====**
 
