@@ -343,7 +343,7 @@ case <identifier> => <expression or expression block> //<identifier>是与match�
 //example
 
 scala> val message = "ok"
-scala> status = message match {
+scala> val status = message match {
      | case "false" => 200
      | case other => {       //other标识符与值"ok"绑定
      
