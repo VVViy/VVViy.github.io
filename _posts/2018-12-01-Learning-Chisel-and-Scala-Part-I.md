@@ -220,7 +220,9 @@ var <identifier> [: <type>] = <expression>
 或
 
 { expr1  //多行可省略分号
+
 | expr2  //左侧的"|"是REPL中为标识多行语句自动添加的符号
+
 | ...
 |}
 ```
@@ -325,6 +327,7 @@ scala> val day = "MON"
 
 scala> val kind = day match {
      | case "MON" |  "TUE" | "WED" | "THU" | "FRI" => "weekday" //除最左侧REPL自动添加的多行符号，其余"|"为逻辑或
+     
      | case "SAT" | "SUN" => "weekend"
      | }
 <console>: kind: String = weekday
@@ -343,7 +346,9 @@ scala> val message = "ok"
 scala> status = message match {
      | case "false" => 200
      | case other => {       //other标识符与值"ok"绑定
+     
      | println(s"couldn't parse $other") //println内部使用了字符串内插的一种格式s，将在介绍String类型的时候介绍
+     
      | -1 }
      | }
 <console> couldn't parse ok
@@ -355,6 +360,7 @@ status: Int = -1
 
 case _ => <expression or expression block> //case关键字与下划线间有空格
 
+
 //example
 
 scala> val message = "Unauthorized"
@@ -364,6 +370,7 @@ scala> val status = message match {
      | case "Ok" => 200
      | case _ => {
      |     println(s"Couldn't parse $message")  //由于无法引用下划线，这里直接引用了输入message
+     
      |     -1
      | }
      | }
@@ -401,6 +408,7 @@ scala> val x: Int = 12180
 <console>: x: Int = 12180
 
 scala> val y: Any = x   //子类对象赋值父类引用
+
 <console>: y: Any = 12180  
 
 scala> y match {
@@ -409,6 +417,7 @@ scala> y match {
      | case x: Float => f"$x%.2f"
      | case x: Long => s"${x}l"
      | case x: Int => s"${x}i"   //匹配时，是与子类对象的实际类型匹配
+     
      | }
 <console>: res9: String = 12180i
 ```
@@ -533,6 +542,7 @@ scala> val powersOf2 = for (i <- 0 to 8; pow = 1 << i) yield pow
 
 while (<Boolean expression>) statement  //注意这里是语句，而非表达式
 
+
 //example 1
 
 scala> var x = 10; while (x > 0) x -= 1 
@@ -595,6 +605,7 @@ scala> def hi: String = "hi"
 <console>: hi: String
 
 scala> hi   //第一章介绍Scala核心类型结构时，提到过Scala的所有类型都继承了Java的toString方法
+
 <console>: res2: String = hi
 ```
 
@@ -641,13 +652,16 @@ scala> def sum(items: Int*): Int = {
      | var total = 0
      | for (i <- items) total += i
      | total  //表达式块的最后一条作为返回值
+     
      | }
 <console>: sum: (items: Int*)Int
 
 scala> sum(10, 20, 30) //匹配3个Int类型值
+
 <console>: res11: Int = 60
 
 scala> sum() //匹配0个
+
 <console>: res12: Int = 0
 ```
     
@@ -674,9 +688,11 @@ scala> def greet(prefix: String, name: String) = s"$prefix $name"
 <console>: greet: (prefix: String, name: String)String
 
 scala> val greeting1 = greet("Ms", "Brown")  //位置参数调用
+
 <console>: greeting1: String = Ms Brown
 
 scala> val greeting2 = greet(name = "Brown", prefix = "Mr") //命名参数调用 
+
 <console>: greeting2: String = Mr Brown
 
 //example 2：混合调用
@@ -685,6 +701,7 @@ scala> def greet(prefix: String = "", name: String) = s"$prefix$name"
 <console>: greet: (prefix: String, name: String)String
 
 scala> val greeting1 = greet(name = "Paul") //必须使用命名调用，否则，编译器无法确定给定参数值是属于哪个参数
+
 <console>: greeting1: String = Paul
 
 //exaple 3：混合调用
@@ -693,6 +710,7 @@ scala> def greet(name: String, prefix: String = "") = s"$prefix$name"
 <console>: greet: (name: String, prefix: String)String
 
 scala> val greeting2 = greet("Ola") //调整参数列表中参数位置后，可以不适用命名参数调用
+
 <console>: greeting2: String = Ola
 ```
   
@@ -709,9 +727,11 @@ scala> def formatEuro(amt: Double) = f"€$amt%.2f"
 <console>: formatEuro: (amt: Double)String
 
 scala> formatEuro(3.4645) //值调用
+
 <console>: res4: String = €3.46
 
 scala> formatEuro { val rate = 1.32; 0.235 + 0.7123 + rate * 5.32 } //表达式块调用
+
 <console>: res5: String = €7.97
 ```
     
@@ -734,15 +754,19 @@ scala> def safeTrim(s: String): String = {
 //example
 
 scala> def log(d: Double) = println(f"Got value $d%.2f") //隐式推断
+
 <console>: log: (d: Double)Unit
 
 scala> def log(d: Double): Unit = println(f"Got value $d%.2f") //显式声明
+
 <console>: log: (d: Double)Unit
 
 scala> def log(d: Double) { println(f"Got value $d%.2f") } //非正式版procedure定义
+
 <console>: log: (d: Double)Unit
 
 scala> def foo = { val he = "heja" } //val或var的定义属于语句
+
 <console>: foo: Unit
 ```
 
@@ -783,7 +807,9 @@ scala> max(3,4)
 
 scala> def max(a: Int, b: Int, c: Int) = {
      | def max(x: Int, y: Int) = if (x > y) x else y //虽然内外函数名相同，但参数列表不同，编译可以区分
+     
      | max(a, max(b, c))                             //即使函数名和参数列表都相同，也不会冲突，因为在外部函数体内内嵌函数优先级高于外部函数
+     
      | }
 <console>: max: (a: Int, b: Int, c: Int)Int
 
@@ -806,9 +832,11 @@ scala> def identity[A](a: A): A = a
 identity: [A](a: A)A
 
 scala> val s: String = identity[String]("Hello") //调用时，显式声明函数类型
+
 s: String = Hello
 
 scala> val s: String = identity("Hello") //Scala编译器有类型推断能力，所以可以省略类型说明
+
 s: String = Hello
 ```
 
@@ -843,6 +871,7 @@ class Mux4 extends Module {
   })
   io.out := Mux2(io.sel(1),
                  Mux2(io.sel(0), io.in0, io.in1),   //此处确实契合了两个本不相关的概念
+                 
                  Mux2(io.sel(0), io.in2, io.in3))
 }
 
@@ -884,22 +913,27 @@ y<sup>1/2</sup> ---> (x - y<sup>1/2</sup>)(x + y<sup>1/2</sup>) ---> sin((x - y<
 
 ([<type>, ...]) => <type>  //函数输入参数类型列表 => 函数返回值类型
 
+
 //example
 
 scala> def double(x: Int): Int = x * 2
 <console>: double: (x: Int)Int
 
 scala> val myDouble: (Int) => Int = double  //注意这里的定义值的方式 val <identifier> : <function type> = <function identifier>
+
 <console>： myDouble: Int => Int = <function1>
 
 
 scala> val yourDouble: Int => Int = double  //只有一个输入参数，省略掉括号
+
 <console>： yourDouble: Int => Int = <function1>
 
 scala> myDouble(5)                 //myDouble就是个普通的value，但却有函数的功能
+
 <console>: res1: Int = 10
 
 scala> val myDoubleCopy = myDouble //在使用方式上，函数定义的值与Int等其他类型值没有区别
+
 <console>: myDoubleCopy: Int => Int = <function1>
 
 scala> myDoubleCopy(5)
@@ -913,12 +947,14 @@ scala> myDoubleCopy(5)
 
 val <identifier> = <function name> _ //注意<function name>和下划线之间有空格
 
+
 //example
 
 scala> def double(x: Int): Int = x * 2
 <console>: double: (x: Int)Int
 
 scala> val myDouble = double _      //简化函数类型值的定义形式
+
 <console>: myDouble: Int => Int = <function1>
 ```
 
@@ -928,9 +964,11 @@ scala> val myDouble = double _      //简化函数类型值的定义形式
 //example
 
 scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //如果定义成 def logStart = ...，下面定义值时便会报错
+
 <console>: logStart: ()String
 
 scala> val start: () => String = logStart    //在新版2.12.7 REPL中将报warning
+
 <console>: start: () => String = <function0>
 
 scala> println( start() )
@@ -948,6 +986,7 @@ Starting NOW
 //example
 
 scala> def safeStringOp(s: String, f: String => String) = { //注意函数类型参数的形式，para：函数输入参数类型列表 => 函数返回值类型
+
      | if (s != null) f(s) else s
      | }
 <console>: safeStringOp: (s: String, f: String => String)String
@@ -956,6 +995,7 @@ scala> def reverser(s: String) = s.reverse
 <console>: reverser: (s: String)String
 
 scala> safeStringOp(null, reverser) //和定义函数类型值一样，直接使用函数名调用
+
 <console>: res4: String = null
 
 scala> safeStringOp("Ready", reverser)
@@ -976,6 +1016,7 @@ scala> safeStringOp("Ready", reverser)
 //example
 
 scala> val doubler = (x: Int) => x * 2  //从编译器类型推断的角度，有了参数列表和函数体也就知道了输入和输出类型
+
 <console>: doubler: Int => Int = <function1> 
 
 scala> val doubled = doubler(22)
@@ -988,12 +1029,15 @@ scala> val doubled = doubler(22)
 //example
 
 scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //前面的例子中必须使用无参数括号，否则无法定义函数类型的value和variable
+
 <console>: logStart: ()String
 
 scala> def logStartNoParentheses = "=" * 50 + "\nStarting NOW\n" + "=" * 50 //但使用函数字面量则不受有无括号的限制
+
 <console>: logStart: ()String
 
 scala> val start = () => "=" * 50 + "\nStarting NOW\n" + "=" * 50  //方式一
+
 <console>: start: () => String = <function0>
 
 scala> println( start() )
@@ -1002,9 +1046,11 @@ Starting NOW
 ==================================================
 
 scala> val start = () => logStart()  //方式二不具有一般意义，只有定义了有名函数才有此等价定义
+
 <console>: start: () => String = <function0>
 
 scala> val start = () => logStartNoParentheses   //无参数函数定义value
+
 <console>: start: () => String = <function0>
 
 ```
@@ -1023,6 +1069,7 @@ scala> safeStringOp("Ready", (s: String) => s.reverse)
 <console>: res8: String = ydaeR
 
 scala> safeStringOp("Ready", s => s.reverse)  //省略单输入参数的类型和括号
+
 <console>: res10: String = ydaeR
 ```
 
@@ -1041,6 +1088,7 @@ scala> safeStringOp("Ready", s => s.reverse)  //省略单输入参数的类型�
 //example 1
 
 scala> val doubler: Int => Int = _ * 2  //等号后_ * 2就是简化版字面量.函数的类型在val类型说明中指定，仅有的一个输入参数也只被使用一次，所以满足应用条件
+
 <console>: doubler: Int => Int = <function1>
 ```
 
@@ -1053,12 +1101,15 @@ scala> def safeStringOp(s: String, f: String => String) = {
 <console>: safeStringOp: (s: String, f: String => String)String
 
 scala> safeStringOp("Ready", (s: String) => s.reverse) //字面量原始版
+
 <console>: res8: String = ydaeR
 
 scala> safeStringOp("Ready", s => s.reverse)  //单参数简化版
+
 <console>: res10: String = ydaeR
 
 scala> safeStringOp("Ready", _.reverse) //占位符简化版，对比原始版容易理解，函数输入输出类型已在高阶函数参数中指定，占位符替代了s, (s: String)已无表示必要
+
 <console>: res12: String = ydaeR
 ```
 
@@ -1069,6 +1120,7 @@ scala> def combination(x: Int, y: Int, f: (Int,Int) => Int) = f(x,y)
 <console>: combination: (x: Int, y: Int, f: (Int, Int) => Int)Int
 
 scala> combination(23, 12, _ * _)  //两输入，按高阶函数参数中函数类型参数的位置占位
+
 <console>: res13: Int = 276
 ```
 
@@ -1099,18 +1151,23 @@ scala> tripleOp[Int,Boolean](93, 92, 14, _ > _ + _)
 //example：对比完整调用与部分调用
 
 scala> def factorOf(x: Int, y: Int) = y % x == 0  //完整调用
+
 <console>: factorOf: (x: Int, y: Int)Boolean
 
 scala> val f = factorOf _   //如果两个参数值都将改变  
+
 <console>: f: (Int, Int) => Boolean = <function2>
 
 scala> val x = f(7, 20)    //提供两个参数值才能正常调用
+
 <console>: x: Boolean = false
 
-scala> val multipleOf3 = factorOf(3, _: Int)  //部分调用，使用时标明可变与不可变参数，
+scala> val multipleOf3 = factorOf(3, _: Int)  //部分调用，使用时标明可变与不可变参数
+
 <console>: multipleOf3: Int => Boolean = <function1>
 
 scala> val y = multipleOf3(78)  //调用时仅给出一个参数值即可
+
 <console>: y: Boolean = true
 ```
 
@@ -1123,9 +1180,11 @@ scala> def factorOf(x: Int)(y: Int) = y % x == 0
 <console>: factorOf: (x: Int)(y: Int)Boolean
 
 scala> val isEven = factorOf(2) _ //定义静态参数值
+
 <console>: isEven: Int => Boolean = <function1>
 
 scala> val z = isEven(32) //应用动态分组参数
+
 <console>: z: Boolean = true
 ```
 
@@ -1141,12 +1200,14 @@ scala> val z = isEven(32) //应用动态分组参数
 //example
 
 scala> def doubles(x: => Int) = {   //传入的函数参数的返回值必须是Int类型
+
      | println("Now doubling " + x)
      | x * 2
      | }
 <console>: doubles: (x: => Int)Int
 
 scala> doubles(5)       //value作为参数值
+
 <console>: Now doubling 5
 res18: Int = 10
 
@@ -1154,6 +1215,7 @@ scala> def f(i: Int) = { println(s"Hello from f($i)"); i }
 <console>: f: (i: Int)Int
 
 scala> doubles( f(8) )  //函数作为参数值，返回值类型为Int
+
 <console>: Hello from f(8)
 Now doubling 8
 Hello from f(8)
@@ -1183,6 +1245,7 @@ scala> statusHandler(400)
 res21: String = Your Error
 
 scala> statusHandler(401)  //非限定输入会报匹配错误，====partial函数允许使用match中介绍的下划线通配符来提供默认选项====
+
 scala.MatchError: 401 (of class java.lang.Integer)
 at $anonfun$1.apply(<console>:7)
 at $anonfun$1.apply(<console>:7)
@@ -1205,6 +1268,7 @@ scala> val uuid = java.util.UUID.randomUUID.toString
 <console>: uuid: String = bfe1ddda-92f6-4c7a-8bfc-f946bdac7bc9
 
 scala> val timedUUID = safeStringOp(uuid, { s =>  //单参数与块参数混合调用
+
      | val now = System.currentTimeMillis
      | val timed = s.take(24) + now
      | timed.toUpperCase
