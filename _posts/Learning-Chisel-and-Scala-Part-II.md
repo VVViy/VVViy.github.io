@@ -96,6 +96,7 @@ scala> "PI is: " + fval
 
 s"characters + ${value/variable}" //s开头，${}引用变量，而且{}这里也是可选的
 
+
 //example
 
 scala> val item = "apple" 
@@ -112,6 +113,7 @@ scala> s"Fish n chips n vinegar, ${"pepper "*3}salt"
 //syntax: 类似于c语言中的printf函数
 
 f"characters + ${value/variable}with format" //f开头，在引用变量上加格式控制
+
 
 //example
 
@@ -143,8 +145,10 @@ scala> val lyric = ("country","road", "take me", 2, "home")
 scala> val lyric = "country" -> 2
 <console>: lyric: (String, Int) = (country, 2)  //如果连续多个就会生成嵌套Tuple
 
+
 scala> val lyric = "country" -> "road" -> 2
 <console>: lyric: ((String, String), Int) = ((country, road), 2) //如果这是你想要的，你也可以这么干
+
 ```
 
 ```scala
@@ -167,12 +171,41 @@ scala> tval._1
 ```
 
 ##### List collection
+   List是`immutable`类型中最常用的数据类型，而且`List`支持的大多数方法(函数)，`Set`和`Map`类型基本也都支持. 因此，下面主要通过`List`类型来介绍一些方法的使用.
+   
+* 构造与访问: 
 
-* 定义: List是`immutable`类型中最基本的数据类型，`List`支持是方法也基本都支持`Set`和`Map`类型.
+```scala
+//example 1: 使用List直接创建对象
+
+scala> val numbers = List(32, 95, 24, 21, 17)
+<console>: numbers: List[Int] = List(32, 95, 24, 21, 17)
+
+scala> val colors = List("red", "green", "blue")
+<console>: colors: List[String] = List(red, green, blue)
+```
+
+```scala
+//example 2: 使用双冒号::操作符创建对象
+
+scala> val numbers = 1 :: 2 :: 3 :: Nil
+numbers: List[Int] = List(1, 2, 3)
+
+```
 
 * 成员函数
 
-* 高阶函数
+1）常用函数: head(), tail()
+
+```scala
+//example
+```
+
+2）高阶函数: foreach(), map(), reduce()
+
+```scala
+
+```
 
 * 进阶特性
 
@@ -181,8 +214,40 @@ scala> tval._1
 ##### Immutable Stack and Queue
 
 ##### Map collection
+   `Map`类型与C++，Java中的类似，是一个不可变、支持泛型的键值对存储结构，且要求键具有唯一性，支持父类`Iterable`中定义的方法. 
+   
+* 构造与访问：键值对的关联使用二元`Tuple`的方式创建，即
+
+```scala
+//example
+
+scala> val colorMap = Map("red" -> 0xFF0000, "green" -> 0xFF00, "blue" -> 0xFF)
+colorMap: scala.collection.immutable.Map[String,Int] = Map(red -> 16711680, green -> 65280, blue -> 255)
+
+scala> val redRGB = colorMap("red") 
+redRGB: Int = 16711680
+
+scala> val cyanRGB = colorMap("green") | colorMap("blue") 
+cyanRGB: Int = 65535
+
+scala> for (pairs <- colorMap) { println(pairs) } 
+(red,16711680) (green,65280) (blue,255)
+```
 
 ##### Set collection
+   `Set`类型与C++，Java中的类似，是一个不可变、无重复元素、无序、支持泛型的复合数据类型，且与`Map`类似，都支持`Iterable`父类中定义的方法.
+
+* 构造与访问
+
+```scala
+//example
+
+scala> val unique = Set(10, 20, 30, 20, 20, 10)
+unique: scala.collection.immutable.Set[Int] = Set(10, 20, 30)
+
+scala> val sum = unique.reduce( (a: Int, b: Int) => a + b )
+sum: Int = 60
+```
 
 ##### Converting and Matching
 
