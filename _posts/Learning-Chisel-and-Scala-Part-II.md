@@ -195,7 +195,7 @@ scala> val numbers = 1 :: 2 :: 3 :: Nil
 <console>: numbers: List[Int] = List(1, 2, 3)
 ```
 
-1) ::操作符: 如上所示，使用::与Nil可以创建等价的List对象，::操作符实际上是`List`的成员函数，其接受1个元素作为List对象的"head"元素，主调对象则为"tail"，如下例1，此外，::操作符具有右关联特性，所以追加元素时，需置于操作符左侧，如下例2.
+1）::操作符: 如上所示，使用::与Nil可以创建等价的List对象，::操作符实际上是`List`的成员函数，其接受1个元素作为List对象的"head"元素，主调对象则为"tail"，如下例1，此外，::操作符具有右关联特性，所以追加元素时，需置于操作符左侧，如下例2.
 
 ```scala
 //example 1: 调用::方法
@@ -219,7 +219,7 @@ scala> second.tail == first
 <console>: res1: Boolean = true
 ```
 
-2) Nil：`Nil`是一个flag，表明当前位置是`List`最后一个元素的下一个位置，类似于C++顺序容器中的`end()`，`Nil`本身是不可变的，是`List[Nothing]`的`SingleTone`对象，`Nothing`在前一篇的Fig-1中介绍过，是Scala类结构中最底层的类型，所以`List[Nothing]`可以兼容任意类型，所以可以和::操作符一起创建任意类型的`List`.
+2）Nil：`Nil`是一个flag，表明当前位置是`List`最后一个元素的下一个位置，类似于C++顺序容器中的`end()`，`Nil`本身是不可变的，是`List[Nothing]`的`SingleTone`对象，`Nothing`在前一篇的Fig-1中介绍过，是Scala类结构中最底层的类型，所以`List[Nothing]`可以兼容任意类型，所以可以和::操作符一起创建任意类型的`List`.
 
 ```scala
 //example
@@ -232,7 +232,7 @@ scala> l == Nil  //空List就是以Nil结尾的列表
 <console>: res0: Boolean = true
 ```
 
-3) head()与tail()：上面提到了`List`的`head`和`tail`元素，分别表示`List`的左侧的第一个元素，和剩下的所有元素(注意tail不表示列表最右侧元素)，二者对应函数head()与tail().
+3）head()与tail()：上面提到了`List`的`head`和`tail`元素，分别表示`List`的左侧的第一个元素，和剩下的所有元素(注意tail不表示列表最右侧元素)，二者对应函数head()与tail().
 
 ```scala
 example
@@ -270,26 +270,27 @@ Table 2. Common operations on List
 
 | Name | Example | Description |
 |------|---------|-------------|
-| :+ | List(1,3,4,5) :+ 6, reas: List(1,3,4,5,6) | 左关联操作符，元素从右侧追加，正好与::相反. |
-| ::: | List(1,2) ::: List(2,3), res: List(1,2,2,3) | 追加List，右关联. |
-| ++ | List(1,2) ++ Set(2,3), res: List(1,2,2,3) | 追加其他collection类型，左关联 |
-| == | List(1,2) == List(1,2), res: true | 等价比较，返回布尔.
-| distinct | List(1,2,2).distinct, res: List(1,2) | 返回无重复元素版本列表. |
-| drop | List('a','b','c') drop 2, res: List('c') | 从列表中去除前2个元素的新列表. |
+| :: | 3 :: List(1,2), res: List(3,1,2) | 右关联操作符，元素左侧追加 | 
+| :+ | List(1,3,4,5) :+ 6, reas: List(1,3,4,5,6) | 左关联操作符，元素从右侧追加，正好与::相反 |
+| ::: | List(1,2) ::: List(2,3), res: List(1,2,2,3) | 追加List，右关联 |
+| ++ | List(1,2) ++ Set(2,3), res: List(1,2,2,3) | 追加其他List或collection类型，左关联 |
+| == | List(1,2) == List(1,2), res: true | 等价比较，返回布尔 |
+| distinct | List(1,2,2).distinct, res: List(1,2) | 返回无重复元素版本列表 |
+| drop | List('a','b','c') drop 2, res: List('c') | 从列表中去除前2个元素的新列表 |
 | dropRight | List('a','b','c') dropRight 2, res: List('a') | drop反向操作 |
-| filter | List(23,8,14) filter (_ > 18), res: List(23) | 返回条件过滤后的新列表. |
-| flatten | List(List(1,2),List(3,4)).flatten, res: List(1,2,3,4) | 返回多列表元素构成的单一列表. |
-| partition | List(1,2,3,4) partition (_ > 3), res: List(List(4),List(1,2,3)) | flatten逆向操作，符合条件的在前. |
-| reverse | List(1,2,3).reverse, res: List(3,2,1) | 逆转列表. |
-| slice | List(2,3,5,7) slice (1,3), res: List(3, 5) | 截取原列表指定范围内的元素，不包含有边界元素.  |
-| sortBy | List("apple", "to") sortBy (_.size), res: List("to","apple")| 按照排序函数对列表排序. |
-| sorted | List("apple","to").sorted, res: List("apple","to") | 按照元素类型本身的规则顺序(字母表中a在t前). |
-| splitAt | List(2,3,5,7) splitAt 2, res: List(List(2,3),List(5,7)) | 以splitAt指定的参数为界，将列表元素划分为两个List元素列表. |
-| take | List(2,3,5,7,11) take 3, res: List(2,3,5) | 返回前3个元素构成的新List. |
-| takeRight | List(2,3,5,7,11) takeRight 3, res: List(5,7,11) | take反向操作. |
-| zip | List(1,2) zip List("a","b"), res: List((1,"a"),(2,"b")) | 相同index的元素构成tuple，作为列表元素. |
-| size | List(1,2,3).size, res: 3 | 返回列表元素数量. |
-| isEmpty | List().isEmpty, res: true | 判断列表是否为空，返回布尔. |
+| filter | List(23,8,14) filter (_ > 18), res: List(23) | 返回条件过滤后的新列表 |
+| flatten | List(List(1,2),List(3,4)).flatten, res: List(1,2,3,4) | 返回多列表元素构成的单一列表 |
+| partition | List(1,2,3,4) partition (_ > 3), res: List(List(4),List(1,2,3)) | flatten逆向操作，符合条件的在前 |
+| reverse | List(1,2,3).reverse, res: List(3,2,1) | 逆转列表 |
+| slice | List(2,3,5,7) slice (1,3), res: List(3, 5) | 截取原列表指定范围内的元素，不包含有边界元素  |
+| sortBy | List("apple", "to") sortBy (_.size), res: List("to","apple")| 按照排序函数对列表排序 |
+| sorted | List("apple","to").sorted, res: List("apple","to") | 按照元素类型本身的规则顺序(字母表中a在t前) |
+| splitAt | List(2,3,5,7) splitAt 2, res: List(List(2,3),List(5,7)) | 以splitAt指定的参数为界，将列表元素划分为两个List元素列表 |
+| take | List(2,3,5,7,11) take 3, res: List(2,3,5) | 返回前3个元素构成的新List |
+| takeRight | List(2,3,5,7,11) takeRight 3, res: List(5,7,11) | take反向操作 |
+| zip | List(1,2) zip List("a","b"), res: List((1,"a"),(2,"b")) | 相同index的元素构成tuple，作为列表元素 |
+| size | List(1,2,3).size, res: 3 | 返回列表元素数量 |
+| isEmpty | List().isEmpty, res: true | 判断列表是否为空，返回布尔 |
 
 上述函数功能基本都很清晰，不做过多解释，有一个有意思的是`++`操作符，这个操作符在其他collection类型中也支持，那么如果将例子中的顺序调换，便会生成合并后的Set对象，如下，说明++操作符的输出类型由主调对象的类型决定，实际上，Scala中的操作符都是函数(方法)，因为Scala中所有的类型都是类，也就是说`A ++ B`背后是由`A.++ B`实现的. 
 
@@ -348,7 +349,7 @@ scala> List("milk,tea") flatMap (_.split(','))  //具有map函数映射功能，
 <console>: res1: List[String] = List(milk, tea)
 ```
 
-2) Reducing List: 列表规约是指将函数字面量参数作用于全部List内部元素，进行统一操作，最终得到唯一的输出，如例1中的`reduce`方法，一些数学规约、布尔规约及通用规约相关的操作如Table 3 ~ Table 5所示.
+2）Reducing List: 列表规约是指将函数字面量参数作用于全部List内部元素，进行统一操作，最终得到唯一的输出，如例1中的`reduce`方法，一些数学规约、布尔规约及通用规约相关的操作如Table 3 ~ Table 5所示.
 
 ```scala
 //example 1：reduce
@@ -365,9 +366,9 @@ Table 3. Math reduction ops
 
 | Name | Example | Description |
 |------|---------|-------------|
-| max | List(1,2,3).max, res: 3 | 返回列表中最大值. |
-| min | List(1.1, 2.2, 3.3).min, res: 1.1 | 返回最小值. |
-| product | List(1,2,3).product, res: 6 | 返回乘积. |
+| max | List(1,2,3).max, res: 3 | 返回列表中最大值 |
+| min | List(1.1, 2.2, 3.3).min, res: 1.1 | 返回最小值 |
+| product | List(1,2,3).product, res: 6 | 返回乘积 |
 | sum | List(1,2,3).sum, res: 6 | 求和 |
 
 Table 4. Boolean reduction ops
@@ -397,9 +398,10 @@ Table 5. Generic list reduction ops
 表中介绍的三类操作实际上差不多，但既然同时存在于Scala中，应该是在不同应用域下有不同的限制，作者没有深挖，也不想深挖，毕竟不是要做Scala程序员，只是掌握基础核心内容罢了. 另外，注意到三类操作都有左右顺序之分，这一方面是简化一些特殊运算的形式，另一方面是因为`List`属于链式存储结构，学过数据结构的都知道，链式存储相较于顺序存储，其删除和添加的性能都非常高，但是查找操作效率很低，所以左右操作顺序代表了不同的性能需求，不想当Scala程序员的话，就别管它了.
 
 ##### Immutable Stack and Queue
+  栈和队列是我们很熟悉的数据结构，写软件的小伙伴几乎天天打交道，二者应用特性决定了可变应用价值，所以这里的`immutable`版本栈和队列没什么实际用处，实际上，Scala中的`immutable`和`mutable`中的复合数据类型都是可以相互转化的，在介绍可变类型时将介绍相互转换. 此外，在Fig-1中还有很多的immutable类型复合类型，如红黑树，这里就不一一介绍了，如果后续发现`RISC-V`相关项目源码中使用到了本文未介绍的复合结构，会增量添加进来.
 
 ##### Map collection
-   `Map`类型(注意与map方法相区分)与C++，Java中的类似，是一个不可变、支持泛型的键值对存储结构，且要求键具有唯一性，支持父类`Iterable`中定义的方法.
+   `Map`类型(注意与map方法相区分)与C++，Java中的类似，是一个不可变、支持泛型的键值对存储结构，且要求键具有唯一性，上面介绍的`List`操作，`Map`也基本都支持，还有一些常用的方法如Table 6所示.
    
 * 构造与访问：键值对的关联使用二元`Tuple`的方式创建，即
 
@@ -423,8 +425,44 @@ scala> for (pairs <- colorMap) { println(pairs) } //应用于for循环
 <console>: (red,16711680) (green,65280) (blue,255)
 ```
 
+Table 6. Common Map operations
+
+| Name | Example | Dscription |
+|------|---------|------------|
+| get | Map(1->"st", 2->"nd") get 1/Map(1->"st", 2->"nd")(1), res: st | 由键访问值 |
+| getOrElse | Map(1->"st", 2->"nd") getOrElse ("rd", 2), res: 2 | 根据"rd"查找，找到返回对应值，否则返回默认值2 |
+| contains | Map(1->"st", 2->"nd") contains 2, res: true | 判断2是否为Map键 |
+| + | Map(1->"st", 2->"nd") + (3->"rd")/Map(1->"st", 2->"nd") ++ (3->"rd", 4->"th"), res: Map(1->"st", 2->"nd",3->"rd")/Map(1->"st", 2->"nd",3->"rd",4->"th") | 追加元素或子map |
+| ++ | Map(1->"st", 2->"nd") ++ List((3,"rd")), res: Map(1->"st", 2->"nd", 3->"rd") | 追加其他Map或复合类型元素 |
+| - | Map(1->"st", 2->"nd") - 1/Map(1->"st", 2->"nd",3->"rd") - (1,2), res: Map(2->"nd")/Map(3->"rd") | 根据键删除元素 |
+| -- | Map(1->"st", 2->"nd") -- List(1), res: Map(2->"nd") | 删除其他复合类型指定的键所对应的Map元素 |
+| keys | Map(1->"st", 2->"nd").keys, res: Set(1,2) | 返回键构成的集合 |
+| values | Map(1->"st", 2->"nd").values, res: MapLike.DefaultValuesIterable(1, 2, 3) | 由值构成Iterable集合 |
+
+这里我们要再讨论一下`++`，这个操作符真是很有意思，前面我们聊过`List ++ Set`的组合形式，最终的类型取决于主调对象的类型，但是对于`Map`还有进一步的推断，看下例. 由于`Map`内部元素的构造本身就是通过`二元Tuple`实现的，所以其他以`二元Tuple`为元素的复合类型都能够与`Map ++`，而不改变类型，一旦元素结构不符合二元元组结构，这时就会将`Map`内部元素向其他能够以二元元组作为元素的复合类型转化.
+
+```scala
+//example 1
+
+scala> Map(1->"st", 2->"nd") ++ Map(3->"rd") //同类型++，输出依然是Map
+
+<console>: res0: scala.collection.immutable.Map[Int,String] = Map(1 -> st, 2 -> nd, 3 -> rd)  
+
+//example 2
+
+scala> Map(1->"st", 2->"nd") ++ List((3，"rd")) //List类型内部元素为Tuple，输出也是Map
+
+<console>: res1: scala.collection.immutable.Map[Int,String] = Map(1 -> st, 2 -> nd, 3 -> rd)  
+
+//example 3
+scala> Map(1->"st", 2->"nd") ++ List(3, "rd") //List内部元素不是Tuple了，输出变成了List，且原Map中的元素在List中变成了二元元组
+
+<console>: res2: scala.collection.immutable.Iterable[Any] = List((1,st), (2,nd), 3, rd)  
+
+```
+
 ##### Set collection
-   `Set`类型与C++，Java中的类似，是一个不可变、无重复元素、无序、支持泛型的复合数据类型，且与`Map`类似，都支持`Iterable`父类中定义的方法.
+   `Set`类型与C++，Java中的类似，是一个不可变、无重复元素、无序、支持泛型的复合数据类型，且与`Map`类似，支持`List`中介绍的方法，其他一些常用方法如Table 7所示.
 
 * 构造与访问: `Set`的构造很简单，直接调用`Set`例化即可，但对`Set`内部元素的访问，由于其属于无序集合，所以不能像`List(index)`那样直接访问，`Set(item)`等同于调用了`contains`函数，是判断`item`是否存在于Set中，所以可以通过查找元素的方式访问，也可以通过迭代整个集合访问内部元素.
 
@@ -452,13 +490,113 @@ scala> unique.foreach((i: Int) => println(i))  //使用高阶函数进行遍历
 30
 ```
 
-##### Matching
+Table 7. Common Set operations
 
-* 转型
+| Name | Example | Description |
+|------|---------|-------------|
+| contains | Set(1,2,3) contains 4, res: false | 判断元素存在性，等价于index查找 |
+| subsetOf | Set(1,2) subsetOf Set(1,2,3), res: true | 判断子集存在性 |
+| + | Set(1,2) + 3/Set(1,2) + (3,4), res: Set(1,2,3)/Set(1,2,3,4) | 追加元素或子集合 |
+| ++ | Set(1,2) ++ List(2,3), res: Set(1,2,3) | 追加其他Set或复合类型元素 |
+| - | Set(1,2,3) - 2/Set(1,2,3) - (1,2), res: Set(1)/Set(3) | 删除原有元素，构成新Set |
+| -- | Set(1,2,3) -- List(1,2), res: Set(3) | ++逆向操作 |
+| empty | Set(1,2,3).empty, res: Set() | 清空集合构成新Set |
+| & / intersect | Set(1,2,3) & Set(1)/Set(1,2,3) intersect Set(1), res: Set(1) | 求交集 |
+| \| / union | Set(1,2,3) | Set(4)/Set(1,2,3) union Set(4), res: Set(1,2,3,4) | 求并集 |
+| &~ / diff | Set(1,2,3) &~ Set(3)/Set(1,2,3) diff Set(3), res: Set(1,2) | 去交集，求补集 |
 
-* 复合类型模式匹配
+##### Casting and Matching
 
+* 转型：scala中提供了一些方法能够在`List, Set, Map, String`间转化，即
+
+Table 8. Collections casting operations
+
+| Name | Example | Description |
+|------|---------|-------------|
+| mkString | List(1,2,3).mkString("$ "), res: 1$ 2$ 3 | 用List中的元素和mkString中定义的分隔符生成字符串 |
+| toString | List(1,2,3).toString, res: String = List(1,2,3) | 转换为字符串, 例子中的List是字符，不是类型名 |
+| toMap | Set(1->true, 2->true).toMap, res: Map(1->true, 2->true) | —— |
+| toSet | List(1,2,2,3).toSet, res: Set(1,2,3) | —— |
+| toList | Map("a"->1, "b"->2).toList, res: List(("a",1),("b",2)) | —— |
+
+* 模式匹配：本节介绍将复合类型应用于前一篇blog介绍的`match`逻辑表达式中，从下面的例子可以看到，复合类型作为元素的集合，与`match`结合使用非常灵活.
+
+```scala
+//example 1: 元素匹配
+
+scala> val statuses = List(500, 404) 
+<console>: statuses: List[Int] = List(500, 404)
+
+scala> val msg = statuses.head match {  //使用List中的首元素进行匹配，无特别之处
+
+     | case x if x < 500 => "okay" 
+     | case _ => "whoah, an error" 
+     | }
+<console>: msg: String = whoah, an error
+```
+
+```scala
+//example 2: 使用collection方法做模式匹配
+
+scala> val msg = statuses match { 
+     | case x if x contains(500) => "has error" //在guard中使用contains方法
+     | case _ => "okay" 
+     | }
+<console>: msg: String = has error
+```
+
+```scala
+//example 3: 匹配collection对象
+
+scala> val msg = statuses match { 
+     | case List(404, 500) => "not found & error" //List作为匹配参数
+     
+     | case List(500, 404) => "error & not found" 
+     | case List(200, 200) => "okay" 
+     | case _ => "not sure what happened" 
+     | }
+<console>: msg: String = error & not found
+```
+
+```scala
+//example 4: 值绑定 
+
+scala> val msg = statuses match { 
+     | case List(500, x) => s"Error followed by $x" //x与404绑定
+     
+     | case List(e, x) => s"$e was followed by $x" 
+     | }
+<console>: msg: String = Error followed by 404
+```
 ---
+
+```scala
+//example 5: head + tail分裂匹配
+
+scala> val head = List('r','g','b') match { 
+     | case x :: xs => x   //x与List('r','g','b') 的head绑定，xs与tail绑定
+     
+     | case Nil => ' ' 
+     | }
+<console>: head: Char = r
+```
+
+  前面介绍`Tuple`时提到过，其不是`collection`体系下的类型，但是其行为与`collections`类型非常相似，所以`Tuple`也可应用于`match`控制结构，`Tuple`可以保存不同类型的元素，在有些应用场景下更加灵活.
+  
+```scala
+//exampe
+
+scala> val code = ('h', 204, true) match { 
+     | case (_, _, false) => 501 
+     | case ('c', _, true) => 302 
+     | case ('h', x, true) => x 
+     | case (c, x, true) => { 
+     |   println(s"Did not expect code $c") 
+     |   x
+     |  } 
+     | }
+<console>: code: Int = 204
+```
 
 #### 2. Mutable collections
 
