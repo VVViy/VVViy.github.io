@@ -501,9 +501,9 @@ Table 7. Common Set operations
 | - | Set(1,2,3) - 2/Set(1,2,3) - (1,2), res: Set(1)/Set(3) | 删除原有元素，构成新Set |
 | -- | Set(1,2,3) -- List(1,2), res: Set(3) | ++逆向操作 |
 | empty | Set(1,2,3).empty, res: Set() | 清空集合构成新Set |
-| & / intersect | Set(1,2,3) & Set(1)/Set(1,2,3) intersect Set(1), res: Set(1) | 求交集 |
-| \| / union | Set(1,2,3) | Set(4)/Set(1,2,3) union Set(4), res: Set(1,2,3,4) | 求并集 |
-| &~ / diff | Set(1,2,3) &~ Set(3)/Set(1,2,3) diff Set(3), res: Set(1,2) | 去交集，求补集 |
+| & 或 intersect | Set(1,2,3) & Set(1) 或 Set(1,2,3) intersect Set(1), res: Set(1) | 求交集 |
+| \| 或 union | Set(1,2,3) \| Set(4) 或 Set(1,2,3) union Set(4), res: Set(1,2,3,4) | 求并集 |
+| &~ 或 diff | Set(1,2,3) &~ Set(3) 或 Set(1,2,3) diff Set(3), res: Set(1,2) | 去交集，求补集 |
 
 ##### Casting and Matching
 
@@ -789,7 +789,7 @@ scala> println(s"b is not defined? ${b.isEmpty}")
 2）应用：Option常取代"null"，用作安全运算检查，即先检查运算是否合法，再决定是否使用运算结果.
 
 ```scala
-example 1
+//example 1
 
 scala> def divide(amt: Double, divisor: Double): Option[Double] = { //返回类型为Option，这样检查返回值类型便知是否为合法运算
 
@@ -823,6 +823,8 @@ res1: Option[Nothing] = None
 3）访问元素：在2）中判断运算合法性后，还是要取出结果，可以使用Table 10中安全方式.
 
 ```scala
+//example 
+
 scala> def divide(amt: Double, divisor: Double): Option[Double] = {
      | if (divisor == 0) None 
      | else Option(amt / divisor) 
@@ -847,10 +849,115 @@ Table 10.Safe Option extractions
 ---
 
 ### VI. Classes
+  作者假设路过的小伙伴有面向对象基础，基础内容就不介绍了，直接介绍定义和有差异的内容.
+  
+* 定义：与其他高级语言相比，Scala类定义形式除了构造函数，其他并无特别之处，其完整定义形式如下，除了`class <identifier>`其他参数都是可选的，下面逐一讲解其中的参数.
 
-* 定义
+```scala
+//syntax
 
-* 例化
+class <identifier> [type-parameters]
+                   [([val|var] <identifier>: <type> = <expression>[, ... ])] 
+                   [extends <identifier>[type-parameters](<input parameters>)] 
+                   [{ fields and methods }]                          
+```
+
+1）继承与类成员: 用如下形式便能定义一个简单的类，在最后的类成员中前两个是常见的类属性(val和var)和类方法，最后还有个嵌套类，Scala支持嵌套类，实际上，在Scala中，**表达式、函数和类之间都是可以相互嵌套的**，嵌套类可以访问其父类.
+
+```scala
+//syntax
+
+class <identifier> [extends <identifier>] [{ fields, methods, and classes }]
+
+//example 1：简单类与实例
+
+scala> class Child extends Parent {val m_value; var m_variable; def foo = "fool"; class Nest {println("This is a nested class")}}
+<console>: defined class Child
+
+scala> val lm = new Child  //例化对象也使用new关键字
+
+<console>: lm: Child = Child@memory_addr 
+
+//example 2: class nested in expression
+
+scala> val te = {val tes = 18; class Test {var est = tes + 3}}
+<console>: te: Unit = () 
+```
+
+2）类参数：通过如下形式定义类参数可以作为构造参数初始化类内参数，若未使用`val/var`，则参数仅在实例化阶段使用，之后不可访问，若使用，则构成了一个域，初始化后可以继续访问，而且可以设置默认参数，比较方便的一种方式是将类属性作为类参数进行声明，若父类包含类参数，继承时要提供相应初始化参数，需要**注意**的是在实例化带有类参数的对象时，必须提供参数，即没有C++那样的默认构造函数，若类本身无参数，实例化时可省略括号.
+
+```scala
+//syntax
+
+class <identifier> ([val|var] <identifier>: <type> = <expression>[, ... ]) 
+                   [extends <identifier>(<input parameters>)] 
+                   [{ fields and methods }]
+                   
+//example 1：无默认参数
+
+scala> class Car(val make: String, var reserved: Boolean) { 
+     | def reserve(r: Boolean): Unit = { reserved = r } 
+     | }
+<console>: defined class Car
+
+scala> val t = new Car("Toyota", reserved = false) //对于混合提供类参数，顺序遵守先位置参数，后命名参数，且命名参数顺序任意
+
+<console>: t: Car = Car@4eb48298
+
+scala> val tt = new Car  //实例化时必须提供参数
+
+<console>:12: error: not enough arguments for constructor Car: (make: String, reserved: Boolean)Car.
+Unspecified value parameters make, reserved.
+       val tt = new Car
+       
+scala> t.reserved = true //访问类成员使用周期符号"."
+
+<console>: t.reserved: Boolean = true
+```
+
+```scala
+//example 2: 为父类提供类参数
+
+scala> class Lotus(val color: String, reserved: Boolean) extends Car("Lotus", reserved) 
+<console>: defined class Lotus
+```
+
+```scala
+//example 3: 设置类参数默认值
+
+scala> class Car(val make: String, var reserved: Boolean = true, val year: Int = 2015) {
+     | override def toString = s"$year $make, reserved = $reserved" 
+     | }
+<console>: defined class Car
+
+scala> val l = new Car("Lexus", year = 2010) //第二个默认为位置参数，第三个参数必须使用命名参数
+
+<console>: l: Car = 2010 Lexus, reserved = true
+```
+
+3）泛型：定义形式便是开头介绍的类的完整定义形式.
+
+```scala
+//example
+
+scala> class Singular[A](element: A) extends Traversable[A] { 
+     | def foreach[B](f: A => B) = f(element) 
+     | }
+<console>: defined class Singular
+
+scala> val p = new Singular[String]("Planes") //也可省略"[String]"，通过编译器的类型推断功能指定A
+<console>: p: Singular[String] = (Planes)
+```
+
+Table 11. Common key words of class definition
+
+| Name | Example |Description |
+|------|---------|------------|
+| new | new AClass | 例化对象 |
+| extends | class Child extends parent | 与Java一样，继承关键字 |
+| override | override def toString = ... | 重写父类方法关键字 |
+| this | —— | 与Java/C++一样，表示指向当前对象的引用/指针 |
+| super | —— | 与Java一样，表示指向当前对象内父类对象的引用 |
 
 #### 1. Abstract class
 
