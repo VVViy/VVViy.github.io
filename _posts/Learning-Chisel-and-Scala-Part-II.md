@@ -599,22 +599,250 @@ scala> val code = ('h', 204, true) match {
 ```
 
 #### 2. Mutable collections
+  前一节介绍了不可变的复合类型，对应的也有可变类型版本，如Table 9所示. 需要再次说明的是，`collection.immutable package`是自动添加到当前命名空间内的，而`collection.mutable package`未自动添加左右在未`import package`的情况下，只能写出完整包名进行引用类型.
+  
+Table 9. Mutable collection types
 
-##### Buffer
+| Immutable type | Mutable type |
+|----------------|--------------|
+| collection.immutable.List | collection.mutable.Buffer |
+| collection.immutable.Set | collection.mutable.Set |
+| collection.immutable.Map | collection.mutable.Map |
 
-* 构造方法
+##### Buffer, Set, and Map
 
-* immutable与mutable互转
+* 构造方法：可变类型的构造方式有三种：类名创建、使用不可变类型转换以及使用`collection builer`.
+
+```scala
+//example 1.1: 直接例化
+
+scala> val nums = collection.mutable.Buffer(1) //创建包含一个元素的可变列表
+
+<console>: nums: scala.collection.mutable.Buffer[Int] = ArrayBuffer(1)
+
+scala> for (i <- 2 to 10) nums += i //为可变列表添加元素
+
+scala> println(nums)
+<console>: Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+//example 1.2
+
+scala> val nums = collection.mutable.Buffer[Int]() //构建空列表，由于不包含初始元素，无法进行类型推断，所以必须在创建的时候指明类型
+
+<console>: nums: scala.collection.mutable.Buffer[Int] = ArrayBuffer()
+
+scala> for (i <- 1 to 10) nums += i 
+scala> println(nums)
+Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+```
+
+```scala
+//example 2: immutable与mutable相互转化, List, Set, Map都可以使用toBuffer转换为Buffer类型
+
+scala> val conv = Map("a"->1,"b"->2).toBuffer  //Map转换为Buffer
+<console>: conv: scala.collection.mutable.Buffer[(String, Int)] = ArrayBuffer((a,1), (b,2))  //Map内部元素为二元Tuple
+
+//相互转化
+
+scala> conv.toMap  
+<console>: res0: scala.collection.immutable.Map[String,Int] = Map(a -> 1, b -> 2)
+
+scala> conv.toList
+<console>: res1: List[(String, Int)] = List((a,1), (b,2))
+
+scala> conv.toSet
+<console>: res2: scala.collection.immutable.Set[(String, Int)] = Set((a,1), (b,2))
+
+```
+
+```scala
+//example 3：collection builder, 若创建mutable对象的目的是为了转化为immutable对象可以考虑该方法
+
+scala> val nSet = Set.newBuilder[Char] //第一步：任意不可变类型使用newBuilder方法创建一个Builder(实际上builder是一个简化形式的Buffer)
+
+<console>: nSet: scala.collection.mutable.Builder[Char,scala.collection.immutable. 
+Set[Char]] = scala.collection.mutable.SetBuilder@726dcf2c
+
+scala> nSet += 'h'  //第二步：nSet此时是一个"可变类型对象"，所以可以添加元素
+
+<console>: res0: nSet.type = scala.collection.mutable.SetBuilder@d13d812 
+
+scala> nSet ++= List('e', 'l', 'l', 'o')
+<console>: res1: nSet.type = scala.collection.mutable.SetBuilder@d13d812 
+
+scala> val helloSet = nSet.result //第三步：调用result方法，转化为immutable 
+<console>: helloSet: scala.collection.immutable.Set[Char] = Set(h, e, l, o)
+```
 
 ##### Arrays
+  `Array`与`String`类似，并不是Scala中定义的类型，而是对Java的Array基础上加了一层`wrapper`，`Array`本身是一个固定尺寸，内部元素可变，`index-based`的复合类型，而且支持`Iterable`分支下定义的方法.
+  
+```scala
+//example
 
-##### Seq
+scala> val colors = Array("red", "green", "blue") 
+<console>: colors: Array[String] = Array(red, green, blue)
+
+scala> colors(0) = "purple"  //起始index为0
+
+scala> colors  //调用默认的toString方法
+<console>: res0: Array[String] = Array(purple, green, blue)
+```
+
+##### Seq 
+  在Fig-1中可以看到，`Seq`是序列类型的根几点，本身为抽象类不可例化对象，而若使用`Seq`例化对象实际上会例化`List`对象，所以也可以将`Seq`看作是`List`的"快捷键"，类似的，`IndexedSeq`也是`Vector`类型的快捷键.
+  
+```scala
+//example
+
+scala> val links_1 = Seq('C','M','Y','K') 
+<console>: links_1: Seq[Char] = List(C, M, Y, K)
+
+scala> val links_2 = IndexedSeq(1,2,3,43)
+<console>: links_2: IndexedSeq[Int] = Vector(1, 2, 3, 43) //Vector类似于C++中的vector，是一个动态数组
+
+
+scala> links_2(3)  //数组index起始值为0
+
+<console>: Int = 43
+```
 
 ##### Streams
+  在上一篇blog开头介绍了一种特殊的`lazy value`，其初始化过程是在第一次访问时进行的，而非定义时，同样地，`Streams`类型是一个`lazy collection`，其由起始元素加一个生成元素的迭代函数两部分构成. 在定义`Stream`类型对象时，不会主动生成元素，只有在后续访问时才会生成指定数量的元素，且每一个元素只在第一次访问时生成一次，之后不会重复生成. 创建`Streams`类型对象有两种方式，即调用`Stream.cons`和使用`#::`操作符.
+  
+```scala
+//example 1: 调用Stream.cons创建无界Streams
+
+scala> def inc(i: Int): Stream[Int] = Stream.cons(i, inc(i+1)) //通过Stream.cons创建Stream，第一个参数是生成元素值，第二个是生成器
+
+<console>: inc: (i: Int)Stream[Int]
+
+scala> val s = inc(1) //指明尺寸为1
+
+<console>: s: Stream[Int] = Stream(1, ?) //？表示可以"无穷"生成元素
+
+
+scala> val l = s.take(5).toList  //调用Stream的take方法生成指定尺寸stream，这里的1已经生成，2~5在本次访问时产生
+
+<console>: l: List[Int] = List(1, 2, 3, 4, 5)
+
+scala> s 
+<console>: res1: Stream[Int] = Stream(1, 2, 3, 4, 5, ?)
+```
+ 
+```scala
+//example 2: 使用#::操作符创建Streams，右关联
+
+scala> def inc(head: Int): Stream[Int] = head #:: inc(head+1) 
+<console>: inc: (head: Int)Stream[Int]
+
+scala> inc(10).take(10).toList 
+<console>: res0: List[Int] = List(10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
+```
+
+```scala
+//example 3: 使用Stream.empty创建有界Streams
+
+scala> def to(head: Char, end: Char): Stream[Char] = (head > end) match { //加了结尾参数进行限定
+
+     | case true => Stream.empty 
+     | case false => head #:: to((head+1).toChar, end) 
+     | }
+<console>: to: (head: Char, end: Char)Stream[Char]
+
+scala> val hexChars = to('A', 'F').take(20).toList 
+<console>: hexChars: List[Char] = List(A, B, C, D, E, F)
+```
 
 ##### Option(Monadic)
+  最后介绍的复合类型是"SingleTon collection"，即这类复合类型内部至多有一个元素，是一种非白即黑的二元对立逻辑，称为`monadic collections`，`Option，Try，and Future`都属于此类，其中，`Try`和其他高级编程语言类似，主要用于异常处理，这里不作介绍，用到再查都可以，`Future`的作用是使具体任务在后台运行，类似于Shell下`&`修饰的任务，所以这里主要介绍`Option`.
 
-Try and Future
+1）定义：假设我们要判断一个元素是否存在与一个集合中，那么只有两种结果：存在，不存在，这就是`Option`类似所描述的，即判断一个元素是否存在，诸如此类的二元判断. 但`Option`是一个抽象类，是不可例化的，所以真正做判断的是其两个子类：`Some`和`None`，前者是泛型类型，包含一个值，意为"存在"，后者为空.
+
+```scala
+//example 1
+
+scala> var x: String = "Indeed" 
+<console>: x: String = Indeed
+
+scala> var a = Option(x) //判断x是否为空
+
+<console>: a: Option[String] = Some(Indeed) //Some指明不为空，且值为Indeed
+
+scala> x = null 
+x: String = null
+
+scala> var b = Option(x) 
+b: Option[String] = None //None判断为空
+```
+
+```
+//example 2: 使用isDefined和isEmpty做等价判断
+
+scala> println(s"a is defined? ${a.isDefined}") 
+<console>: a is defined? true
+
+scala> println(s"b is not defined? ${b.isEmpty}") 
+<console>: b is not defined? true
+```
+
+2）应用：Option常取代"null"，用作安全运算检查，即先检查运算是否合法，再决定是否使用运算结果.
+
+```scala
+example 1
+
+scala> def divide(amt: Double, divisor: Double): Option[Double] = { //返回类型为Option，这样检查返回值类型便知是否为合法运算
+
+     | if (divisor == 0) None 
+     | else Option(amt / divisor) 
+     | }
+<console>: divide: (amt: Double, divisor: Double)Option[Double]
+
+scala> val legit = divide(5, 2) 
+<console>: legit: Option[Double] = Some(2.5)
+
+scala> val illegit = divide(3, 0) 
+<console>: illegit: Option[Double] = None
+```
+
+```scala
+//example 2: scala为一些类型内置了Option选项的方法，如读取空列表的head元素，可以使用Table
+
+scala> List().head  //直接使用head会报异常
+
+<console>: java.util.NoSuchElementException: head of empty list
+  at scala.collection.immutable.Nil$.head(List.scala:426)
+  at scala.collection.immutable.Nil$.head(List.scala:423)
+  ... 28 elided
+
+scala> List().headOption  //使用headOption则有特定返回值判断
+
+res1: Option[Nothing] = None
+```
+
+3）访问元素：在2）中判断运算合法性后，还是要取出结果，可以使用Table 10中安全方式.
+
+```scala
+scala> def divide(amt: Double, divisor: Double): Option[Double] = {
+     | if (divisor == 0) None 
+     | else Option(amt / divisor) 
+     | }
+<console>: divide: (amt: Double, divisor: Double)Option[Double]
+
+scala> val legit = divide(5, 2) 
+<console>: legit: Option[Double] = Some(2.5)
+
+scala> val illegit = divide(3, 0) 
+<console>: illegit: Option[Double] = None
+```
+
+Table 10.Safe Option extractions
+
+| Name | Example | Description |
+|------|---------|-------------|
+| fold | divide(3,0).fold(-1)(x => x), res: -1 | 根据返回值判断是否为None，若为None则返回指定值-1，否则进行函数字面量参数指定的运算，本例直接返回x，Table 5中的方法都可类似应用 |
+| getOrElse | divide(3,0) getOrElse -1, res: -1 | 类似的检查函数返回值是否为None，为None则输出指定的默认值-1，否则返回实际结果 |
+| match expression | divide(3,0) match { case Some(x) => x; case None => -1}, res: -1 | —— |
 
 ---
 
@@ -720,7 +948,7 @@ Try and Future
 | 函数类型的进化 |  |
 | class扩展途径 |  |
 | 类内定义的元素 |  |
-| 被忽视的符号 |  |
+| 被忽视的符号 | (1) #:: |
 
 ---
 
