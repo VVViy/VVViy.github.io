@@ -640,7 +640,9 @@ Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 //example 2: immutable与mutable相互转化, List, Set, Map都可以使用toBuffer转换为Buffer类型
 
 scala> val conv = Map("a"->1,"b"->2).toBuffer  //Map转换为Buffer
+
 <console>: conv: scala.collection.mutable.Buffer[(String, Int)] = ArrayBuffer((a,1), (b,2))  //Map内部元素为二元Tuple
+
 
 //相互转化
 
@@ -671,6 +673,7 @@ scala> nSet ++= List('e', 'l', 'l', 'o')
 <console>: res1: nSet.type = scala.collection.mutable.SetBuilder@d13d812 
 
 scala> val helloSet = nSet.result //第三步：调用result方法，转化为immutable 
+
 <console>: helloSet: scala.collection.immutable.Set[Char] = Set(h, e, l, o)
 ```
 
@@ -686,6 +689,7 @@ scala> val colors = Array("red", "green", "blue")
 scala> colors(0) = "purple"  //起始index为0
 
 scala> colors  //调用默认的toString方法
+
 <console>: res0: Array[String] = Array(purple, green, blue)
 ```
 
@@ -946,6 +950,7 @@ scala> class Singular[A](element: A) extends Traversable[A] {
 <console>: defined class Singular
 
 scala> val p = new Singular[String]("Planes") //也可省略"[String]"，通过编译器的类型推断功能指定A
+
 <console>: p: Singular[String] = (Planes)
 ```
 
@@ -967,8 +972,11 @@ Table 11. Common key words of class definition
 
 scala> abstract class Car { 
      | val year: Int                 //声明，无定义 
+     
      | val automatic: Boolean = true //定义
+     
      | def color: String             //声明，无定义
+     
      | }
 <console>: defined class Car 
 
@@ -1036,6 +1044,7 @@ scala> val notification = new Listening()
 <console>: notification: Listening = Listening@66596c4c
 
 scala> notification.register(new Listener {  //无名类对象参数
+
      | def trigger { println(s"Trigger at ${new java.util.Date}") } 
      | })
 ```
@@ -1122,7 +1131,9 @@ source code
 //example
 
 package bobsrockets.navigation //源文件开头的包定义
+
 class Navigator ...  //源码
+
 ```
 
 ```scala
@@ -1240,6 +1251,7 @@ package com.oreilly {
      
      class Authentication {
          private[this] val password = "jason"   //同类对象不可访问，其他可访问
+         
          def validate = password.size > 0       
      }
 
@@ -1252,11 +1264,13 @@ scala> val valid = new com.oreilly.Authentication().validate
 <console>: valid: Boolean = true
 
 scala> new com.oreilly.Test      //Test类位于com.reilly包内，所以可以例化Config的实例
+
 <console>:
 url = http://localhost
 res0: com.oreilly.Test = com.oreilly.Test@4c309d4d
 
 scala> new com.oreilly.Config   //因为指明在com.reilly包内的类才能访问，所以这里不能直接例化实例
+
 <console>:8: error: class Config in package oreilly cannot be
 accessed in package com.oreilly
 new com.oreilly.Config
