@@ -960,31 +960,312 @@ Table 11. Common key words of class definition
 | super | —— | 与Java一样，表示指向当前对象内父类对象的引用 |
 
 #### 1. Abstract class
+  Scala沿用了Java的抽象类，抽象类声明或定义了若干核心属性和方法，使用`abstract`关键字定义，抽象类不可例化，是实现多态的基础机制. 以抽象类为父类的子类要为抽象类中只提供声明部分的属性和方法添加实现，否则，即使子类未显式声明为`abstract`，依然为抽象类. 虽然抽象类中也可以定义属性和方法，但抽象类一般作为"一个类别"的超类存在，所以很少定义成员，若定义了类成员，子类可以选择不重新定义.
+  
+```scala
+//example
+
+scala> abstract class Car { 
+     | val year: Int                 //声明，无定义 
+     | val automatic: Boolean = true //定义
+     | def color: String             //声明，无定义
+     | }
+<console>: defined class Car 
+
+scala> new Car() //抽象类不可例化
+<console>:9: error: class Car is abstract; cannot be instantiated new Car()
+
+scala> class RedMini(val year: Int) extends Car { //子类重写
+
+     | def color = "Red" 
+     | }
+<console>: defined class RedMini
+
+scala> val m: Car = new RedMini(2005) 
+<console>: m: Car = RedMini@5f5a33ed
+```
 
 ---
 
 #### 2. Anonymous class
+  在上一篇blog介绍函数时，我们介绍过一种"无名函数"，给那些复用率不高，但还需要一些处理逻辑的情况，在类中，也有这样一种一次性的"无名类"，其实际为无名子类，即在实例化的同时，实现(对于抽象父类)或重写(对于一般非抽象类)了父类方法，不得不说这个Scala的这个操作很方便(父类方法中不能有类参数, 作者使用了几种写法均为成功建立带参数的无名子类，有成功的小伙伴记得评论).
+
+```scala
+//example 1: 抽象父类
+
+scala> abstract class Listener { def trigger } 
+<console>: defined class Listener
+
+scala> val myListener = new Listener {  //实现方式：在实例化语句后紧跟父类待实现或重写的方法定义. 实际上，这是个两步走过程，
+                                        //第一步编译器生成包含重定义方法的自动化子类，第二步例化该自动化子类对象
+
+     | def trigger { println(s"Trigger at ${new java.util.Date}") } 
+     | }
+<console>: myListener: Listener = $anon$1@59831016
+```
+
+```scala
+//example 2: 非抽象父类
+
+scala> class A { def foo = "i\'m " + "father"} //不能使用类参数
+
+<console>: defined class A
+
+scala> val anon = new A {override def foo = "i\'m " + "child"}
+<console>: anon: A = $anon$1@3e65c397
+
+scala> anon.foo
+<console>: res0: String = i'm child
+```
+
+```scala
+//example 3: 观察者模式更方便
+
+scala> abstract class Listener { def trigger } 
+<console>: defined class Listener
+
+scala> class Listening { 
+     | var listener: Listener = null 
+     | def register(l: Listener) { listener = l } //将无名类定义放到函数调用中
+     
+     | def sendNotification() { listener.trigger } 
+     | }
+<console>: defined class Listening
+
+scala> val notification = new Listening() 
+<console>: notification: Listening = Listening@66596c4c
+
+scala> notification.register(new Listener {  //无名类对象参数
+     | def trigger { println(s"Trigger at ${new java.util.Date}") } 
+     | })
+```
 
 ---
 
-#### 3. More field and method toyes
+#### 3. More field and method types
+1）函数重载：函数重载是指一系列具有不同输入参数列表(输入参数数量不同或类型不同)的同名函数.
+
+```scala
+//example
+
+scala> class Printer(msg: String) { 
+     | def print(s: String): Unit = println(s"$msg: $s") 
+     | def print(l: Seq[String]): Unit = print(l.mkString(", ")) 
+     | }
+<console>: defined class Printer
+
+scala> new Printer("Today's Report").print("Foggy" :: "Rainy" :: "Hot" :: Nil) 
+<console>: Today's Report: Foggy, Rainy, Hot
+```
+
+2）apply函数：该函数是Scala中应用非常广泛的一类函数，`Chisel API`中有大量的`apply`函数. `apply`函数在调用时可以省略函数名.
+
+```scala
+//example
+scala> class Multiplier(factor: Int) { 
+     | def apply(input: Int) = input * factor //定义apply函数 
+     
+     | }
+<console>: defined class Multiplier
+
+scala> val tripleMe = new Multiplier(3)
+
+<console>: tripleMe: Multiplier = Multiplier@339cde4b
+
+scala> val tripled = tripleMe.apply(10) //显示调用
+
+<console>: tripled: Int = 30
+
+scala> val tripled2 = tripleMe(10)      //使用"对象名()"间接调用apply函数
+
+<console>: tripled2: Int = 30
+```
+
+3）lazy value: 在上一篇blog开头就介绍了惰性value，只是那里没有给出合适的应用，这里结合类来看其应用意义. 先回顾一下惰性值的特征，对于一个类，其属性成员一般是在例化对象时进行初始化，但`lazy val`并不遵守此规，其有且只有在第一次被访问时才会被初始化.
+
+```scala
+//example
+
+scala> class RandomPoint { 
+     | val x = { println("creating x"); util.Random.nextInt } 
+     | lazy val y = { println("now y"); util.Random.nextInt }  //定义lazy value 
+     | }
+<console>: defined class RandomPoint
+
+scala> val p = new RandomPoint() //实例化时，会为对象内类成员分配内存空间并初始化，但lazy value未在其中
+
+<console>: creating x
+p: RandomPoint = RandomPoint@6c225adb
+
+scala> println(s"Location is ${p.x}, ${p.y}") //当lazy value被访问时，才被初始化
+
+now y
+<console>: Location is 2019268581, -806862774
+
+scala> println(s"Location is ${p.x}, ${p.y}") //第一次初始化后，值便稳定
+
+<console>: Location is 2019268581, -806862774
+```
 
 ---
 
-#### 4. Privacy control
+#### 4. Packaging
+  
+1）源码打包：Scala沿用了Java基于`package`的代码组织方式，按照目录层级安置源码，代码打包的方式有两种.
 
-* 关键字
+```scala
+//syntax: 第一种是在源文件开头加入package关键字的包定义，<identifier>的命名应该按照Java的定义，即机构属性+机构名+功能分类，如com.netflix.utilities.
 
-* 私有访问修饰符
+package <identifier> 
+source code
+
+//example
+
+package bobsrockets.navigation //源文件开头的包定义
+class Navigator ...  //源码
+```
+
+```scala
+//syntax: 第二种使用package定义块区域，只有包含在区域内的源码才会打包在对应的路径下，这使得可以在同一文件中定义属于不同包的源码，但显然不是好的管理方式
+
+package <identifier> {
+    source code
+}
+
+//example
+
+package com {
+      package oreilly {           //逐层嵌套
+      
+                     class Config(val baseUrl: String = "http://localhost") 
+      } 
+} 
+```
+
+2）访问打包类：访问包中的类有两种基本方式，完整路径引用及`import`指定的`package`.
+
+```scala
+//example 1: 完整路径引用
+
+scala> val d = new java.util.Date
+<console>: d: java.util.Date = Wed Jan 22 16:42:04 PDT 2014
+```
+
+```scala
+//syntax: 导入指定包中类到当前命名空间，Scala中import的是一个语句，因为它没有返回值，可以放在任何可以使用语句的地方，如可以在使用处就近安置
+
+import <package>.<class>
+
+//example 2: 导入包中的一个类
+
+scala> import java.util.Date 
+<console>: import java.util.Date
+
+scala> val d = new Date //可省略路径
+
+<console>: d: java.util.Date = Wed Jan 22 16:49:17 PDT 2014
+```
+
+```scala
+//example 3: 使用下划线通配符导入整个包，在Java中使用的*，注意区分
+
+scala> import collection.mutable._ 
+<console>: import collection.mutable._
+```
+
+```scala
+//syntax: 导入类集合，导入整个包可能带来命名冲突，所以可以选择只导入需要的类
+
+import <package>.{<class 1>[, <class 2>...]}
+
+//example 4
+
+scala> import collection.mutable.{Queue,ArrayBuffer} //很明确导入了哪些类
+
+<console>: import collection.mutable.{Queue, ArrayBuffer}
+
+```
+
+```scala
+//syntax: 定义包别名，上一种方式还有一种潜在同名冲突问题，如前面介绍Scala中有immutable和mutable两个版本的collection，如同名Map类型，一旦导入mutable包，那么使用Map实例化便不会再例化immutable版本的对象，可以使用设置别名的方式加以规避，或使用完整路径名.
+
+import <package>.{<original name>=><alias>}
+
+//example 5
+
+scala> import collection.mutable.{Map=>MutMap} 
+<console>: import collection.mutable.{Map=>MutMap}
+
+scala> val m1 = Map(1 -> 2)
+<console>: m1: scala.collection.immutable.Map[Int,Int] = Map(1 -> 2) 
+
+scala> val m2 = MutMap(2 -> 3)
+<console>: m2: scala.collection.mutable.Map[Int,Int] = Map(2 -> 3)
+```
 
 ---
 
-#### 5. Final and Sealed classes
+#### 5. Privacy control
+ 
+* 访问控制： Scala中定义的类默认具有"public"的访问权限，即任何代码都可以访问. 若要都一些类成员，甚至`package`的访问权限加以限制，可以对其增加访问控制. Scala中也有`protcted`和`private`两种限制访问机制，即类外均不可访问，前者子类可访问保护成员，后者子类也不可访问保护成员.
 
+```scala
+//example 1: protcted关键字
+
+scala> class User { protected val passwd = util.Random.nextString(10) } 
+<console>: defined class User
+
+//example 2: private关键字
+
+scala> class User(private var password: String) { 
+     | def update(p: String) { 
+     |    println("Modifying the password!") 
+     |    password = p
+     |  } 
+     | def validate(p: String) = p == password 
+     | }
+<console>: defined class User
+```
+
+* 限制访问修饰符：前面是在类级别对成员的保护，增加限制访问修饰符可以在`package，class，instance`各级别控制访问. 简单的说，在受限访问字段前添加访问限定后，被授权的访问范围可以public的访问受保护字段，然而一旦出了访问受限修饰符划定的范围之后，受保护字段将不可访问.
+
+```scala
+//example 3: 访问控制修饰符
+
+package com.oreilly {
+     private[oreilly] class Config {   //指明Config类在oreilly包内是public的，包外是private的
+     
+         val url = "http://localhost"
+     }
+     
+     class Authentication {
+         private[this] val password = "jason"   //同类对象不可访问，其他可访问
+         def validate = password.size > 0       
+     }
+
+     class Test {
+          println(s"url = ${new Config().url}")
+     }
+}
+
+scala> val valid = new com.oreilly.Authentication().validate
+<console>: valid: Boolean = true
+
+scala> new com.oreilly.Test      //Test类位于com.reilly包内，所以可以例化Config的实例
+<console>:
+url = http://localhost
+res0: com.oreilly.Test = com.oreilly.Test@4c309d4d
+
+scala> new com.oreilly.Config   //因为指明在com.reilly包内的类才能访问，所以这里不能直接例化实例
+<console>:8: error: class Config in package oreilly cannot be
+accessed in package com.oreilly
+new com.oreilly.Config
+```
 ---
 
-#### 6. Implicit class
-
+#### 6. Final and Sealed classes
+  `Final, sealed`主要用于控制子类继承，i）`final`关键字可添加在类、类属性、类方法前表明这些内容都不能被子类重写；ii）`sealed`相较于`final`宽松一些，其用于修饰类，如`sealed class A`，表明只有在`A`所在的源文件中定义的类才能成为`A`的子类，源文件范围外定义的类则不能成为其子类，前面介绍过的`Option`类型就是`abstract and sealed`.
+  
 ---
 
 ### VII. Special classes: Objects, Case classes, and Traits
@@ -993,25 +1274,25 @@ Table 11. Common key words of class definition
 
 ---
 
-#### 2. Case classes
+#### 2. Implicit class
 
 ---
 
-#### 3. Traits
+#### 3. Case classes
+
+---
+
+#### 4. Traits
 
 ---
 
 ### VIII. Package
 
-#### 1. Packaging
+#### 1. Package objects
 
 ---
 
-#### 2. Package objects
-
----
-
-#### 3. Importing instance members
+#### 2. Importing instance members
 
 ---
 
