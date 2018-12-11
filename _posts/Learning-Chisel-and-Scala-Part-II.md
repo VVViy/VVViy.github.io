@@ -1268,7 +1268,7 @@ new com.oreilly.Config
   
 ---
 
-### VII. Special classes: Objects, Case classes, and Traits
+### VII. Special classes
 
 #### 1. Objects
 
@@ -1286,17 +1286,7 @@ new com.oreilly.Config
 
 ---
 
-### VIII. Package
-
-#### 1. Package objects
-
----
-
-#### 2. Importing instance members
-
----
-
-### IX. Review Function
+### VIII. Review Function
 
 #### 1. Function value
 
@@ -1306,7 +1296,7 @@ new com.oreilly.Config
 
 ---
 
-### X. Advanced features of data type
+### IX. Advanced features of data type
 
 #### 1. Type aliases
 
@@ -1324,7 +1314,7 @@ new com.oreilly.Config
 
 ---
 
-### XI. Some tips
+### X. Some tips
 
 
 | Item | Description |
