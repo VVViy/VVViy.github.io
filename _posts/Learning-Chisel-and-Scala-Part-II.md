@@ -11,7 +11,7 @@ tags:
     - Scala
 ---   
 
-### V. Advanced data type: Collections
+### V. Advanced Data Type: Collections
    Scala沿用了Java的`collection`称谓，作者就称其为复合类型了，C++里称STL中此类数据类型为"容器"，意思差不多. Scala中复合类型的继承体系如Fig-1所示，图中省略了很多中间父类和同级的兄弟类型，内容实在太多，这里仅对照C++ STL介绍一些常用的类型，即Table-1中罗列类型，详细的类型可以查看Scala官方[API](https://docs.scala-lang.org/api/all.html).
    
    Scala中的复合类型可分成两大类: `immutable`和`mutable`，即定义后不可变类型和可变类型，类似于`value`和`variable`的关系. 需要注意的是，`collection.immutable package`会自动添加到当前的`namespace`中，所以可以直接使用类型名称进行定义，但`collection.mutable package`不会自动添加，定义时需要写出完整的包路径或手动`import package`后直接使用类型名.
@@ -1282,7 +1282,7 @@ new com.oreilly.Config
   
 ---
 
-### VII. Special classes
+### VII. Special Classes
 
 #### 1. Objects
 
@@ -1310,7 +1310,7 @@ new com.oreilly.Config
 
 ---
 
-### IX. Advanced features of data type
+### IX. Advanced Features of Data Type
 
 #### 1. Type aliases
 
@@ -1328,7 +1328,7 @@ new com.oreilly.Config
 
 ---
 
-### X. Some tips
+### X. Some Tips
 
 
 | Item | Description |
