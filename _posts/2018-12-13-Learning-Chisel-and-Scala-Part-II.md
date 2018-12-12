@@ -2,7 +2,7 @@
 layout:     post
 title:      Learning Chisel and Scala
 subtitle:   Scala Part II
-date:       2018-11-24
+date:       2018-12-12
 author:     Max
 header-img: img/post-gray-background.jpg
 catalog: true
@@ -841,7 +841,7 @@ scala> val illegit = divide(3, 0)
 <console>: illegit: Option[Double] = None
 ```
 
-Table 10.Safe Option extractions
+Table 10. Safe Option extractions
 
 | Name | Example | Description |
 |------|---------|-------------|
@@ -1852,7 +1852,7 @@ defined trait UserFactory
   `Chisel API`中用到不少`bounded types`，其表示仅能使用指定的类、基类或子类进行设计应用. 包括`upper bound`和`lower bound`，前者指定了能够作为`type parameter`的类型只能是指定类型和其子类（一般指定最高的父类），后者则指定能接受的最低阶的类，一般指向子类，尽管实际执行的类型比声明的要低.
   
 ```scala
-//syntax: 操作符<
+//syntax: 操作符<:
 
 <identifier> <: <upper bound type>
 
@@ -1879,10 +1879,11 @@ scala> check(new Customer("Fred"))
 scala> check(new Admin("", "strict"))
 <console>: Fail!
 ```
----
+
+相较于严格的`upper bound`还有一种相对宽松的`view bound`使用`<%`操作符标识，`view bound`支持隐式转换，即输入类型可以不是指定的基类或其子类，但是允许通过隐式转换转为可接受类型，而`upper bound`不支持隐式转换.
 
 ```scala
-//syntax: 操作符>
+//syntax: 操作符>:
 
 <identifier> >: <lower bound type>
 
@@ -1903,7 +1904,70 @@ scala> val preferred = recruit(new PreferredCustomer("George"))  //函数定义�
 
 ```
 
+---
+
 #### 4. Type variance
+  上面介绍有关泛型的定义时，`type parameter`是一个定值，本节介绍的`type variance`允许类型变量用于泛型定义，其主要体现了"类型的转换"，是一种比上一节介绍的`bounded types`稍宽松的类型限定机制.
+  
+  `Type variance`主要解决的是下例所示的一类问题.
+
+```scala
+//example 1
+
+scala> class Car { override def toString = "Car()" } 
+defined class Car
+
+scala> class Volvo extends Car { override def toString = "Volvo()" } 
+defined class Volvo
+
+scala> val c: Car = new Volvo() 
+c: Car = Volvo()
+
+scala> case class Item[A](a: A) { def get: A = a } 
+defined class Item
+
+scala> val c: Item[Car] = new Item[Volvo](new Volvo)   //即子类Volvo可以赋值给与父类Car的value以实现多态，但在类的泛型定义中，泛型声明与类定义是特定组合，即使type parameter是相互兼容，也不能匹配.
+
+<console>:12: error: type mismatch; found : Item[Volvo] required: Item[Car]
+Note: Volvo <: Car, but class Item is invariant in type A. You may wish to define A as +A instead. (SLS 4.5) val c: Item[Car] = new Item[Volvo](new Volvo)
+```
+  
+要fix这个问题，便需要使用`type variance`，即将类定义中的泛型定义为`type covariant`，这个协变类型能够自动将非兼容类型转化为声明类型的基类，以实现泛型多态.
+
+```scala
+//example 2: 定义class，case class，trait等可继承的类时，在泛型定义的类型前加+
+
+scala> case class Item[+A](a: A) { def get: A = a }  
+
+<console>: defined class Item
+
+scala> val c: Item[Car] = new Item[Volvo](new Volvo) //编译器自动寻求子类型Volvo向基类Car转化，一旦发现可转化，便可正确执行多态
+
+<console>: c: Item[Car] = Item(Volvo())
+
+scala> val auto = c.get  //虽然实际传入的对象是子类对象，但由于声明的类型是基类，所以返回值依然是基类
+
+auto: Car = Volvo()
+```
+
+需要注意的是`covariant type`可以定义方法成员返回值类型，但不能定义方法输入参数类型，否则会报如下错误.
+
+```scala
+//example 3
+
+scala> class Check[+A] { def check(a: A) = {} }
+<console>:7: error: covariant type A occurs in contravariant position in type A of value a
+class Check[+A] { def check(a: A) = {} }
+```
+
+错误信息说的很清楚，方法输入参数的类型需要`contravariant type`，逆变类型，就是从基类向子类转变的声明（这个逆变我没太搞明白，父类向子类转型?!），其定义形式如下.
+
+```scala
+//example 4: 使用-号
+
+scala> class Check[-A] { def check(a: A) = {} } 
+<console>: defined class Check
+```
 
 ---
 
@@ -1912,15 +1976,23 @@ scala> val preferred = recruit(new PreferredCustomer("George"))  //函数定义�
 
 | Item | Description |
 |------|-------------|
-| =>操作符应用|  |
-| 下划线通配符的应用 |  |
-| 可嵌套类型 |  |
-| 无名函数/类 |  |
-| 函数类型的进化 |  |
-| class扩展途径 |  |
-| 类内定义的元素 |  |
-| 被忽视的符号 | (1) #:: |
+| =>操作符应用| (1) match表达式 <br> (2) 函数型变量定义 <br> (3) 函数字面量 <br> (4) By-name parameter <br> (5) package import alias |
+| 可嵌套元素 | (1) 表达式 <br> (2) 函数 <br> (3) 类 <br> (4) 第二种packaging |
+| 无名函数/类 | (1) 函数字面量 <br> (2) 抽象类 <br> (3) instantiation with trait |
+| 类的扩展途径 | (1) 继承 <br> (2) 聚合 <br> (3) 伴生object <br> (4) 多继承 <br> (5)self type trait <br> (6) instantiation with trait <br> (7) 使用隐式类 |
+| 类内定义的元素 | (1) selftype <br> (2) implicit class <br> (3) type alias <br> (4) abstract types |
+| 被忽视的符号 | (1) -> <br> (2) <- <br> (3) :: <br> (4) #:: <br> (5) >: <br> (6) <: <br> (7) <% |
 
 ---
 
 **====说明====**
+            
+    (1) 因为学习Scala的目的还是为Chisel服务，并没有打算把Scala背后的原理和各种应用弄的很透，
+        所以，两篇blog主要以"Learning Scala"为主来提取内容，同时参考"Programming in scala 3rd"
+        避免核心内容缺失，之后也对比了Scala官网的cheatsheet，基本覆盖了全部基础内容，可能在
+        collection那部分少了几种，一个是因为类型太多，另一个是个人觉得不常用.
+    (2) 写这两篇blog主要是因为之前在Chisel讨论中有小伙伴提出关于Scala和函数式的一些问题，回答了
+        一些，简单整理后结合教材写了这篇blog，后续可能遇到新问题后还会添加进来，使内容更加完善，
+        帮助理解学习过程中遇到的问题.
+    (3) 本来下一篇想把Chisel简单整理一下，但是目前素材不多，准备分析一个小的Chisel开源core后，
+        再结合Chisel API介绍，可能更有实用价值.
