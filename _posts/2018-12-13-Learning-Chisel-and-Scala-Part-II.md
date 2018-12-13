@@ -1977,11 +1977,12 @@ scala> class Check[-A] { def check(a: A) = {} }
 | Item | Description |
 |------|-------------|
 | =>操作符应用| (1) match表达式 <br> (2) 函数型变量定义 <br> (3) 函数字面量 <br> (4) By-name parameter <br> (5) package import alias |
+| 下划线通配符 | (1) match表达式 <br> (2) 函数类型隐式定义 <br> (3) 字面量占位符 <br> (4) import package._ |
 | 可嵌套元素 | (1) 表达式 <br> (2) 函数 <br> (3) 类 <br> (4) 第二种packaging |
 | 无名函数/类 | (1) 函数字面量 <br> (2) 抽象类 <br> (3) instantiation with trait |
-| 类的扩展途径 | (1) 继承 <br> (2) 聚合 <br> (3) 伴生object <br> (4) 多继承 <br> (5)self type trait <br> (6) instantiation with trait <br> (7) 使用隐式类 |
+| 类的扩展途径 | (1) 继承 <br> (2) 聚合 <br> (3) 伴生object <br> (4) 多继承 <br> (5) self type trait <br> (6) instantiation with trait <br> (7) 使用隐式类 |
 | 类内定义的元素 | (1) selftype <br> (2) implicit class <br> (3) type alias <br> (4) abstract types |
-| 被忽视的符号 | (1) -> <br> (2) <- <br> (3) :: <br> (4) #:: <br> (5) >: <br> (6) <: <br> (7) <% |
+| 被忽视的符号 | (1) -> 二元Tuple构造符 <br> (2) <- for循环迭代 <br> (3) :: List构造符 <br> (4) #:: Stream构造符 <br> (5) >: lower bound <br> (6) <: upper bound <br> (7) <% view bound |
 
 ---
 
