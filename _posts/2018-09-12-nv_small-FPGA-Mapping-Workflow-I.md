@@ -81,7 +81,7 @@ CPAN > exit
 	
     2). nvdla_pwrbus_ram_*_pd相关逻辑，可以转化使用BRAM的sleep达到相同效果，待测试.
 
-4.[optional] 之后可在`NV_nvdla`里添加generated时钟，进行综合~~、布局布线，~~查看资源开销、功耗和时钟频率等信息.
+4.[optional] 之后可在`NV_nvdla`里添加generated时钟，进行综合~~及布局布线~~查看资源开销、功耗和时钟频率等信息.
 
 **====Tips====**
 
