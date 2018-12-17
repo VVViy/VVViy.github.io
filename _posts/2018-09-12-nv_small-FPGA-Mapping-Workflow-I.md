@@ -81,8 +81,16 @@ CPAN > exit
 	
     2). nvdla_pwrbus_ram_*_pd相关逻辑，可以转化使用BRAM的sleep达到相同效果，待测试.
 
-4.[optional] 之后可在`NV_nvdla`里添加generated时钟，进行综合、布局布线，查看资源开销、功耗和时钟频率等信息.
+4.[optional] 之后可在`NV_nvdla`里添加generated时钟，进行综合~~、布局布线，~~查看资源开销、功耗和时钟频率等信息.
 
+**====Tips====**
+
+	之前的描述可能对一些小伙伴产生了误导，导致几个人都mail我问综合之后IO资源超标，无法进行PR的问题. 
+	这里需要解释一下，整个nv_small加速核与外部有两个通信接口，AXI总线接口用于与DDR控制器交互读写数据，
+	APB接口与MCU交互配置nvdla内部各子核的寄存器，前者的接口数量很大，后者接口只有少量几个，如果直
+	接综合或PR，相当于将这些接口连接到了FPGA的引脚上，所以IO的资源会超标，这里有两种基本解决方式，
+	i）使用内置处理器的MPSoC FPGA芯片，这样处于PL部分的nvdla接口将直接连接到PS部分的MCU上，并由
+	MCU与DDR控制器通信读写片外DDR；ii）选择IO引脚数量大的FPGA芯片，通过AXI chip-to-chip与MCU通信.
 
 ### Step 3: 封装IP (Win10)
 1.添加wrapper，如果在`NV_nvdla`里例化了`generated clock`，请删除，另外，为了在`block design`中连接`PS`的`AXI master`和`AXI slave`接口，需要在当前工程结构下，增加一个NV_nvdla_wrapper module封装`NV_nvdla`和`NV_NVDLA_apb2csb` modules;
