@@ -28,7 +28,7 @@ tags:
   
 * Board: Xilinx zcu102 rev1.0
 
-### Step 1: Build tree and vmod (Linux)
+### Step 1: Build Tree and vmod (Linux)
 官方HW工程是通过在`branch/spec/defs/`下定义不同的`spec`对同一源码构建不同的行为模型架构，所以，源码内部有很多的`c++`和`perl`相关的条件编译。因此，在搭建`vivado`工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将`nv_small/vmod/nvdla`编译为纯RTL source code.
 
 **====Tips====** 
@@ -54,7 +54,7 @@ CPAN > exit
 成功`[TMAKE]:DONE`后，在目录下会生成一个`outdir`目录，目录下便是搭建`vivado`所需的全部`RTL code`.
 
 
-### Step 2: 新建RTL工程 (Win10)
+### Step 2: Create RTL Project (Win10)
 1.添加源文件，可按照`nv_small/spec/defs/nv_small.spec`描述来指定`vmod/nvdla/`目录下待添加的内核源文件————small版本不包含`bdma`，`retiming`和`rubik`内核(文件夹)以及其他文件夹中的部分`.v`————实际中，可先添加`top`文件下的`modules`. 之后，`vivado`显示的hierarchy中缺少什么文件，加之即可;
 
 2.添加`RAM`文件时，要选择`outdir/nv_small/vmod/rams/fpga/small_rams/`文件夹下的`RAM`源文件;
@@ -92,7 +92,7 @@ CPAN > exit
 	i）使用内置处理器的MPSoC FPGA芯片，这样处于PL部分的nvdla接口将直接连接到PS部分的MCU上，并由
 	MCU与DDR控制器通信读写片外DDR；ii）选择IO引脚数量大的FPGA芯片，通过AXI chip-to-chip与MCU通信.
 
-### Step 3: 封装IP (Win10)
+### Step 3: Packaging NVDLA IP (Win10)
 1.添加wrapper，如果在`NV_nvdla`里例化了`generated clock`，请删除，另外，为了在`block design`中连接`PS`的`AXI master`和`AXI slave`接口，需要在当前工程结构下，增加一个NV_nvdla_wrapper module封装`NV_nvdla`和`NV_NVDLA_apb2csb` modules;
 
 **====Tips====** 
@@ -221,7 +221,7 @@ Fig-4
 8.`Review and Package` -->`Package IP`.
 
 
-### Step 4: 新建BD工程 (Win10)
+### Step 4: Create Block Design Project (Win10)
 1.新建RTL工程，`Settings`-->`IP`-->`Repository`将刚刚封装的`nvdla IP` (nvdla_ip_prj_name.srcs)添加到IP列表，新建`BD`工程, `Flow Navigator`-->`Create Block Design`；
 	
 2.添加`ps，nvdla ip，axi apb bridge，axi interconnect`等IP，`ps`要配置`AXI master，AXI slave`以及`pl_ps_irq`中断接口，之后连接接口即可. 对于`nvdla ip`的几个接口信号————`global_clk_ovr_on, tmc2slcg_disable_clock_gating, test_mode，nvdla_pwrbus_ram_*_pd`按照官网`small`版本[Integrator’s Manual](http://nvdla.org/hw/v2/integration_guide.html#integrator-s-manual)建议，使用`Constant ip`直接拉低；
@@ -230,7 +230,7 @@ Fig-4
 
 4.添加`xdc`，综合、布局布线和输出`bit`文件，之后`export hardware`（复选'include bitstream'）.
 
-### Step 5: [optional] 测试
+### Step 5: [optional] Run Test Sets
 Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
 
 ---
