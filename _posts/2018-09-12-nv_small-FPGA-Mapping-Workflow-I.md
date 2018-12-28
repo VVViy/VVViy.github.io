@@ -228,7 +228,7 @@ Fig-4
 
 3.地址分配，待interface连接完成后，切换到`Address Editor`页面，右键选择`Auto Assign Address`对互连接口进行地址映射，`slave`接口保留`64k`即可(官网已指明`small`版本的[Address space layout](http://nvdla.org/hw/v2/scalability.html#address-space-layout)所占空间为`56KB`,所以这里分配`64k`足矣). 之后切换回`Diagram`窗口，`validate`.
 
-4.添加`xdc`，综合、布局布线和输出`bit`文件，之后`export hardware`（复选'include bitstream'）.
+4.添加`xdc`，综合、布局布线和输出`bit`文件，之后`export hardware`（复选`include bitstream`）.
 
 ### Step 5: [optional] Run Test Sets
 Vivado+SDK/VIP/HW manager, 请自行选择，我没做 :sweat_smile:.
