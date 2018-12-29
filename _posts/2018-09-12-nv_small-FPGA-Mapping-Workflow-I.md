@@ -232,7 +232,7 @@ Fig-4
 
 <div align="center">
 
-<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%235.JPG?raw=true" />
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%235.jpg?raw=true" />
 
 Fig-5
 
