@@ -67,7 +67,7 @@ CPAN > exit
     2). 待全部缺失文件补全后，可能会发现在NV_nvdla hierarchy以外，还存在一些modules，这个是因为一个文
         件中定义了多个modules，可以将未用到的modules comment掉.
 	
-3.关闭`clock gating`，原设计对`RAM`存储op使用了大量`clock gating`以降低功耗，但与`processor，ASIC`不同，FPGA的时钟树是设计好的，`clock buf`资源有限，若不关闭`gating`，可能产生很大`skew`(之前因为部分`gating`未关闭，测试一直不过). 使用到的`clock gating`开关宏包括以下4个，作者定义了一个`.vh`文件，define了这些宏，然后将该头文件`include`到指定`.v`文件，最初使用`set global header`没设置成功，所以只能傻傻搜索查找相关`.v`，不过用`notepad++`全局搜索，效率倒是还可以，大家自行处理;(或者在Vivado的`Project Settings`->`General`->`Verilog options`->`Defines`中添加宏，但该方式作者尚未测试)
+3.关闭`clock gating`，原设计对`RAM`存储op使用了大量`clock gating`以降低功耗，但与`processor，ASIC`不同，FPGA的时钟树是设计好的，`clock buf`资源有限，若不关闭`gating`，可能产生很大`skew`(之前因为部分`gating`未关闭，测试一直不过). 使用到的`clock gating`开关宏包括以下4个，有4种设置方式：i）在vivado的`Project Settings`->`General`->`Verilog options`->`Defines`中添加宏名称和值；ii）定义`.vh`头文件，define宏，右键该头文件选择`Global Include`；iii）定义`.vh`，之后在vivado的`Project Settings`->`General`->`Verilog options`->`Verilog Include Files Search Paths`中选择头文件的路径；iv）前三种方式都不需要将头文件在各源文件中`include`，最后一种是笨方法，即将头文件`include`到所有相关的`.v`源文件中，大家自行选择.
 
 - VLIB_BYPASS_POWER_CG
 - NV_FPGA_FIFOGEN
