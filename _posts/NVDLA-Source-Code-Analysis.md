@@ -42,7 +42,7 @@ tags:
 
 * partition_p：管理生成特征图前的非线性函数计算逻辑.
 
-各Partition之间关联性及与MCU间的通信可参见作者画的Visio流程图，简单总结NVDLA的工作流程：MCU--->CSB--->CFGROM，读取硬件版本和配置信息; MCU--->CSB--->SUB-CORES, 按照CNN计算逻辑配置各功能子核RF；SUB-CORES--->CSB--->MCU，各子核完成本次Load后，中断MCU并进行下一轮计算，Fused mode由MCU协调各子核之间的Hazard.
+各Partition之间关联性及与MCU间的通信可参见作者画的[Visio流程图](https://github.com/VVViy/VVViy.github.io/tree/master/flowchart)，简单总结NVDLA的工作流程：MCU--->CSB--->CFGROM，读取硬件版本和配置信息; MCU--->CSB--->SUB-CORES, 按照CNN计算逻辑配置各功能子核RF；SUB-CORES--->CSB--->MCU，各子核完成本次Load后，中断MCU并进行下一轮计算，Fused mode由MCU协调各子核之间的Hazard.
 
 ### III. Several Key Blocks
 
