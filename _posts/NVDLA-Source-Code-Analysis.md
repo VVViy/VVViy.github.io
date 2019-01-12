@@ -14,7 +14,7 @@ tags:
 
 ### I. Preface
 
-断断续续的看了两个月的源码，有了一些收获，在这里与小伙伴一起分享. 对于源码的学习，作者并未以全部代码分析搞懂为目标，那样代价太高也没必要，而是分成两个学习阶段，第一阶段，分析整个加速核的逻辑划分和组织结构，研究背后的微架构设计逻辑；分析CNN算法分解与硬件映射，研究功能分布与模块划分的背后目的；第二个阶段，根据实际应用需求，在第一阶段的基础上快速定位功能关联逻辑，进行定制化修改或分析感兴趣模块的实现逻辑.
+断断续续的看了两个多月的源码，有了一些收获，在这里与小伙伴一起分享. 对于源码的学习，作者并未以全部代码分析搞懂为目标，那样代价太高也没必要，而是分成两个学习阶段，第一阶段，分析整个加速核的逻辑划分和组织结构，研究背后的微架构设计逻辑；分析CNN算法分解与硬件映射，研究功能分布与模块划分的背后目的；第二个阶段，根据实际应用需求，在第一阶段的基础上快速定位功能关联逻辑，进行定制化修改或分析感兴趣模块的实现逻辑.
 
 本文将介绍一些个人认为有价值，可应用于我们自己工程中的逻辑，这部分内容将逐步添加.
 
@@ -45,10 +45,26 @@ tags:
 各Partition之间关联性及与MCU间的通信可参见作者画的[Visio流程图](https://github.com/VVViy/VVViy.github.io/tree/master/flowchart)，简单总结NVDLA的工作流程：MCU--->CSB--->CFGROM，读取硬件版本和配置信息; MCU--->CSB--->SUB-CORES, 按照CNN计算逻辑配置各功能子核RF；SUB-CORES--->CSB--->MCU，各子核完成本次Load后，中断MCU并进行下一轮计算，Fused mode由MCU协调各子核之间的Hazard.
 
 ### III. Several Key Blocks
+这部分介绍一些有价值的模块，以及一些与官网Full版本描述文档有出入逻辑，随着分析的加深，会逐步添加分析结果.
 
 #### 1. HW Configuration
+NVDLA内部各功能子核都通过`ping-pong buffer`进行参数设置，包括卷积核(不包括其中的CBUF和CMAC)，SDP，PDP，CDP.
 
 * Ping-pong buffer
+
+  [框图](http://nvdla.org/hw/v1/hwarch.html#ping-pong-synchronization-mechanism)及配置逻辑如Fig-1~Fig-2所示，
+  
+<div align="center">
+    
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%2312.jpg?raw=true">
+
+Fig-1. Ping-pong block diagram
+    
+<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%231.jpg?raw=true" />
+
+Fig-2. Ping-pong configuration flow
+    
+</div>    
 
 * Interrupt
 
