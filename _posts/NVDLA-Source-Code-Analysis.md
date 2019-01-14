@@ -107,6 +107,7 @@ Fig-5. Short loop data transfer
 </div>
  
 * Adding a skid buffer to aid flow control  
+
   在`nvdla/hw/vmod/plugins`文件下的`pipe.pm`是SKID Buffer的生成器，里面简单描述了SKID Buffer在NVDLA中的作用，是在Ready信号上加了一级Pipeline，从而"Make ro/ri timing clean"就是时序在高频下更容易收敛. 一般情况下，基于握手协议的数据传输会使用如Fig-6所示的`Basic Pipeline`进行数据和控制信号的，对于Ready控制信号，如前所述，因为缺少Reg的中继，所以很难在高频下时序收敛. 那么最直接的想法是为Ready信号加一级Pipeline，出于Pipeline Balance，在Data和Valid路径同时插入1级流水如Fig-7. 虽然Ready信号时序问题得到了处理，但是基于这种逻辑的DMA传输效率会降低，每次Stall后都要牺牲一个时钟恢复重传，即
   
 ```  
@@ -138,10 +139,6 @@ Fig-7. Basic pipe with 1 pipeline
 
 下面来研究一下SKID Buffer，看它是否能同时解决控制信号时序和DMA传输效率问题，这里我们仍以`RDMA req`信道为例，根据`NV_NVDLA_DMAIF_rdreq`可以很容易画出SKID Buffer原理图，如Fig-8所示，可以看到"pipeline 1"同样是一个"Basic pipe"，但是上面使用了一级"Bypass queue"构成了一级SKID Buffer，时序问题显然由插入的一级Pipeline解决了(注意：SKID Buffer可以叠加使用)，下图简单分析传输效率问题，即旁路解决了数据选择问题. 
 
-总之，SKID Buffer是解决基于Buffer传输中Control Path时序和效率问题的有效方式，可以应用于我们自己的DMA设计中. 实际上，还有一种同类解决方法，也是Intel-Altera喜欢的一种方式，如Fig-9所示，是一种利用FIFO Almost Full状态信号配合多级流水的处理，FIFO的状态包括Full/Almost Full/Half Full，Empty/Almost Empty/Half Empty，对于Almost Full是设置一阈值，达到该值后发送状态值，该值越低，Control Path可插入流水线的级数越多. 假设Fig-9中FIFO的Almost Full阈值为8，那么当Sender接收到反馈的控制信号时，实际上已经发送了4个数据了，所以Sender"知道"它再发4个数据FIFO就满了，所以这是一种基于先验知识的控制方式. 但对于NVDLA，个人觉得使用SKID更适合，因为MCIF需要与MCU交互，而且要占用系统总线，发生非FIFO写满的Stall可能性更大，显然利用FIFO状态信号的方式，传输效率就变低了，而且Sender端要增加"先验知识"的检查电路.
-
-这里没有介绍MCIF对内面板的设计，MCIF对外为AXI协议，对内则为[Arbiter](http://nvdla.org/hw/v1/ias/unit_description.html#sramif)，其从各功能内核DMA中选择服务对象. 这部分逻辑内容太多，在`nvdla/hw/vmod/nvdla/nocif`下除了DMA的三个接口文件，其他都是MCIF ingress/egress逻辑，所以这里就不做逻辑分析了. 但建议在研究时，可以找本NOC相关书配合着看(大牛请忽略)，实际上，完整的SoC数据通信包括两条路径:Datapath(数据通路——数据相关处理路径)和Control Path(控制通路——Valid，Ready等控制信号处理相关路径)，针对这两条通信路径，又分别由Router，Channel，Buffer三部分Device完成传输，上面介绍的SKID Buffer就是一种Channel Microarchitecture，而MCIF实际上是一个Router，路由器中Buffer和Switch是服务于Datapath的Part，而Arbiter/Allocator是服务于Control Path，MCIF对外只有一个AXI接口，所以所有的DMA需要Arbiter选择. 而Router/Channel/Buffer/Arbiter/Switch等Device都有不同的分类，所以结合这些内容及NVDLA数据传输特征/功能特征去研究MCIF会有可持续应用的收获. （推荐两本NOC书[1~2]）
-
 ```
 clock     j-1(stall)       j      ...       k(recover)       k+1               k+2
 -------------------------------------------------------------------------------------------------------------
@@ -159,9 +156,18 @@ Ro        1                0                0                1                 1
 ```
 
 <div align="center">
+    
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%235.jpg?raw=true" />
 
 Fig-8. SKID bufer
+
+</div>
+
+总之，SKID Buffer是解决基于Buffer传输中Control Path时序和效率问题的有效方式，可以应用于我们自己的DMA设计中. 实际上，还有一种同类解决方法，也是Intel-Altera喜欢的一种方式，如Fig-9所示，是一种利用FIFO Almost Full状态信号配合多级流水的处理，FIFO的状态包括Full/Almost Full/Half Full，Empty/Almost Empty/Half Empty，对于Almost Full是设置一阈值，达到该值后发送状态值，该值越低，Control Path可插入流水线的级数越多. 假设Fig-9中FIFO的Almost Full阈值为8，那么当Sender接收到反馈的控制信号时，实际上已经发送了4个数据了，所以Sender"知道"它再发4个数据FIFO就满了，所以这是一种基于先验知识的控制方式. 但对于NVDLA，个人觉得使用SKID更适合，因为MCIF需要与MCU交互，而且要占用系统总线，发生非FIFO写满的Stall可能性更大，显然利用FIFO状态信号的方式，传输效率就变低了，而且Sender端要增加"先验知识"的检查电路.
+
+这里没有介绍MCIF对内面板的设计，MCIF对外为AXI协议，对内则为[Arbiter](http://nvdla.org/hw/v1/ias/unit_description.html#sramif)，其从各功能内核DMA中选择服务对象. 这部分逻辑内容太多，在`nvdla/hw/vmod/nvdla/nocif`下除了DMA的三个接口文件，其他都是MCIF ingress/egress逻辑，所以这里就不做逻辑分析了. 但建议在研究时，可以找本NOC相关书配合着看(大牛请忽略)，实际上，完整的SoC数据通信包括两条路径:Datapath(数据通路——数据相关处理路径)和Control Path(控制通路——Valid，Ready等控制信号处理相关路径)，针对这两条通信路径，又分别由Router，Channel，Buffer三部分Device完成传输，上面介绍的SKID Buffer就是一种Channel Microarchitecture，而MCIF实际上是一个Router，路由器中Buffer和Switch是服务于Datapath的Part，而Arbiter/Allocator是服务于Control Path，MCIF对外只有一个AXI接口，所以所有的DMA需要Arbiter选择. 而Router/Channel/Buffer/Arbiter/Switch等Device都有不同的分类，所以结合这些内容及NVDLA数据传输特征/功能特征去研究MCIF会有可持续应用的收获. （推荐两本NOC书[1~2]）
+
+<div align="center">
 
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%236.jpg?raw=true" />
 
@@ -170,7 +176,7 @@ Fig-9. Control flow with FIFO status signals
 </div>
 
 #### 3. Convolution Solver Logic（DC Mode）
-
+卷积运算是CNN的主要运算逻辑，本节对官方文档的`Atomic, Stripe, Block, Channel`的运算基础硬件逻辑作个简要分析. Fig-10是官方文档对[Convolution](http://nvdla.org/hw/v1/ias/unit_description.html#convolution-dma)运算逻辑单元的描述，其中`CDMA`读入图像/特征图数据和卷积核权重数据，`CBUF, CMAC`没有`Ping-pong buffer`配置寄存器，主要通过`CSC`模块调度，`CBUF`缓存读入数据由`CMAC`做成累加，攒够一个`Stripe operation`结果后转发到`CACC`进行累加.
 
 <div align="center">
     
@@ -182,24 +188,37 @@ Fig-10. Convolution pipeline
 
 * Convolution workflow
   
+  `Atomic, Stripe, Block, Channel Operations`这些操作就是Fig-10中Convolution Pipeline要实现的逻辑，实际上，前述的抽象运算逻辑似乎并行度很高，实际上，
+  
+  - CMAC内部只有**16个MAC Cell，64 Elements/MAC Cell，1 Elements=16 bit/2\*8 bit**，所以，
+  - NVDLA要求卷积核在运算前要先分组，每组最多只有16 kernels (for int16/fp16)，或32 kernels (for int8)，每个kernel都是一个3D Cube，每个3D Cube又可进一步划分为一系列1\*1\*C的Small Element Cube，C表示Channel Element宽度，如CNN第一层是RGB 3 Channel，那么C = 3\*Element Width/Channel;
+  - 由于64 Elements/MAC Cell的限制，所以，每个kernel要划分为一系列1\*1\*64 Elements的Small Cube，那么对于int16/fp16，每个Small Cube=1\*1\*64\*2 bytes = 128 bytes，对于int8，1 Small Cube=1\*1\*64\*1 byte = 64 bytes (但int8，每组32 kernels，即计算量一致，吞吐量int8比int16/fp16高一倍)，Data 3D Cube与权重处理一致. 所以，
+  - Atomic Operation：
+  - Stripe Operation：
+  - Block Operation：
+  - Channel Operation：
+  - 最大并行度：
+  
 <div align="center">
 
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%239.jpg?raw=true" />
 
-Fig-11. 
+Fig-11. One 3D data cube vs one group kernel
 
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%2310.jpg?raw=true" />
 
-Fig-12.
+Fig-12. Open 3D cube package
 
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%2311.jpg?raw=true" />
 
-Fig-13.
+Fig-13. One small element cube vs one kernel
 
 </div>
 
 * CDMA workflow
 
+  CDMA Block不作分析，放在这里是因为官网[Unit Description](http://nvdla.org/hw/v1/ias/unit_description.html#convolution-dma)是对Full/Large版本中CDMA的描述，同时，未对Small版本各Unit作描述，CDMA的正确逻辑如Fig-14所示. 
+  
 <div align="center">
     
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%238.jpg?raw=true" />
@@ -212,7 +231,7 @@ Fig-14. nv_small CDMA
 
     后续应该会添加定点数与浮点数融合datapath，MAC使用效率，内核同步逻辑和Winograd分析对比.
     
-**Referece**
+#### Referece
 
 [1] W.J. Dally and B. Towles. Principles and Practices of Interconection Networks. Morgan Kaufmann, 2004.
 
