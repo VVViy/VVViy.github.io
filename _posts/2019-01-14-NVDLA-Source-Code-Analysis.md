@@ -2,7 +2,7 @@
 layout:     post
 title:      NVDLA HW Source Code Analysis
 subtitle:   nv_small
-date:       2018-01-11
+date:       2019-01-11
 author:     Max
 header-img: img/post-gray-background.jpg
 catalog: true
