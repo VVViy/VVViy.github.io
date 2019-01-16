@@ -87,7 +87,7 @@ Fig-3. NVDLA RMDA
 
   在DMA中使用FIFO具有缓解相邻模块吞吐量不一致和跨时钟多bit信号同步的作用，实际上，还有很多设计上的优势. 如Fig-4所示，Sender向Receiver发送数据，Receiver接收到数据后，反馈Ready信号，这形成了一个`Long Loop`回路，这种设计很难跑高频时钟，因为走线延迟可能导致一个时钟内Ready信号无法到达Sender端，造成延迟传播，使上游逻辑出错，而且对于回路，很难插入流水或使用Retiming对上游组合逻辑进行优化.   
   
-  在下游Receiver前插入一个FIFO，将`Long Loop`打断，把回路压缩到FIFO与Receiver间，如Fig-5所示，这一方面解除了上游电路对下游电路控制信号的依赖，可以对上游电路应用流水线，Retiming等优化技术，另一方面，下游短回路时时序更易收敛，且提高了下游数据请求的连续性. 
+  在下游Receiver前插入一个FIFO，将`Long Loop`打断，把回路压缩到FIFO与Receiver间，如Fig-5所示，这一方面解除了上游电路对下游电路控制信号的依赖，可以对上游电路应用流水线，Retiming等优化技术，另一方面，下游短回路时序更易收敛，且提高了下游数据请求的连续性. 
   
   然而，所有基于Buffer的通信，都要为`Flow Control`提供`Backpressure`，即缓存即将达到写满状态或下游逻辑出现需要暂停缓存写入的中断请求，Buffer的控制通路就需要通知Sender停止发送数据. 这时，会带来两个问题，Buffer反馈的控制信号Ready依然存在走线超时的风险，其次，如果对控制信号进行Pipeline，会降低DMA的性能，因为一旦数据传输被Stall，重新开始传输会有固定时钟延迟. NVDLA对Control Path的处理则通过SKID Buffer技术实现.
   
@@ -135,7 +135,7 @@ Fig-7. Basic pipe with 1 pipeline
 
 </div>
 
-下面来研究一下SKID Buffer，看它是否能同时解决控制信号时序和DMA传输效率问题，这里我们仍以`RDMA req`信道为例，根据`NV_NVDLA_DMAIF_rdreq`可以很容易描绘出SKID Buffer原理图，如Fig-8所示，可以看到"pipeline 1"同样是一个"Basic pipe"，但是上面使用了一级"Bypass queue"构成了一级SKID Buffer，时序问题显然由插入的一级Pipeline解决了(注意：SKID Buffer可以叠加使用)，下图简单分析了传输效率问题，即使用旁路解决数据延迟. 
+下面来研究一下SKID Buffer，看它是否能同时解决控制信号时序和DMA传输效率问题，这里我们仍以`RDMA req`信道为例，根据`NV_NVDLA_DMAIF_rdreq`可以很容易描绘出SKID Buffer原理图，如Fig-8所示，可以看到"pipeline 2"同样是一个"Basic pipe"，但是上面使用了一级"Bypass queue"构成了一级SKID Buffer，时序问题显然由插入的一级Pipeline解决了(注意：SKID Buffer可以叠加使用)，下图简单分析了传输效率问题，即使用旁路解决数据延迟. 
 
 ```
 clock     j-1(stall)       j      ...       k(recover)       k+1               k+2
@@ -163,7 +163,7 @@ Fig-8. SKID bufer
 
 总之，SKID Buffer是解决基于Buffer传输中Control Path时序和效率问题的有效方式，可以应用于我们自己的DMA设计中. 实际上，还有一种同类解决方法，也是Intel-Altera推荐的一种方式，如Fig-9所示，其是一种利用FIFO Almost Full状态信号配合多级流水的控制结构. 众知，FIFO的状态包括Full/Almost Full/Half Full，Empty/Almost Empty/Half Empty，其中，Almost Full通过设置一阈值，FIFO达到该值后发送"将满"状态信号，该值越低，Control Path可插入流水线的级数越多. 假设Fig-9中FIFO的Almost Full阈值为8，那么当Sender接收到反馈的控制信号时，实际上已经发送了4个数据了，所以Sender"知道"它再发4个数据FIFO就满了，所以这是一种基于先验知识的控制方式. 但对于NVDLA，个人认为使用SKID更适合，因为MCIF需要与MCU交互，而且要占用系统总线，发生非FIFO写满的Stall可能性更大，显然利用FIFO状态信号的方式，传输效率就变低了.
 
-这里没有介绍MCIF对内面板的设计，MCIF对外为AXI协议，对内则为[Arbiter](http://nvdla.org/hw/v1/ias/unit_description.html#sramif)，其从各功能内核DMA中选择服务对象. 这部分逻辑内容太多，在`nvdla/hw/vmod/nvdla/nocif`下除了DMA的三个接口文件，其他都是MCIF ingress/egress逻辑，所以这里就不做逻辑分析了. 但建议在研究时，可以找本NOC相关书配合着看(大牛请忽略)，实际上，完整的SoC数据通信包括两条路径:Datapath(数据通路——数据相关处理路径)和Control Path(控制通路——Valid，Ready等控制信号处理相关路径)，针对这两条通信路径，又分别由Router，Channel，Buffer三部分Device完成传输，上面介绍的SKID Buffer就是一种Channel Microarchitecture，而MCIF实际上是一个Router，路由器中Buffer和Switch是服务于Datapath的Part，而Arbiter/Allocator是服务于Control Path，MCIF对外只有一个AXI接口，所以所有的DMA需要Arbiter选择. Router/Channel/Buffer/Arbiter/Switch等Device都有不同的应用分类和Micro-architecture，所以，结合NOC背景资料，研究NVDLA数据传输特征/功能特征下MCIF的结构设计，应该会有Design Reuse的收获. （推荐两本NOC书[1~2]）
+这里没有介绍MCIF对内面板的设计，MCIF对外为AXI协议，对内则为[Arbiter](http://nvdla.org/hw/v1/ias/unit_description.html#sramif)，其从各功能内核DMA中选择服务对象. 这部分逻辑内容太多，在`nvdla/hw/vmod/nvdla/nocif`下除了DMA的三个接口文件，其他都是MCIF Ingress/Egress逻辑，所以这里就不做逻辑分析了. 但建议在研究时，可以找本NOC相关书配合着看(大牛请忽略)，实际上，完整的SoC数据通信包括两条路径:Datapath(数据通路——数据相关处理路径)和Control Path(控制通路——Valid，Ready等控制信号处理相关路径)，针对这两条通信路径，又分别由Router，Channel，Buffer三部分Device完成传输，上面介绍的SKID Buffer就是一种Channel Microarchitecture，而MCIF实际上是一个Router，路由器中Buffer和Switch是服务于Datapath的Part，而Arbiter/Allocator是服务于Control Path，MCIF对外只有一个AXI接口，所以所有的DMA需要Arbiter选择. Router/Channel/Buffer/Arbiter/Switch等Device都有不同的应用分类和Microarchitecture，所以，结合NOC背景资料，研究NVDLA数据传输特征/功能特征下MCIF的结构设计，应该会有Design Reuse的收获. （推荐两本NOC书[1~2]）
 
 <div align="center">
 
