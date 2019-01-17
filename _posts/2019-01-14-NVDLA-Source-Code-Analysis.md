@@ -79,7 +79,7 @@ NVDLA内部卷积，激活函数，池化，局部规则化等功能模块都有
     
 <img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%236-%234.jpg?raw=true" />
 
-Fig-3. NVDLA RMDA
+Fig-3. NVDLA RDMA
 
 </div>
 
