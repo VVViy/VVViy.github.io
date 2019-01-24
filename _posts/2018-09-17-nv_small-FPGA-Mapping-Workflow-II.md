@@ -61,7 +61,7 @@ $ echo $PETALINUX
 $ cd <specified-prj-dir>
 $ source <path-to-installed-Petalinux>/settings.sh
 ...
-$ petalinux-creat -t project --template [zynq/zynqMP/microblaze] -n [project_name]
+$ petalinux-create -t project --template [zynq/zynqMP/microblaze] -n [project_name]
 ```
 
 对于`template`，如果使用`zynq-7000`系列芯片，选择`zynq`；`zynq +UltraScale MPSoC`，则选择`zynqMP`.
@@ -218,7 +218,7 @@ SRC_URI = "file://makefile \
 &[your label-name appeared in pl.dtsi]{
     compatible = "nvidia,nvdla_2";
     memory-region = <&nvdla_reserved>;
-}
+};
 ```
 
 **====Tips====**
@@ -252,7 +252,7 @@ $ lsblk -a
 # make sure your SD partition 2 label---sdX2, X may be 'b' or 'c' 
 ...
 $ sudo umount /dev/sdX2
-$ sudo dd if=rootfs.etx4 of=/dev/sdX2
+$ sudo dd if=rootfs.ext4 of=/dev/sdX2
 ...
 $ sync
 ```
