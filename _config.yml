@@ -1,7 +1,7 @@
 # Site settings
 title: Max's Blog
 SEOTitle: Max's Blog
-header-img: img/blog_bg_homepage_2019_2.jpg
+header-img: img/blog_bg_homepage_2019_4.jpg
 email: viywang@gmail.com
 description: "Keep self busy."
 keyword: "Max's Blog"
@@ -19,84 +19,4 @@ sidebar-avatar: /img/avatar-max.jpg      # use absolute URL, seeing it's used in
 # SNS settings
 RSS: false
 # zhihu_username:     VVViy
-# github_username:    VVViy
-# facebook_username:  
-
-
-# Build settings
-# from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
-permalink: pretty
-paginate: 10
-exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
-anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
-
-
-# Gems
-# from PR#40, to support local preview for Jekyll 3.0
-gems: 
-#    [jekyll-paginate]
-     [jemoji]
-
-
-# Markdown settings
-# replace redcarpet to kramdown,
-# although redcarpet can auto highlight code, the lack of header-id make the catalog impossible, so I switch to kramdown
-# document: http://jekyllrb.com/docs/configuration/#kramdown
-markdown: kramdown
-highlighter: rouge
-kramdown:
-  input: GFM                            # use Github Flavored Markdown !important
-
-
-#Plugins
-#plugins:
-#  - jemoji
-
-
-# Gitalk
-gitalk:
-  enable: true    
-  clientID: d7dd31629b248b9aa5eb   
-  clientSecret: 0adeaa9e187cb75e6c79d2431defe0902a1cfb4e
-  repo: VVViy.github.io   
-  owner: VVViy    
-  admin: VVViy
-  distractionFreeMode: true 
-  
-# Gitment
-gitment:
-  enable: false
-  repo: VVViy.github.io
-  owner: VVViy
-  clientID: d7dd31629b248b9aa5eb
-  clientSecret: 0adeaa9e187cb75e6c79d2431defe0902a1cfb4e
-
-
-# Analytics settings
-# Baidu Analytics
-ba_track_id: dc6952b6bed2215a315af325680caedf
-
-
-# Google Analytics
-ga_track_id: 'UA-122325447-1'            # Format: UA-xxxxxx-xx
-ga_domain: auto             
-
-
-# Featured Tags
-featured-tags: true                    
-featured-condition-size: 1
-
-
-# Progressive Web Apps
-chrome-tab-theme-color: "#000000"
-service-worker: true
-
-
-# Friends
-#friends: [
-#    {
-#        title: "Apple",
-#        href: "https://apple.com"
-#    },{
-#    }
-#]
+# github_
