@@ -281,7 +281,7 @@ $ cat /proc/interrupts
 
 ```
 $ cd /media/card/umd
-$ export TOP=${pwd}
+$ export TOP=${PWD}
 $ make TOOLCHAIN_PREFIX=/usr/bin/
 ...
 $ dmesg -n 1
