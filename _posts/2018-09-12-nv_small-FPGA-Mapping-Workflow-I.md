@@ -1,4 +1,3 @@
-
 ---
 layout:     post
 title:      nv_small FPGA Mapping Workflow
