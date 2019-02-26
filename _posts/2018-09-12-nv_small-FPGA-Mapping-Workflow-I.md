@@ -15,7 +15,7 @@ tags:
 ### Preface
   本文将简要介绍映射`nvdla nv_small`版本到FPGA过程中可能遇到的‘坑’，旨在给做相同工作的小伙伴一个参考，不作指导性建议. 
   
-  本文会尽可能完整地描述从官方源码构建`vivado IP`工程到最终`BD`工程网表生成的全部步骤以及每个步骤中容易出错的地方。但需要**==说明==**的是，该映射工作是本人公司项目的一部分，所以，受规则所限，文中不会直接展示官方开源内容以外的设计内容，望谅解.
+  本文会尽可能完整地描述从官方源码构建`vivado IP`工程到最终`BD`工程网表生成的全部步骤以及每个步骤中容易出错的地方. 但需要**说明**的是，该映射工作是本人公司项目的一部分，所以，受规则所限，文中不会直接展示官方开源内容以外的设计内容，望谅解.
   
  
 ### Development environment setup
@@ -29,7 +29,7 @@ tags:
 * Board: Xilinx zcu102 rev1.0
 
 ### Step 1: Build Tree and vmod (Linux)
-官方HW工程是通过在`branch/spec/defs/`下定义不同的`spec`对同一源码构建不同的行为模型架构，所以，源码内部有很多的`c++`和`perl`相关的条件编译。因此，在搭建`vivado`工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将`nv_small/vmod/nvdla`编译为纯RTL source code.
+官方HW工程是通过在`branch/spec/defs/`下定义不同的`spec`对同一源码构建不同的行为模型架构，所以，源码内部有很多的`c++`和`perl`相关的条件编译. 因此，在搭建`vivado`工程前，要先按照官方[NVDLA Environment Setup Guide](http://nvdla.org/hw/v2/environment_setup_guide.html)将`nv_small/vmod/nvdla`编译为纯RTL source code.
 
 **====Tips====** 
 
@@ -73,6 +73,7 @@ CPAN > exit
 - NV_FPGA_FIFOGEN
 - FIFOGEN_MASTER_CLK_GATING_DISABLED
 - FPGA
+- SYNTHESIS
 
 **====Tips====** 
 
