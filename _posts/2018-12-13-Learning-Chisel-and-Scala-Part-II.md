@@ -247,7 +247,7 @@ scala> colors.tail
 <console>: res1: List[String] = List(green, blue)
 ```
 
-* 泛型：从上面的例子中国可以看到，定义的所有`List`对象，其类型都是`List[Type]`的，也就是说Scala中的复合类型像C++等语言一样，也是支持泛型的，而且，我们不仅能够定义如`Int，String`等常规类型的列表，还能定义复合类型的列表(其他collection类型都支持泛型).
+* 泛型：从上面的例子中可以看到，定义的所有`List`对象，类型都是`List[Type]`，也就是说，Scala中的复合类型像C++等语言一样，也支持泛型，而且，我们不仅能够定义如`Int，String`等常规类型的列表，还能定义复合类型列表(其他collection类型都支持泛型).
 
 ```scala
 //example 1: List[Tuple]
@@ -282,7 +282,7 @@ Table 2. Common operations on List
 | flatten | List(List(1,2),List(3,4)).flatten, res: List(1,2,3,4) | 返回多列表元素构成的单一列表 |
 | partition | List(1,2,3,4) partition (_ > 3), res: List(List(4),List(1,2,3)) | flatten逆向操作，符合条件的在前 |
 | reverse | List(1,2,3).reverse, res: List(3,2,1) | 逆转列表 |
-| slice | List(2,3,5,7) slice (1,3), res: List(3, 5) | 截取原列表指定范围内的元素，不包含有边界元素  |
+| slice | List(2,3,5,7) slice (1,3), res: List(3, 5) | 截取原列表指定范围内的元素，不包含右边界元素  |
 | sortBy | List("apple", "to") sortBy (_.size), res: List("to","apple")| 按照排序函数对列表排序 |
 | sorted | List("apple","to").sorted, res: List("apple","to") | 按照元素类型本身的规则顺序(字母表中a在t前) |
 | splitAt | List(2,3,5,7) splitAt 2, res: List(List(2,3),List(5,7)) | 以splitAt指定的参数为界，将列表元素划分为两个List元素列表 |
@@ -324,7 +324,7 @@ scala> t match {
 
 * 高阶函数: collection类型内置了很多高阶函数方法，如Table 2中的`partition, sortBy`, collection遍历函数——`foreach()`等等，就功能角度，可以分为`mapping List`和`reducing List`两大类，即列表映射和列表规约.
 
-1）Mapping List: 列表映射方法中，最基本也是最常用的方法是`map`，`map`方法使用函数字面量参数作用于`List`对象内部的每一个元素，每个元素的输出作为新的`List`元素，即由一个List映射到另一个List，二者具有相同的`size`，只是元素或元素类型不同. 类似的高阶函数映射方法还包括`select，flatMap`.
+1）Mapping List: 列表映射方法中，最基本也是最常用的方法是`map`，`map`方法使用函数字面量参数作用于`List`对象内部的每一个元素，每个元素的输出作为新的`List`元素，即由一个List映射到另一个List，二者具有相同的`size`，只是元素或元素类型不同. 类似的高阶函数映射方法还包括`collect，flatMap`.
 
 ```scala
 //example 1: map
@@ -435,7 +435,7 @@ Table 6. Common Map operations
 | + | Map(1->"st", 2->"nd") + (3->"rd")/Map(1->"st", 2->"nd") ++ (3->"rd", 4->"th"), res: Map(1->"st", 2->"nd",3->"rd")/Map(1->"st", 2->"nd",3->"rd",4->"th") | 追加元素或子map |
 | ++ | Map(1->"st", 2->"nd") ++ List((3,"rd")), res: Map(1->"st", 2->"nd", 3->"rd") | 追加其他Map或复合类型元素 |
 | - | Map(1->"st", 2->"nd") - 1/Map(1->"st", 2->"nd",3->"rd") - (1,2), res: Map(2->"nd")/Map(3->"rd") | 根据键删除元素 |
-| -- | Map(1->"st", 2->"nd") -- List(1), res: Map(2->"nd") | 删除其他复合类型指定的键所对应的Map元素 |
+| - - | Map(1->"st", 2->"nd") -- List(1), res: Map(2->"nd") | 删除其他复合类型指定的键所对应的Map元素 |
 | keys | Map(1->"st", 2->"nd").keys, res: Set(1,2) | 返回键构成的集合 |
 | values | Map(1->"st", 2->"nd").values, res: MapLike.DefaultValuesIterable(1, 2, 3) | 由值构成Iterable集合 |
 
