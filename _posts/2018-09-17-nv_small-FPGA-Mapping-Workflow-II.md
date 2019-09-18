@@ -167,7 +167,7 @@ modules子工程创建后，将`nvdla/sw/kmd/`下的所有`.c,.h`文件拷贝到
 
 * 对于`nv_small`版本，还要修改`nvdla/sw/kmd/firmware/include/opendla.h`，添加`DLA_SMALL_CONFIG`宏，这样`KMD`驱动才能根据`opendla_small.h`寄存器声明来完成对`nvdla core`内部子内核的裁剪，使其符合`nv_small/spec/defs/nv_small.spec`定义.
 
-3.配置`makefile`和`recipe`，打开目录下的`makefile`文件将`nvdla/sw/kmd/`各级子目录`makefile`中构成`opendla.ko`的`.o`对象添加其中，
+3.配置`makefile`和`recipe`，打开`<path-to-petalinux-prj>/project-spec/meta-user/recipes-modules/opendla/files/`目录下的`makefile`文件,并将`nvdla/sw/kmd/`各级子目录下`makefile`中构成`opendla.ko`的`.o`对象添加其中，
 
 ```
 opendla-m := opendla.o
