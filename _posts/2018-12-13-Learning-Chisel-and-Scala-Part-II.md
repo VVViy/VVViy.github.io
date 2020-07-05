@@ -11,6 +11,8 @@ tags:
     - Scala
 ---   
 
+> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处.
+
 ### V. Advanced Data Type: Collections
    Scala沿用了Java的`collection`称谓，作者就称其为复合类型了，C++里称STL中此类数据类型为"容器"，意思差不多. Scala中复合类型的继承体系如Fig-1所示，图中省略了很多中间父类和同级的兄弟类型，内容实在太多，这里仅对照C++ STL介绍一些常用的类型，即Table-1中罗列类型，详细的类型可以查看Scala官方[API](https://docs.scala-lang.org/api/all.html).
    
