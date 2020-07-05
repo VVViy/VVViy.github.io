@@ -11,6 +11,8 @@ tags:
     - Embedded
 ---
 
+> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处.
+
 ### I. Preface
 本文主要介绍嵌入式系统`Bootloader`中的设备树`(Device Tree)`，援引`Wikipedia`对其定义如下， 简单归纳，`DT`文件是由一系列`Node`构成的树形结构，其中每个`Node`都对应硬件系统中的一个`device`，如`CPU`, `I2C controller`. 目前，`Device Tree (DT)`尚无行业标准，仍在发展中，内容上还不算庞杂，短时间内可掌握，其对参与嵌入式开源项目，特别是RISC-V还是有一定价值的.
 
