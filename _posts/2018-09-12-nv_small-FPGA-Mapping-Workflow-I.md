@@ -12,6 +12,8 @@ tags:
     - FPGA
 ---
 
+> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处.
+
 ### Preface
   本文将简要介绍映射`nvdla nv_small`版本到FPGA过程中可能遇到的‘坑’，旨在给做相同工作的小伙伴一个参考，不作指导性建议. 
   
