@@ -13,6 +13,7 @@ tags:
     - Petalinux
 ---
 
+> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处.
 
 ### Preface
 参考Part I，基本可以跑起FPGA工程，而对于使用Xilinx heterogeneous architecture FPGA chip的小伙伴，完成PL.hdf设计后，肯定要进一步配置ARM linux，下板跑跑`github.com/nvdla/sw`Sanity测试集，所以，本文将结合作者实践及官网`issue`中的信息，尽可能完整的描述Xilinx petalinux工程构建流程及对官方SW工程源码的定制化修改.
