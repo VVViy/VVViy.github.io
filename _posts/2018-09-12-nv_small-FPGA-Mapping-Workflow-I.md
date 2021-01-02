@@ -195,7 +195,7 @@ create_clock -period 10.001 -name u_dla_sys_clk [get_ports u_dla_sys_clk];
         
 <div align="center">
         
-<img src="https://github.com/VVViy/VVViy.github.io/blob/master/img/blog%231-%231.JPG?raw=true" />
+<img src="https://gitee.com/deocorper/img/blob/master/blog%231-%231.JPG?raw=true" />
 
 Fig-1
 
