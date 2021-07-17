@@ -130,7 +130,7 @@ scala> f"Enjoying this $item ${355/113.0}%.5f times today"
 ```
 
 ##### Tuple classes
-   Scala的`Tuple`是一个包含至少两个相同或不同类型值的容器，类似于`python`中的元组类型，实际上，`Tuple`并不属于`collection`类型，其实际上是一系列的`case class`构成的(后面介绍case class)，即每次定义`Tuple`对象时，都是例化了形如`TupleX[Y]`的一个对象，其中`X`取值范围为`1~22`表示内部元素的个数，`Y`则指定了`X`个输入参数，从背后的原理也说明，只能定义不超过22个参数的`Tuple`对象. 之所以和`collection`放在一起，主要考虑都属于多元素的"容器"，而且`Tuple`是介绍的类型中唯一一种能包含不同类型值的类型.
+   Scala的`Tuple`是一个包含至少两个相同或不同类型值的容器，类似于`python`中的元组类型，实际上，`Tuple`并不属于`collection`类型，其实际上是一系列的`case class`构成的(后面介绍case class)，即每次定义`Tuple`对象时，都是例化了形如`TupleX[Y]`的一个对象，其中`X`取值范围为`1~22`表示内部元素的个数，`Y`则指定了`X`个输入参数，从背后的原理也说明，只能定义不超过22个参数的`Tuple`对象. 之所以和`collection`放在一起，主要考虑都属于多元素的"容器".
    
 * 构造方式：Tuple有三种构造方式，即
 
