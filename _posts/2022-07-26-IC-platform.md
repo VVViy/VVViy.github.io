@@ -13,15 +13,17 @@ tags:
     - DV
     
 ---
-> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](
-https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处。
+
+> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处。
 
 ### I. Preface
 本文简要介绍一下目前的一些工作，规则所限，不涉及具体工作内容，主要介绍一些探索方向。
 
 ### II. Basics
 #### 2.1 Object
+
 集成平台的研究对象为数字IC前端流程，因为越往后端走设计空间越小，调整代价越高。前端设计一般流程如Fig-1所示。其中，
+
 * ARCH：指ISA架构设计，对不同类型处理器意义不同。对`CPU/GPGPU`这类通用处理器而言，ISA基本标准化，如x86，ARM，RISC-V，AMD Southern Islands等；对自定义ISA的DSP等`ASIP`，则需进行ISA架构探索；对Google TPU这类`ASIC`，用户接口使用了宏指令，但与前述两种ISA稍有不同的是，宏指令解码后直接配置寄存器，而非"取指-译码-发射-执行-写回"的ISA处理流程，所以没什么分支预测，OOO等技术。
 
 
@@ -59,6 +61,7 @@ Fig-2. IA/CA model
 Fig-3. All-In-One Platform
 
 </div>
+
 ##### 加速迭代
 * __复用__：基于IP的集成设计已广泛应用于各种处理器产品，实际是将业务惯性量化到芯片设计中，将设计流程、设计方法、功能单元固化复用，如ASIC产品，一般就无需考虑分支预测用什么算法；另外，将业务设计中频繁使用的计算或控制单元参数化模板化构建成库，可以提升设计与验证效率，如FSM，在不同平台或功耗要求下可能采用one-hot或one-cold，在跨时钟域情况下，可能采用gray-code或johnson-count。总之，基于IP库的设计，可显著提升集成效率和验证效率。
 
