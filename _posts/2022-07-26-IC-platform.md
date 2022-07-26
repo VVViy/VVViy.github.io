@@ -24,16 +24,16 @@ tags:
 
 集成平台的研究对象为数字IC前端流程，因为越往后端走设计空间越小，调整代价越高。前端设计一般流程如Fig-1所示。其中，
 
-* ARCH：指ISA架构设计，对不同类型处理器意义不同。对`CPU/GPGPU`这类通用处理器而言，ISA基本标准化，如x86，ARM，RISC-V，AMD Southern Islands等；对自定义ISA的DSP等`ASIP`，则需进行ISA架构探索；对Google TPU这类`ASIC`，用户接口使用了宏指令，但与前述两种ISA稍有不同的是，宏指令解码后直接配置寄存器，而非"取指-译码-发射-执行-写回"的ISA处理流程，所以没什么分支预测，OOO等技术。
+* __ARCH__：指ISA架构设计，对不同类型处理器意义不同。对`CPU/GPGPU`这类通用处理器而言，ISA基本标准化，如x86，ARM，RISC-V，AMD Southern Islands等；对自定义ISA的DSP等`ASIP`，则需进行ISA架构探索；对Google TPU这类`ASIC`，用户接口使用了宏指令，但与前述两种ISA稍有不同的是，宏指令解码后直接配置寄存器，而非"取指-译码-发射-执行-写回"的ISA处理流程，所以没什么分支预测，OOO等技术。
 
 
-* IA model：指`Instruction Accurate Model`，也称`Instruction Set Simulator （ISS）`，如RISC-V Spike，作用是从功能上分析ISA对目标应用程序计算逻辑的覆盖情况；一般仿真流程如Fig-2上半部所示，即目标程序经编译器前端转为IR后，后端需根据ISA架构进行IR到ISA的映射和优化（codegen），但不会生成二进制的指令序列文件，而是映射到IA model上，model本身是程序化的ISA，这样目标程序就转化为一组可执行函数构成的可执行序列。对于ISA架构探索而言，难点在后端codegen，如果ISA稳定，可像LLVM一样，为每一种ISA写一个深度优化的后端，但若ISA变来变去，一般很难生成优化的指令序列。
+* __IA model__：指`Instruction Accurate Model`，也称`Instruction Set Simulator （ISS）`，如RISC-V Spike，作用是从功能上分析ISA对目标应用程序计算逻辑的覆盖情况；一般仿真流程如Fig-2上半部所示，即目标程序经编译器前端转为IR后，后端需根据ISA架构进行IR到ISA的映射和优化（codegen），但不会生成二进制的指令序列文件，而是映射到IA model上，model本身是程序化的ISA，这样目标程序就转化为一组可执行函数构成的可执行序列。对于ISA架构探索而言，难点在后端codegen，如果ISA稳定，可像LLVM一样，为每一种ISA写一个深度优化的后端，但若ISA变来变去，一般很难生成优化的指令序列。
 
 
-* CA model：指`Cycle Accurate Model`，实际上就是一个模拟硬件处理流程的软件`Emulator`，作用是从性能上分析目标应用程序的计算效率，一般包含硬件模拟模型及CA模型仿真器，仿真器一般和RTL动态仿真器类似，为`Event-based`类型，如GEM5，QEMU，SST等等很多。
+* __CA model__：指`Cycle Accurate Model`，实际上就是一个模拟硬件处理流程的软件`Emulator`，作用是从性能上分析目标应用程序的计算效率，一般包含硬件模拟模型及CA模型仿真器，仿真器一般和RTL动态仿真器类似，为`Event-based`类型，如GEM5，QEMU，SST等等很多。
 
 
-* Profiling：选择Benchmark跑IA与CA。
+* __Profiling__：选择Benchmark跑IA与CA。
 
 **===NOTE===**
 > 图1流程不具备唯一性，不同公司不同产品，差异很大，如对于CPU或SoC等多时钟域大芯片在综合前还要做UPF低功耗设计与仿真。
