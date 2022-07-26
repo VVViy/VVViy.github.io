@@ -1322,7 +1322,7 @@ Table 12. Objects features
 | 单向继承 | object并非完成于class解耦，其作为管理类公共资源的类型，是对常规类的一部分及扩充，所以object可以继承class，但class不能继承object. |
 | 最佳成员 | 最适合用于object的方法类型是纯函数及直接作用于input/output接口的函数，因为这类方法通常与类属性无关(仅限参考). |
 
-* Apply方法与伴生object：之前介绍的`apply`方法同样可以应用于`oblect`类，而且这是在Scala和Chisel API中广泛应用的组合方式，这种组合应用可以直接通过调用`oblect_class()`来构建对象或其他应用，如在复合类型中介绍例化`List`对象时，就是应用了这种组合方式通过"对象工厂模式"创建实例的.
+* Apply方法与伴生object：之前介绍的`apply`方法同样可以应用于`object`类，而且这是在Scala和Chisel API中广泛应用的组合方式，这种组合应用可以直接通过调用`object_class()`来构建对象或其他应用，如在复合类型中介绍例化`List`对象时，就是应用了这种组合方式通过"对象工厂模式"创建实例的.
 
 `Compinion object`实现了对常规类的扩展，实际上，`List`的对象工厂模式，也是通过`List`伴生的`object apply()`作为入口实现的. 常规类与其伴生`object`拥有相同的名称，而且必须定义在同一源文件中，而且从访问控制的角度，常规类与伴生`object`被看作是一个访问点，所以二者可以相互访问`private`和`protected`属性和方法成员.
 
