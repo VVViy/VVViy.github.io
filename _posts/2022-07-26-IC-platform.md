@@ -13,25 +13,27 @@ tags:
     - DV
     
 ---
-> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](
-https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处。
+
+> 本文采用[知识共享 署名-非商业性使用-禁止演绎 4.0 国际协议授权（CC BY-NC-ND 4.0）](https://creativecommons.org/licenses/by-nc-nd/4.0/)，转载请注明出处。
 
 ### I. Preface
 本文简要介绍一下目前的一些工作，规则所限，不涉及具体工作内容，主要介绍一些探索方向。
 
 ### II. Basics
 #### 2.1 Object
+
 集成平台的研究对象为数字IC前端流程，因为越往后端走设计空间越小，调整代价越高。前端设计一般流程如Fig-1所示。其中，
-* ARCH：指ISA架构设计，对不同类型处理器意义不同。对`CPU/GPGPU`这类通用处理器而言，ISA基本标准化，如x86，ARM，RISC-V，AMD Southern Islands等；对自定义ISA的DSP等`ASIP`，则需进行ISA架构探索；对Google TPU这类`ASIC`，用户接口使用了宏指令，但与前述两种ISA稍有不同的是，宏指令解码后直接配置寄存器，而非"取指-译码-发射-执行-写回"的ISA处理流程，所以没什么分支预测，OOO等技术。
+
+* __ARCH__：指ISA架构设计，对不同类型处理器意义不同。对`CPU/GPGPU`这类通用处理器而言，ISA基本标准化，如x86，ARM，RISC-V，AMD Southern Islands等；对自定义ISA的DSP等`ASIP`，则需进行ISA架构探索；对Google TPU这类`ASIC`，用户接口使用了宏指令，但与前述两种ISA稍有不同的是，宏指令解码后直接配置寄存器，而非"取指-译码-发射-执行-写回"的ISA处理流程，所以没什么分支预测，OOO等技术。
 
 
-* IA model：指`Instruction Accurate Model`，也称`Instruction Set Simulator （ISS）`，如RISC-V Spike，作用是从功能上分析ISA对目标应用程序计算逻辑的覆盖情况；一般仿真流程如Fig-2上半部所示，即目标程序经编译器前端转为IR后，后端需根据ISA架构进行IR到ISA的映射和优化（codegen），但不会生成二进制的指令序列文件，而是映射到IA model上，model本身是程序化的ISA，这样目标程序就转化为一组可执行函数构成的可执行序列。对于ISA架构探索而言，难点在后端codegen，如果ISA稳定，可像LLVM一样，为每一种ISA写一个深度优化的后端，但若ISA变来变去，一般很难生成优化的指令序列。
+* __IA model__：指`Instruction Accurate Model`，也称`Instruction Set Simulator （ISS）`，如RISC-V Spike，作用是从功能上分析ISA对目标应用程序计算逻辑的覆盖情况；一般仿真流程如Fig-2上半部所示，即目标程序经编译器前端转为IR后，后端需根据ISA架构进行IR到ISA的映射和优化（codegen），但不会生成二进制的指令序列文件，而是映射到IA model上，model本身是程序化的ISA，这样目标程序就转化为一组可执行函数构成的可执行序列。对于ISA架构探索而言，难点在后端codegen，如果ISA稳定，可像LLVM一样，为每一种ISA写一个深度优化的后端，但若ISA变来变去，一般很难生成优化的指令序列。
 
 
-* CA model：指`Cycle Accurate Model`，实际上就是一个模拟硬件处理流程的软件`Emulator`，作用是从性能上分析目标应用程序的计算效率，一般包含硬件模拟模型及CA模型仿真器，仿真器一般和RTL动态仿真器类似，为`Event-based`类型，如GEM5，QEMU，SST等等很多。
+* __CA model__：指`Cycle Accurate Model`，实际上就是一个模拟硬件处理流程的软件`Emulator`，作用是从性能上分析目标应用程序的计算效率，一般包含硬件模拟模型及CA模型仿真器，仿真器一般和RTL动态仿真器类似，为`Event-based`类型，如GEM5，QEMU，SST等等很多。
 
 
-* Profiling：选择Benchmark跑IA与CA。
+* __Profiling__：选择Benchmark跑IA与CA。
 
 **===NOTE===**
 > 图1流程不具备唯一性，不同公司不同产品，差异很大，如对于CPU或SoC等多时钟域大芯片在综合前还要做UPF低功耗设计与仿真。
@@ -59,6 +61,7 @@ Fig-2. IA/CA model
 Fig-3. All-In-One Platform
 
 </div>
+
 ##### 加速迭代
 * __复用__：基于IP的集成设计已广泛应用于各种处理器产品，实际是将业务惯性量化到芯片设计中，将设计流程、设计方法、功能单元固化复用，如ASIC产品，一般就无需考虑分支预测用什么算法；另外，将业务设计中频繁使用的计算或控制单元参数化模板化构建成库，可以提升设计与验证效率，如FSM，在不同平台或功耗要求下可能采用one-hot或one-cold，在跨时钟域情况下，可能采用gray-code或johnson-count。总之，基于IP库的设计，可显著提升集成效率和验证效率。
 
@@ -67,7 +70,7 @@ Fig-3. All-In-One Platform
 
 
 ##### 加速验证
-* __参数化验证__：RTL参数化设计或RTL模板业界应用已久，特别是近几年chisel，spinalHDL等新HDL的出现，进一步推动了RTL参数化设计。参数化设计显著提升了设计复用率，但RTL编码在整个设计流程中并非瓶颈问题，因此，未掀起大浪。然而，若能突破参数化验证，将实现验证空间换验证时间，意义重大。最早由Breker提出，且已由Accellera标准化的PSS技术，也许是潜在方法论。
+* __参数化验证__：RTL参数化设计或RTL模板业界应用已久，特别是近几年chisel，spinalHDL等新HDL的出现，进一步推动了RTL参数化设计。参数化设计显著提升了设计复用率，但RTL编码在整个设计流程中并非瓶颈问题，因此，未掀起大浪。然而，若能突破参数化验证(这里的验证指EDA动态验证)，将实现验证空间换验证时间，意义重大。最早由Breker提出，且已由Accellera标准化的PSS技术，原是为解决EDA行为验证、EDA门级验证、FPGA验证、EMU验证等TC执行平台差异造成同一验证行为变形的问题，即将验证场景/行为从TC执行平台中剥离，独立进行建模来消除平台差异带来的影响；验证场景/行为的建模过程，**也许**为参数化验证提供了可乘之机。
 
 
 * __高阶仿真器__：RTL仿真器大家都不陌生，如熟知的SNPS VCS，Cadence IUS ncverilog，IES irun等Event-based 4值仿真器，及Cycle-based的2值开源仿真器Verilator等等；那么“高阶”是什么意思？其实是我瞎起的名字，指可综合HDL的抽象层次。
