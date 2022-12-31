@@ -39,9 +39,9 @@ Fig-1
 
 ### III. File classification and relationship
 `DT`通常由一系列描述文件构成，而非单一文件，不同文件描述了目标硬件系统的不同组成部分，相关文件类型包括以下三种：
-* `.dts`---`"device tree souce"`, `.dts, .dtsi`都是对目标系统硬件的描述，区别在于`.dts`是板级描述文件；
-* `.dtsi`---`"device tree source include"`, 是`SoC`级或`Module`级 (板上硬件模块，非RTL module)描述文件，如Fig-2~Fig-3；
-* `.dtb`---`"device tree blob"`，`DTB`文件只是`DT compiler(DTC)`对`.dts`源文件的编译结果，是能够被`kernel`识别读取的压缩格式.
+- `.dts`---`"device tree souce"`, `.dts, .dtsi`都是对目标系统硬件的描述，区别在于`.dts`是板级描述文件；
+- `.dtsi`---`"device tree source include"`, 是`SoC`级或`Module`级 (板上硬件模块，非RTL module)描述文件，如Fig-2~Fig-3；
+- `.dtb`---`"device tree blob"`，`DTB`文件只是`DT compiler(DTC)`对`.dts`源文件的编译结果，是能够被`kernel`识别读取的压缩格式.
 
 三种源文件的关联与处理流程如Fig-4所示，从图中可以看到，`DTC`无法直接识别`.dtsi`描述文件，需要`/include/`到`.dts`中.  需要注意的是, 源文件间的`/include/`顺序会影响`Node`属性或其本身的参数覆盖，即如果要对overlay.dtsi中的`node 1`的属性值进行“重载”或“添加”，那么相应的编码应该添加到`/include/ overlay.dtsi`的描述文件中.
 
@@ -62,11 +62,13 @@ Fig-4
 </div>
 
 ### IV. Basic elements within a dts(i)
-1.Tree structure.  前述，每个`.dts(i)`都描述了目标系统的部分硬件模块，且文件内部组织形式皆为树形结构，如Fig-5所示，即每个文件内部都有一个或多个`root node ("/")`，其他每个`Node`都描述了一个device或module.  每个`Node`的基本结构如Code-1代码段所示，由三部分构成，`名称+描述域控制("{ };")+属性/子节点定义`，需要说明的是:
+1.Tree structure.
 
-* 与`normal node`相比，`root node`没有`label_name: node_name@unit_address`，而是使用`“/”`作为节点名称, 同时，除了根节点，每个`normal node`都有一个父节点；
-* 所有`normal node`必须在`root node`的控制域内做“初次声明”，如Code-2代码段，有一个例外是在文件中对已声明节点做“属性重载或添加”或“节点重载”时，需要将重载描述写在根节点控制域范围以外. 但作者不确定是否所有manufacturer都如此，毕竟没有统一标准，至少作者看见的案例均遵照此规则，如`xilinx`要求在重载描述的文件中，新添加的("初次声明")节点在根节点控制域内描述，重载描述则在根节点控制域以外添加（本文档是`long-term maintenance`，会持续添加新东西.）;
-* 一个文件中的根节点数目并不是唯一的，可以同时存在多个根节点，即一个.dts(i)内部可以是树或森林；从Fig-4可以看到，所有的.dts(i)最后会组成一个“top”文件，所以，不同文件中即使存在多个根节点最后都会融合在一起.  实际上，所谓的“描述控制域”是作者自定义的说法，其主要意义在于将“brother nodes”和“parent-child nodes”圈定，但不同根节点控制域之间的关系，作者尚不知晓，若有同道了解其中原理还请告知.
+前述，每个`.dts(i)`都描述了目标系统的部分硬件模块，且文件内部组织形式皆为树形结构，如Fig-5所示，即每个文件内部都有一个或多个`root node ("/")`，其他每个`Node`都描述了一个device或module.  每个`Node`的基本结构如Code-1代码段所示，由三部分构成，`名称+描述域控制("{ };")+属性/子节点定义`，需要说明的是:
+
+- 与`normal node`相比，`root node`没有`label_name: node_name@unit_address`，而是使用`“/”`作为节点名称, 同时，除了根节点，每个`normal node`都有一个父节点；
+- 所有`normal node`必须在`root node`的控制域内做“初次声明”，如Code-2代码段，有一个例外是在文件中对已声明节点做“属性重载或添加”或“节点重载”时，需要将重载描述写在根节点控制域范围以外. 但作者不确定是否所有manufacturer都如此，毕竟没有统一标准，至少作者看见的案例均遵照此规则，如`xilinx`要求在重载描述的文件中，新添加的("初次声明")节点在根节点控制域内描述，重载描述则在根节点控制域以外添加（本文档是`long-term maintenance`，会持续添加新东西.）;
+- 一个文件中的根节点数目并不是唯一的，可以同时存在多个根节点，即一个.dts(i)内部可以是树或森林；从Fig-4可以看到，所有的.dts(i)最后会组成一个“top”文件，所以，不同文件中即使存在多个根节点最后都会融合在一起.  实际上，所谓的“描述控制域”是作者自定义的说法，其主要意义在于将“brother nodes”和“parent-child nodes”圈定，但不同根节点控制域之间的关系，作者尚不知晓，若有同道了解其中原理还请告知.
 
 <div align="center">
 
@@ -109,17 +111,18 @@ Fig-5 [3]
 };
 ```
 
-2.Node structure.  Fig-6~Fig-7描述了`node`结构中的组成元素，需要说明的是:
-* `unit-address`: 对于访问`DT`的程序而言，`unit-address`是访问`node`的主要入口地址，其值需与`node`内部的`reg=<address，length>`属性中的`address`匹配，若某`node`无`reg`属性，那么节点名称需去掉`@unit-address`部分；
-* `cell`: 节点内部大多数非字符串属性值，以`cell` 为单位，32-bit，如在32-bit系统中某节点属性`reg=<0x0 0x10>`，表示该节点对应的`device`占用一块起始地址为`0x00000000`，大小为16 bit的存储空间，而若在64-bit系统中描述该节点，则要改写为`reg=<0x0 0x0 0x0 0x10>`，即分别使用两个`cell`表示起始地址和空间大小；
-* `label`: 节点前的`label`是可选的，另外，`label`不仅可以放在节点名称前，还可以放在节点内部的属性前，即`label-name: property=property-value`;
-* `property value`: 属性值类型随属性的不同而不同，可参考文档，需要说明的是，有些属性的值可以为"空"，即只保留属性名，如`ranges；`，而"空"所代表的意义依赖于其所依附的"属性"，请参考文档定义；
-* `phandle`: 类似于windows编程里的“指针句柄”，只不过在那里指向窗口控件，而这里是指向一个`node`，有两种基本用法，即
+2.Node structure.
 
-    - 直接在`node`内部为`phandle`属性赋值，且该值不能与其他节点的`phandle`属性值重复，即在整个`DT`中唯一标识该`node`，以便其他节点能够引用该节点，如Code-3；
-    - 无需在`node`内部为`phandle`赋值，而是直接在其他节点中引用该`node`的`label`，如Code-4.
+Fig-6~Fig-7描述了`node`结构中的组成元素，需要说明的是:
+- `unit-address`: 对于访问`DT`的程序而言，`unit-address`是访问`node`的主要入口地址，其值需与`node`内部的`reg=<address，length>`属性中的`address`匹配，若某`node`无`reg`属性，那么节点名称需去掉`@unit-address`部分；
+- `cell`: 节点内部大多数非字符串属性值，以`cell` 为单位，32-bit，如在32-bit系统中某节点属性`reg=<0x0 0x10>`，表示该节点对应的`device`占用一块起始地址为`0x00000000`，大小为16 bit的存储空间，而若在64-bit系统中描述该节点，则要改写为`reg=<0x0 0x0 0x0 0x10>`，即分别使用两个`cell`表示起始地址和空间大小；
+- `label`: 节点前的`label`是可选的，另外，`label`不仅可以放在节点名称前，还可以放在节点内部的属性前，即`label-name: property=property-value`;
+- `property value`: 属性值类型随属性的不同而不同，可参考文档，需要说明的是，有些属性的值可以为"空"，即只保留属性名，如`ranges；`，而"空"所代表的意义依赖于其所依附的"属性"，请参考文档定义；
+- `phandle`: 类似于windows编程里的“指针句柄”，只不过在那里指向窗口控件，而这里是指向一个`node`，有两种基本用法，即
+	- 直接在`node`内部为`phandle`属性赋值，且该值不能与其他节点的`phandle`属性值重复，即在整个`DT`中唯一标识该`node`，以便其他节点能够引用该节点，如Code-3；
+	- 无需在`node`内部为`phandle`赋值，而是直接在其他节点中引用该`node`的`label`，如Code-4.
 
-  实际上，一般在`DT`的节点中很少显示声明`phandle`属性，除了显示使用`label`，`DTC`会自动在节点中插入`phandle`.
+实际上，一般在`DT`的节点中很少显示声明`phandle`属性，除了显示使用`label`，`DTC`会自动在节点中插入`phandle`.
   
 ```
 //Code-3: phandle example 1
@@ -165,7 +168,7 @@ Fig-7 [2]
 
 节点属性重载应该是使用最多的操作之一，因为不管是自动还是手动生成的`DT`文件，在后续系统使用过程中，我们可能需要对其进行重置，如修改某些硬件模块的可用状态`status = "disabled"`--->`status = "okay"`，即`from "everything on" to "everything off unless requested by the DTB"`原则. 但很奇怪，大多文档中并没交代相关语法，且不同manufacturer的复写方式不同，
 
-* Xilinx与NXP版本[4] (已验证)：直接引用已声明节点的标签，并在控制域内对指定属性重新赋值，如
+- Xilinx与NXP版本[4] (已验证)：直接引用已声明节点的标签，并在控制域内对指定属性重新赋值，如
 
 ```
 //Code-5: Xilinx/NXP overwriting and appending properties
@@ -182,7 +185,7 @@ existed-node-label: existed-node {
 }
 ```
 
-* Raspberry PI版本[5] (未验证)：树莓派不是使用`&+label-name`，而是`/+node-name`对已存在节点属性进行覆盖和追加，如Code-6，需要注意的是，例子中虽然将原始节点定义和重载节点定义写在了相同文件中，但遵从的原则都是`later values override earlier ones`.
+- Raspberry PI版本[5] (未验证)：树莓派不是使用`&+label-name`，而是`/+node-name`对已存在节点属性进行覆盖和追加，如Code-6，需要注意的是，例子中虽然将原始节点定义和重载节点定义写在了相同文件中，但遵从的原则都是`later values override earlier ones`.
 
 ```
 //Code-6：Raspberry PI overwriting and appending properties
@@ -308,30 +311,30 @@ Fig-8 [3]
 
 1). NXP [4]: NXP处理器`DT`中`node`的`#interrupt-cells`属性值通常是4或2，如QorIQ P1010 "interrupts = <42 2 0 0>;"
 
-   - 1st cell: 指示xIVPR寄存器`index`值，<=16表示SoC外部中断源，其余为内部中断源，42-16=26对应"DUART"中断；
-   - 2nd cell：电平敏感信息
-       - 0 = low-to-high edge sensitive type enabled
-       - 1 = active-low level sensitive type enabled
-       - 2 = active-high level sensitive type enabled
-       - 3 = high-to-low edge sensitive type enabled
-   - 3rd cell：中断类型——"interrupt-type", 如MPIC
-       - 0 = normal
-       - 1 = error interrupt
-       - 2 = MPIC inter-processor interrupt
-       - 3 = MPIC timer interrupt
-   - 4th cell：中断类型信息——"type-info", 主要用于指示"error interrupt number".
+- 1st cell: 指示xIVPR寄存器`index`值，<=16表示SoC外部中断源，其余为内部中断源，42-16=26对应"DUART"中断；
+- 2nd cell：电平敏感信息
+	- 0 = low-to-high edge sensitive type enabled
+	- 1 = active-low level sensitive type enabled
+	- 2 = active-high level sensitive type enabled
+	- 3 = high-to-low edge sensitive type enabled
+- 3rd cell：中断类型——"interrupt-type", 如MPIC
+	- 0 = normal
+	- 1 = error interrupt
+	- 2 = MPIC inter-processor interrupt
+	- 3 = MPIC timer interrupt
+- 4th cell：中断类型信息——"type-info", 主要用于指示"error interrupt number".
 
 2). ARM：ARM处理器`DT`中`node`的`#interrupt-cells`属性值通常是3，如"interrupts = <0 89 4>;"
 
-   - 1st cell：指示GIC中断类型，private peripheral interrupts (PPI)或shared peripheral interrupts (SPI)；
-       - 0 = SPI interrupts
-       - 1 = PPI interrupts
-   - 2nd cell：GIC interrupt number，SPI interrupts number 0-987，PPI interrupts number 0-15(需要注意的是，在linux系统中查看interrupt ID时，会与这里的定义的值不同，即kernel interrupt ID=GIC NO. + 32, 源于kernel定义32~255为user-defined interrupts，所以user-space的中断会+32)；
-   - 3rd cell：
-       - 1 = low-to-high edge sensitive
-       - 2 = high-to-low edge sensitive
-       - 4 = active-high level sensitive
-       - 8 = active-low level-sensitive
+- 1st cell：指示GIC中断类型，private peripheral interrupts (PPI)或shared peripheral interrupts (SPI)；
+	- 0 = SPI interrupts
+	- 1 = PPI interrupts
+- 2nd cell：GIC interrupt number，SPI interrupts number 0-987，PPI interrupts number 0-15(需要注意的是，在linux系统中查看interrupt ID时，会与这里的定义的值不同，即kernel interrupt ID=GIC NO. + 32, 源于kernel定义32~255为user-defined interrupts，所以user-space的中断会+32)；
+- 3rd cell：
+	- 1 = low-to-high edge sensitive
+	- 2 = high-to-low edge sensitive
+	- 4 = active-high level sensitive
+	- 8 = active-low level-sensitive
 
 4.Comment：DT源文件支持单行注释`//`和多行注释`/* */`.
 
