@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      nv_small FPGA Mapping Workflow
+title:      NVDLA FPGA Mapping Workflow
 subtitle:   Part II-Petalinux project
 date:       2018-09-17
 author:     Max
